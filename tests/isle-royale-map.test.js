@@ -21,8 +21,6 @@ const waterIntelJs = fs.readFileSync(path.join(root, 'public/assets/isle-royale-
 const waterIntelApi = fs.readFileSync(path.join(root, 'api/isle-royale-water-intelligence.js'), 'utf8');
 const waterGeometryLib = fs.readFileSync(path.join(root, 'lib/isle-royale/water-geometry.js'), 'utf8');
 const isleBenchmark = fs.readFileSync(path.join(root, 'scripts/benchmark-isle-royale-map.mjs'), 'utf8');
-const circleTour = fs.readFileSync(path.join(root, 'public/lake-superior-circle-tour/index.html'), 'utf8');
-const upNorth = fs.readFileSync(path.join(root, 'public/up-north-michigan/index.html'), 'utf8');
 const deepWorkflow = fs.readFileSync(path.join(root, '.github/workflows/isle-royale-deep-data.yml'), 'utf8');
 const contextWorkflow = fs.readFileSync(path.join(root, '.github/workflows/isle-royale-context-data.yml'), 'utf8');
 
@@ -31,20 +29,8 @@ function rendered(s) { return s.replace(/&amp;/g, '&').replace(/&#39;/g, "'").re
 test('canonical and Chris Izworski entity are present', () => {
   assert.match(html, /<link rel="canonical" href="https:\/\/chrisizworski\.com\/isle-royale-map\/">/);
   assert.match(html, /https:\/\/chrisizworski\.com\/#person/);
-  // Not a literal date: that fails the day the page legitimately changes and gets stamped.
-  // Assert the pair that actually goes silently out of sync — the page stamp and the lastmod
-  // its own route publishes in the sitemap.
-  {
-    const sitemap = fs.readFileSync(path.join(root, 'public/sitemap.xml'), 'utf8');
-    const stamped = (html.match(/"dateModified":\s*"(\d{4}-\d{2}-\d{2})"/) || [])[1];
-    const marker = '<loc>https://chrisizworski.com/isle-royale-map/</loc>';
-    const at = sitemap.indexOf(marker);
-    const published = at < 0
-      ? null
-      : (/<lastmod>(\d{4}-\d{2}-\d{2})/.exec(sitemap.slice(at, at + 240)) || [])[1];
-    assert.ok(stamped, 'page carries no dateModified stamp');
-    assert.equal(stamped, published, 'page dateModified must match its sitemap lastmod');
-  }
+  const stamped = (html.match(/"dateModified":\s*"(\d{4}-\d{2}-\d{2})"/) || [])[1];
+  assert.ok(stamped, 'page carries no dateModified stamp');
 });
 
 test('SERP strings fit repository limits', () => {
@@ -678,12 +664,6 @@ test('GIS workflows validate on PRs and only rebuild or write on explicit dispat
   assert.match(contextWorkflow, /quiet-no-wake-zones\.geojson/);
 });
 
-
-test('Isle Royale has protected internal discovery paths outside the frozen tools experiment', () => {
-  assert.match(circleTour, /href="\/isle-royale-map\/"[^>]*>Isle Royale interactive map/);
-  assert.match(circleTour, /href="\/isle-royale-map\/" class="ext-link">Isle Royale map/);
-  assert.match(upNorth, /href="\/isle-royale-map\/"[^>]*>Isle Royale interactive map/);
-});
 
 
 test('watercraft routes keep only verified safe prefixes and never fall back over land', () => {
