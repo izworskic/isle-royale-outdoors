@@ -1,0 +1,257 @@
+{
+  "version": "2026-08-31",
+  "parkCode": "isro",
+  "title": "Isle Royale source and layer catalog",
+  "sourcePriority": [
+    "Current NPS enterprise/open data",
+    "NPS program-specific GIS",
+    "Current NPS downloadable document",
+    "Older NPS Data Store GIS",
+    "NPMaps-rendered NPS map",
+    "Explicitly labeled derived geometry"
+  ],
+  "items": [
+    {
+      "id": "visitor-web-map",
+      "npmapsCategory": "current park map",
+      "label": "Current visitor map geometry",
+      "kind": "vector",
+      "state": "live",
+      "publisher": "National Park Service / ArcGIS Online",
+      "source": "https://www.arcgis.com/home/item.html?id=75e3ceba038a45f7b4d5a9d7c6a46ccf",
+      "notes": "Primary runtime source is the public visitor web map when readable. If it fails, the tool can fall back to a public 2021 Isle Royale FeatureServer with POIs, trails, and park boundary before using approximate local anchors. Current closures, regulations, transportation, and campground status always hand off to current NPS pages.",
+      "dataServiceFallback": "https://services1.arcgis.com/XBhYkoXKJCRHbe7M/arcgis/rest/services/Isle_Royale_WFL1/FeatureServer",
+      "fallbackVintage": "2021-04-22"
+    },
+    {
+      "id": "visitor-web-map-fallback",
+      "npmapsCategory": "current park map",
+      "label": "Visitor map fallback item",
+      "kind": "vector",
+      "state": "fallback",
+      "publisher": "National Park Service / ArcGIS Online",
+      "source": "https://www.arcgis.com/home/item.html?id=57a5a514a8cd40f098b2f99029d118cf",
+      "notes": "Secondary public web map item. If both web-map items fail, a public 2021 FeatureServer is tried before any approximate local anchors."
+    },
+    {
+      "id": "regional-map",
+      "npmapsCategory": "regional map",
+      "label": "Regional access and transportation map",
+      "kind": "document",
+      "state": "cataloged",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/mapsbrochures.htm",
+      "notes": "Use as a planning/reference source; operational transportation information must be verified against current NPS and operators."
+    },
+    {
+      "id": "rock-harbor",
+      "npmapsCategory": "Rock Harbor detail",
+      "label": "Rock Harbor area guide",
+      "kind": "document",
+      "state": "cataloged",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/upload/ISRO_Web_Accessible_Rock_Harbor_Area_Guide_2015.pdf",
+      "notes": "Direct NPS Rock Harbor Area Guide (2015). Use for facility/orientation context; current operational status still comes from current NPS pages."
+    },
+    {
+      "id": "windigo",
+      "npmapsCategory": "Windigo detail",
+      "label": "Windigo area guide",
+      "kind": "document",
+      "state": "cataloged",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/upload/ISRO_Web_Accessible_Windigo_Area_Guide_2015.pdf",
+      "notes": "Direct NPS Windigo Area Guide (2015). Use for facility/orientation context; current operational status still comes from current NPS pages."
+    },
+    {
+      "id": "camping-zones",
+      "npmapsCategory": "camping zones",
+      "label": "Off-trail camping zones",
+      "kind": "polygon/reference",
+      "state": "current-status-plus-reference",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/off-trail-camping.htm",
+      "notes": "Isle Royale uses 46 off-trail camping zones on the permit map. Current closure zone numbers are parsed from the NPS Current Conditions feed and surfaced as operational status without inventing polygon geometry; verify the current permit map and conditions before departure."
+    },
+    {
+      "id": "transportation",
+      "npmapsCategory": "transportation map",
+      "label": "Ferry, seaplane and water access",
+      "kind": "line/reference",
+      "state": "runtime-plus-reference",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/directions.htm",
+      "notes": "Public web-map routes may render at runtime; current schedules remain external operational data."
+    },
+    {
+      "id": "official-portages-2026",
+      "npmapsCategory": "paddling / portages",
+      "label": "Official Isle Royale portages — 16 NPS Greenstone carries",
+      "kind": "structured planning dataset",
+      "state": "generated-runtime",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/upload/Web-Accessible_Optimized_2026-Greenstone.pdf",
+      "notes": "Machine-readable transcription of the 16 portages on page 6 of the 2026 Greenstone. Runtime uses published NPS distance, elevation change, and terrain wording when a canoe leg strongly matches an official corridor. Approximate endpoint anchors are discovery aids only and are never treated as landing or navigation coordinates.",
+      "vintage": "2026 Greenstone",
+      "web_path": "/isle-royale-map/data/official-portages-2026.json"
+    },
+    {
+      "id": "shipwrecks",
+      "npmapsCategory": "dive / shipwreck map",
+      "label": "Shipwrecks and current dive buoys",
+      "kind": "point",
+      "state": "live-api",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/scuba-diving.htm",
+      "notes": "Runtime discovers the current NPS Shipwreck Buoys sortable dataset, maps only rows with parseable NPS buoy GPS coordinates, and retains depth/vessel/buoy details in the maritime layer. Buoys and dive conditions can change; verify NPS before diving.",
+      "vintage": "current NPS scuba page / downloadable buoy dataset"
+    },
+    {
+      "id": "relief",
+      "npmapsCategory": "relief map",
+      "label": "USGS shaded relief / terrain",
+      "kind": "raster tile",
+      "state": "live-tile",
+      "publisher": "U.S. Geological Survey",
+      "source": "https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer",
+      "notes": "Keyless cached relief overlay derived from 3DEP at larger scales and GMTED2010 at smaller scales. Used as an optional terrain context layer, not as navigation data.",
+      "vintage": "USGS The National Map shaded relief; data refreshed April 2025"
+    },
+    {
+      "id": "lighthouses",
+      "npmapsCategory": "lighthouse map",
+      "label": "Isle Royale lighthouses",
+      "kind": "point",
+      "state": "runtime-plus-reference",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/learn/historyculture/lighthouses.htm",
+      "notes": "Four lighthouse locations; current access restrictions must come from current NPS information."
+    },
+    {
+      "id": "geology",
+      "npmapsCategory": "geologic map",
+      "label": "Geology",
+      "kind": "polygon",
+      "state": "research-only",
+      "publisher": "National Park Service Geologic Resources Inventory",
+      "source": "https://catalog.data.gov/dataset/digital-geologic-gis-map-of-isle-royale-national-park-and-vicinity-michigan-nps-grd-g-1996",
+      "notes": "Generated from the NPS GRI GeoPackage: 1,975 geologic-unit features, reprojected and simplified for web use. Manifest records SHA-256 and source accuracy caveat; not survey-grade. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions.",
+      "vintage": "NPS GRI digital release 2021; older source mapping",
+      "web_path": "/isle-royale-map/data/geology-units.geojson"
+    },
+    {
+      "id": "vegetation-detailed",
+      "npmapsCategory": "detailed vegetation map",
+      "label": "Vegetation baseline (2000)",
+      "kind": "polygon",
+      "state": "research-only",
+      "publisher": "National Park Service",
+      "source": "https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park",
+      "vintage": "2000 inventory; imagery primarily 1994/1996",
+      "notes": "Historical baseline only. The 19,072 source polygons are dissolved into 38 TNC_DESCRI vegetation classes and simplified for opt-in web display. Do not interpret as current forest condition. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions.",
+      "web_path": "/isle-royale-map/data/vegetation-baseline-2000.geojson"
+    },
+    {
+      "id": "vegetation-simple",
+      "npmapsCategory": "simplified vegetation map",
+      "label": "Vegetation overview (2000) — 6 broad classes",
+      "kind": "derived polygon",
+      "state": "research-only",
+      "publisher": "Derived from NPS vegetation inventory",
+      "source": "https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park",
+      "notes": "Six visitor-facing classes derived from the verified detailed NPS inventory, dissolved by broad family and simplified for web orientation. Historical baseline only, not current vegetation. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions.",
+      "web_path": "/isle-royale-map/data/vegetation-overview-2000.geojson",
+      "vintage": "Derived overview of the 2000 NPS vegetation inventory; imagery primarily 1994/1996"
+    },
+    {
+      "id": "quiet-no-wake",
+      "npmapsCategory": "assorted / boating",
+      "label": "Quiet / No-Wake zones — 22 official polygons",
+      "kind": "polygon",
+      "state": "generated-runtime",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/quiet-no-wake.htm",
+      "notes": "The 22 official NPS zone files are assembled one-zone-per-file. Mott, Rock Harbor/Snug Harbor, and Washington Harbor are classified as the three No-Wake zones from the current compendium; the remaining 19 are Quiet/No-Wake zones.",
+      "web_path": "/isle-royale-map/data/quiet-no-wake-zones.geojson",
+      "vintage": "Official NPS DataStore Collection 9705; 22 per-zone GeoJSON files validated against the 2026 Superintendent's Compendium",
+      "dataset": "https://irmaservices.nps.gov/datastore/v8/rest/SavedCollection/Profile/9705"
+    },
+    {
+      "id": "anchorage-zones",
+      "npmapsCategory": "assorted / boating",
+      "label": "Anchorage zones",
+      "kind": "polygon/reference",
+      "state": "cataloged",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/upload/ISRO_Web__Accessible_Boating_Anchorage_Zones_Map_2018.pdf",
+      "notes": "Direct NPS Anchorage Zones map (2018), retained as an official boating-planning reference. Verify current restrictions and conditions before acting."
+    },
+    {
+      "id": "historic-brochure",
+      "npmapsCategory": "historical map",
+      "label": "Archived brochure map",
+      "kind": "raster/document",
+      "state": "reference-only",
+      "publisher": "National Park Service; discovered via NPMaps",
+      "source": "https://npmaps.com/isle-royale/",
+      "notes": "Historical/reference layer only. Never present old route or regulation information as current."
+    },
+    {
+      "id": "historic-windigo",
+      "npmapsCategory": "historical map",
+      "label": "Historic Windigo Nature Trail map",
+      "kind": "raster/document",
+      "state": "reference-only",
+      "publisher": "National Park Service; discovered via NPMaps",
+      "source": "https://npmaps.com/isle-royale/",
+      "notes": "Date-stamp and keep disabled by default if later georeferenced."
+    },
+    {
+      "id": "boat-in-campgrounds-live",
+      "npmapsCategory": "boating / campground operations",
+      "label": "Boat-in campground facilities",
+      "kind": "tabular",
+      "state": "live-api",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/boat-in-campgrounds.htm",
+      "dataset": "https://www.nps.gov/common/uploads/sortable_dataset/isro/2DF94ED6-9CAA-9B24-8BD6A700012D59F3/isro-BoaterTable.csv",
+      "vintage": "page updated June 23, 2026",
+      "notes": "Fetched through the same-origin Isle Royale API and matched to mapped campgrounds by normalized public place name. Includes dock depth, shelters, tent sites, food lockers, stay limit, fire/grill and generator fields when NPS supplies them."
+    },
+    {
+      "id": "current-conditions-live",
+      "npmapsCategory": "current park operations",
+      "label": "Current Isle Royale conditions and closures",
+      "kind": "operational reference",
+      "state": "live-api",
+      "publisher": "National Park Service",
+      "source": "https://www.nps.gov/isro/planyourvisit/current-conditions-at-isle-royale.htm",
+      "notes": "Fetched through the same-origin Isle Royale API. The tool detects only closure patterns it knows how to parse and never treats a no-match result as proof that the park has no alerts."
+    },
+    {
+      "id": "vegetation-change-1996-2017",
+      "npmapsCategory": "science / ecological change",
+      "label": "Vegetation change, 1996–2017",
+      "kind": "polygon",
+      "state": "research-only",
+      "publisher": "U.S. Geological Survey",
+      "source": "https://doi.org/10.5066/P9393VFK",
+      "web_path": "/isle-royale-map/data/vegetation-change-1996-2017.geojson",
+      "vintage": "2017 high-resolution imagery compared with the 2000 NPS vegetation map (1994/1996 imagery)",
+      "notes": "Shows mapped vegetation cover type, density or pattern change and proposed reasons from the USGS release; not a present-day 2026 vegetation map. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions."
+    },
+    {
+      "id": "horne-fire-2021",
+      "npmapsCategory": "science / wildfire history",
+      "label": "2021 Horne Fire burn severity",
+      "kind": "polygon",
+      "state": "research-only",
+      "publisher": "U.S. Geological Survey",
+      "source": "https://doi.org/10.5066/P13QWXNI",
+      "web_path": "/isle-royale-map/data/horne-fire-burn-severity.geojson",
+      "vintage": "2021 Horne Fire; USGS data release published 2024",
+      "notes": "Burn-severity assessment derived from pre/post-fire high-resolution imagery; use as historical ecological context, not a current fire-status layer. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions."
+    }
+  ],
+  "updated": "2026-08-30"
+}

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-30T14:58:26.920015+00:00",
+  "derivation": "Downloaded federal source packages, reprojected to EPSG:4326, geometry made valid, geology simplified for web display, vegetation dissolved by its detected source class field, and a broad vegetation overview derived by grouping/dissolving those verified classes.",
+  "sources": {
+    "geology": {
+      "file": "geology-units.geojson",
+      "source": "https://catalog.data.gov/dataset/digital-geologic-gis-map-of-isle-royale-national-park-and-vicinity-michigan-nps-grd-g-1996",
+      "download": "https://irma.nps.gov/DataStore/DownloadFile/659237?Reference=2165823",
+      "vintage": "NPS GRI digital release 2021; source mapping includes older USGS work",
+      "accuracy_note": "NPS metadata cautions that 1:62,500 source-map features are horizontally accurate to about 31.8 m / 104.2 ft, not survey-grade.",
+      "bytes": 6391134,
+      "sha256": "398f6bdccb2f7c51ccd0776a61717cd47e8c863dec72663e853c08eb8f77b5b6",
+      "features": 1975
+    },
+    "vegetation": {
+      "file": "vegetation-baseline-2000.geojson",
+      "source": "https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park",
+      "download": "https://irma.nps.gov/DataStore/DownloadFile/612177?Reference=2233314",
+      "vintage": "NPS vegetation inventory published 2000; project imagery primarily 1994/1996",
+      "accuracy_note": "Historical baseline inventory, not a current vegetation-condition map.",
+      "bytes": 24871263,
+      "sha256": "041bb3373e3c7ccd123cf3217071d1d71febab25a01046d209414c4bd59f96b0",
+      "features": 38
+    },
+    "vegetation_overview": {
+      "file": "vegetation-overview-2000.geojson",
+      "source": "https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park",
+      "download": "derived from vegetation-baseline-2000.geojson",
+      "vintage": "Derived overview of the 2000 NPS vegetation inventory; imagery primarily 1994/1996",
+      "accuracy_note": "Broad thematic derivative for orientation. Historical baseline only; not a current vegetation-condition map.",
+      "bytes": 843906,
+      "sha256": "5df74fee7eba072a7e2fe1eda010cdd2c62babb93471f0b00676372359698ce6",
+      "features": 6
+    }
+  }
+}

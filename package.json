@@ -1,0 +1,10 @@
+{
+  "name": "@izworskic/isle-royale-outdoors",
+  "version": "1.0.0",
+  "private": false,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "benchmark": "node scripts/benchmark-isle-royale-map.mjs --check"
+  },
+  "engines": { "node": "22.x" }
+}

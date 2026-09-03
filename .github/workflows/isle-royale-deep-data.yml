@@ -1,0 +1,105 @@
+name: Isle Royale deep GIS build
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/isle-royale-deep-data.yml"
+      - "scripts/build-isle-royale-deep-layers.sh"
+      - "scripts/derive-isle-royale-vegetation-overview.py"
+      - "public/isle-royale-map/data/geology-units.geojson"
+      - "public/isle-royale-map/data/vegetation-baseline-2000.geojson"
+      - "public/isle-royale-map/data/vegetation-overview-2000.geojson"
+      - "public/isle-royale-map/data/deep-layer-manifest.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isle-royale-gis-writer-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-or-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install GDAL for explicit rebuild
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin python3-gdal unzip
+
+      - name: Rebuild normalized federal GIS derivatives
+        if: github.event_name == 'workflow_dispatch'
+        run: bash scripts/build-isle-royale-deep-layers.sh
+
+      - name: Validate committed deep GIS
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path("public/isle-royale-map/data")
+          manifest=json.loads((root/"deep-layer-manifest.json").read_text())
+          expected={
+              "geology":("geology-units.geojson",1900,25000000),
+              "vegetation":("vegetation-baseline-2000.geojson",38,25000000),
+              "vegetation_overview":("vegetation-overview-2000.geojson",3,8000000),
+          }
+          counts={}
+          sizes={}
+          for key,(filename,min_features,max_bytes) in expected.items():
+              meta=manifest["sources"][key]
+              path=root/filename
+              data=path.read_bytes()
+              fc=json.loads(data)
+              assert fc["type"]=="FeatureCollection", (key,"not FeatureCollection")
+              count=len(fc["features"])
+              assert count>=min_features, (key,count,min_features)
+              if key=="vegetation":
+                  assert count==38, count
+              if key=="vegetation_overview":
+                  assert count<=10, count
+              assert len(data)<=max_bytes, (key,len(data),max_bytes)
+              assert meta["file"]==filename
+              assert meta["bytes"]==len(data)
+              assert meta["features"]==count
+              assert meta["sha256"]==hashlib.sha256(data).hexdigest()
+              counts[key]=count
+              sizes[key]=len(data)
+              print(key,count,len(data),meta["sha256"])
+          assert sizes["vegetation_overview"] < sizes["vegetation"] / 2, sizes
+          PY
+
+      - name: Commit rebuilt layers
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/isle-royale-map/data/geology-units.geojson
+          git add public/isle-royale-map/data/vegetation-baseline-2000.geojson
+          git add public/isle-royale-map/data/vegetation-overview-2000.geojson
+          git add public/isle-royale-map/data/deep-layer-manifest.json
+          if git diff --cached --quiet; then
+            echo "No generated GIS changes to commit."
+            exit 0
+          fi
+          git commit -m "Generate Isle Royale deep GIS layers"
+          git pull --rebase origin "${{ github.ref_name }}"
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: Upload rebuilt GIS artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: isle-royale-deep-gis
+          path: |
+            public/isle-royale-map/data/geology-units.geojson
+            public/isle-royale-map/data/vegetation-baseline-2000.geojson
+            public/isle-royale-map/data/vegetation-overview-2000.geojson
+            public/isle-royale-map/data/deep-layer-manifest.json
+          retention-days: 14

@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-30T14:30:26.540634+00:00",
+  "derivation": "Official NPS boating-restriction sources plus USGS ScienceBase geospatial releases normalized to EPSG:4326 and simplified for opt-in web display. Each layer is independent; unresolved upstream geometry is never fabricated.",
+  "layers": {
+    "quiet_no_wake": {
+      "status": "generated",
+      "file": "quiet-no-wake-zones.geojson",
+      "bytes": 155584,
+      "sha256": "d3afd411491f39d4d597792ab9518691163f806b400f069fbcd953ad56d0267d",
+      "source": "https://www.nps.gov/isro/planyourvisit/quiet-no-wake.htm",
+      "regulatory_source": "https://www.nps.gov/isro/learn/management/superintendents-compendium.htm",
+      "geometry_source": "https://irmaservices.nps.gov/datastore/v8/rest/SavedCollection/Profile/9705",
+      "datastore_collection": "https://irma.nps.gov/DataStore/Collection/Profile/9705",
+      "irma_api_collection": "https://irmaservices.nps.gov/datastore/v8/rest/SavedCollection/Profile/9705",
+      "irma_reference_ids": [
+        2310584
+      ],
+      "irma_public_geospatial_files": [
+        {
+          "reference_id": 2310584,
+          "file_name": "Barnum Island.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722201"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Chippewa Harbor.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722202"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Conglomerate Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722203"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Crystal Cove.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722204"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Duncan Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722205"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Five Finger Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722206"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Hay Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722207"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Johns Island.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722208"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Lane Cove.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722209"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Lorelei Lane.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722210"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Malone Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722211"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "McCargoe Cove.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722212"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Merritt Lane.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722213"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Moskey Basin.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722214"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Mott.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722215"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Passage Island.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722216"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Robinson Bay.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722217"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Rock Harbor.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722218"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Tobin Harbor.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722219"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Todd Harbor.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722220"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Washington Harbor.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722221"
+        },
+        {
+          "reference_id": 2310584,
+          "file_name": "Wright Island.geojson",
+          "download_url": "https://irma.nps.gov/DataStore/DownloadFile/722222"
+        }
+      ],
+      "selected_source_files": [
+        "Barnum Island.geojson",
+        "Chippewa Harbor.geojson",
+        "Conglomerate Bay.geojson",
+        "Crystal Cove.geojson",
+        "Duncan Bay.geojson",
+        "Five Finger Bay.geojson",
+        "Hay Bay.geojson",
+        "Johns Island.geojson",
+        "Lane Cove.geojson",
+        "Lorelei Lane.geojson",
+        "Malone Bay.geojson",
+        "McCargoe Cove.geojson",
+        "Merritt Lane.geojson",
+        "Moskey Basin.geojson",
+        "Mott.geojson",
+        "Passage Island.geojson",
+        "Robinson Bay.geojson",
+        "Rock Harbor.geojson",
+        "Tobin Harbor.geojson",
+        "Todd Harbor.geojson",
+        "Washington Harbor.geojson",
+        "Wright Island.geojson"
+      ],
+      "vintage": "Official NPS DataStore Collection 9705; 22 per-zone GeoJSON files validated against the 2026 Superintendent's Compendium",
+      "regulation_note": "The 22 official NPS zone files are assembled one-zone-per-file. Mott, Rock Harbor/Snug Harbor, and Washington Harbor are classified as the three No-Wake zones from the current compendium; the remaining 19 are Quiet/No-Wake zones.",
+      "features": 22,
+      "quiet_no_wake_features": 19,
+      "no_wake_features": 3
+    },
+    "vegetation_change": {
+      "status": "generated",
+      "file": "vegetation-change-1996-2017.geojson",
+      "bytes": 5966512,
+      "sha256": "1ddc38bf1fceb7bc69acc3c893435c0396eb80477bdf1f20fed3727545342871",
+      "source": "https://doi.org/10.5066/P9393VFK",
+      "sciencebase_parent": "https://www.sciencebase.gov/catalog/item/65c246f9d34ef4b119ca6c8b",
+      "license": "CC0 1.0 Universal / U.S. public domain",
+      "features": 2738,
+      "selection_score": 150,
+      "selected_source_path": "/tmp/tmpbakvurts/65c24a77d34ef4b119ca6c97/ISRO_Veg_Change_Selected_Sites_unzipped/ISRO_Veg_Change_Selected_Sites.shp",
+      "selected_layer": "ISRO_Veg_Change_Selected_Sites",
+      "vintage": "2017 high-resolution imagery compared with the 2000 NPS vegetation map (1994/1996 imagery)",
+      "interpretation_note": "Shows mapped vegetation cover type, density or pattern change and proposed reasons from the USGS release; not a present-day 2026 vegetation map."
+    },
+    "horne_fire": {
+      "status": "generated",
+      "file": "horne-fire-burn-severity.geojson",
+      "bytes": 2210153,
+      "sha256": "052d4594bded429ffe9065d0a1a6dac226831fd3d4ab00290ad770aeae777d6f",
+      "source": "https://doi.org/10.5066/P13QWXNI",
+      "sciencebase_parent": "https://www.sciencebase.gov/catalog/item/6659f2cfd34ef3137d36a465",
+      "license": "CC0 1.0 Universal / U.S. public domain",
+      "features": 93,
+      "selection_score": 256,
+      "selected_source_path": "/tmp/tmpil17vpwn/6659f2cfd34ef3137d36a465/ISRO_Post_HorneFire_unzipped/ISRO_Post_HorneFire.shp",
+      "selected_layer": "ISRO_Post_HorneFire",
+      "vintage": "2021 Horne Fire; USGS data release published 2024",
+      "interpretation_note": "Burn-severity assessment derived from pre/post-fire high-resolution imagery; use as historical ecological context, not a current fire-status layer."
+    }
+  },
+  "errors": {}
+}

@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "dataset_id": "isle-royale-official-portages-2026",
+  "title": "Isle Royale National Park Official Portages — 2026 Greenstone",
+  "authority": "National Park Service — Isle Royale National Park",
+  "source_vintage": 2026,
+  "source_url": "https://www.nps.gov/isro/upload/Web-Accessible_Optimized_2026-Greenstone.pdf",
+  "source_page": 6,
+  "source_context_url": "https://www.nps.gov/isro/greenstone-newspaper.htm",
+  "source_last_checked": "2026-08-31",
+  "disclaimer": "Distances, elevation changes, and terrain descriptions are transcribed from the NPS 2026 Greenstone portage table. Search anchors are approximate waterbody/place centroids used only to help associate a user-drawn leg with an official portage; they are not landing coordinates and must never be used as navigation geometry.",
+  "summary": {
+    "official_portage_count": 16,
+    "published_portage_miles_total": 9.5,
+    "longest_portage_miles": 2,
+    "greatest_published_elevation_change_ft": 175
+  },
+  "endpoint_anchors": {
+    "malone-bay": {
+      "label": "Malone Bay",
+      "lat": 47.98044,
+      "lng": -88.8123,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1
+    },
+    "siskiwit-lake": {
+      "label": "Siskiwit Lake",
+      "lat": 48.00125,
+      "lng": -88.79723,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 3
+    },
+    "intermediate-lake": {
+      "label": "Intermediate Lake",
+      "lat": 48.030726,
+      "lng": -88.727174,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 0.8
+    },
+    "lake-richie": {
+      "label": "Lake Richie",
+      "lat": 48.043807,
+      "lng": -88.69536,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1
+    },
+    "wood-lake": {
+      "label": "Wood Lake",
+      "lat": 48.003494,
+      "lng": -88.744244,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 0.8
+    },
+    "lake-whittlesey": {
+      "label": "Lake Whittlesey",
+      "lat": 48.00644,
+      "lng": -88.70721,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 0.8
+    },
+    "chippewa-harbor": {
+      "label": "Chippewa Harbor",
+      "lat": 48.02891,
+      "lng": -88.65041,
+      "role": "waterbody-place-centroid-not-landing",
+      "match_radius_miles": 1.2
+    },
+    "moskey-basin": {
+      "label": "Moskey Basin",
+      "lat": 48.069,
+      "lng": -88.6296,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1.2
+    },
+    "lake-lesage": {
+      "label": "Lake LeSage",
+      "lat": 48.05518,
+      "lng": -88.709,
+      "role": "waterbody-centroid-not-landing",
+      "aliases": [
+        "LeSage Lake",
+        "Lake Lesage"
+      ],
+      "match_radius_miles": 0.8
+    },
+    "lake-livermore": {
+      "label": "Lake Livermore",
+      "lat": 48.064733,
+      "lng": -88.7084,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 0.7
+    },
+    "chickenbone-lake": {
+      "label": "Chickenbone Lake",
+      "lat": 48.06734,
+      "lng": -88.71318,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1
+    },
+    "mccargoe-cove": {
+      "label": "McCargoe Cove",
+      "lat": 48.09877,
+      "lng": -88.6973,
+      "role": "waterbody-centroid-not-landing",
+      "aliases": [
+        "McCargo Cove"
+      ],
+      "match_radius_miles": 1.2
+    },
+    "pickerel-cove": {
+      "label": "Pickerel Cove",
+      "lat": 48.12877,
+      "lng": -88.63786,
+      "role": "waterbody-centroid-not-landing",
+      "aliases": [
+        "Dory Bay"
+      ],
+      "match_radius_miles": 0.9
+    },
+    "lane-cove": {
+      "label": "Lane Cove",
+      "lat": 48.14571,
+      "lng": -88.55924,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1
+    },
+    "stockly-bay": {
+      "label": "Stockly Bay",
+      "lat": 48.15154,
+      "lng": -88.53924,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1
+    },
+    "five-finger-bay": {
+      "label": "Five Finger Bay",
+      "lat": 48.16654,
+      "lng": -88.51257,
+      "role": "waterbody-centroid-not-landing",
+      "aliases": [
+        "Five Fingers Bay"
+      ],
+      "match_radius_miles": 1.2
+    },
+    "duncan-bay": {
+      "label": "Duncan Bay",
+      "lat": 48.1506,
+      "lng": -88.5225,
+      "role": "place-centroid-not-landing",
+      "match_radius_miles": 1.2
+    },
+    "tobin-harbor": {
+      "label": "Tobin Harbor",
+      "lat": 48.14432,
+      "lng": -88.49785,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1.2
+    },
+    "rock-harbor": {
+      "label": "Rock Harbor",
+      "lat": 48.13639,
+      "lng": -88.49586,
+      "role": "waterbody-centroid-not-landing",
+      "match_radius_miles": 1.5
+    }
+  },
+  "portages": [
+    {
+      "number": 1,
+      "id": "malone-bay-siskiwit-lake",
+      "official_label": "Malone Bay - Siskiwit Lake",
+      "from": "Malone Bay",
+      "to": "Siskiwit Lake",
+      "from_anchor_id": "malone-bay",
+      "to_anchor_id": "siskiwit-lake",
+      "distance_miles": 0.3,
+      "elevation_change_ft": 40,
+      "terrain": "Gradual Slope",
+      "terrain_tags": [
+        "gradual"
+      ],
+      "route_family": "southwest-interior",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 2,
+      "id": "siskiwit-lake-intermediate-lake",
+      "official_label": "Siskiwit Lake - Intermediate Lake",
+      "from": "Siskiwit Lake",
+      "to": "Intermediate Lake",
+      "from_anchor_id": "siskiwit-lake",
+      "to_anchor_id": "intermediate-lake",
+      "distance_miles": 0.4,
+      "elevation_change_ft": 40,
+      "terrain": "Gradual ups and downs",
+      "terrain_tags": [
+        "gradual",
+        "rolling"
+      ],
+      "route_family": "southwest-interior",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 3,
+      "id": "intermediate-lake-lake-richie",
+      "official_label": "Intermediate Lake - Lake Richie",
+      "from": "Intermediate Lake",
+      "to": "Lake Richie",
+      "from_anchor_id": "intermediate-lake",
+      "to_anchor_id": "lake-richie",
+      "distance_miles": 0.6,
+      "elevation_change_ft": 120,
+      "terrain": "Hilly and wooded",
+      "terrain_tags": [
+        "hilly",
+        "wooded"
+      ],
+      "route_family": "southwest-interior",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 4,
+      "id": "wood-lake-lake-whittlesey",
+      "official_label": "Wood Lake - Lake Whittlesey",
+      "from": "Wood Lake",
+      "to": "Lake Whittlesey",
+      "from_anchor_id": "wood-lake",
+      "to_anchor_id": "lake-whittlesey",
+      "distance_miles": 0.6,
+      "elevation_change_ft": 80,
+      "terrain": "Rolling",
+      "terrain_tags": [
+        "rolling"
+      ],
+      "route_family": "southwest-interior",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 5,
+      "id": "lake-whittlesey-chippewa-harbor",
+      "official_label": "Lake Whittlesey - Chippewa Harbor",
+      "from": "Lake Whittlesey",
+      "to": "Chippewa Harbor",
+      "from_anchor_id": "lake-whittlesey",
+      "to_anchor_id": "chippewa-harbor",
+      "distance_miles": 0.6,
+      "elevation_change_ft": 140,
+      "terrain": "Steep grades and rocky",
+      "terrain_tags": [
+        "steep",
+        "rocky"
+      ],
+      "route_family": "southwest-interior",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 6,
+      "id": "chippewa-harbor-lake-richie",
+      "official_label": "Chippewa Harbor - Lake Richie",
+      "from": "Chippewa Harbor",
+      "to": "Lake Richie",
+      "from_anchor_id": "chippewa-harbor",
+      "to_anchor_id": "lake-richie",
+      "distance_miles": 1.2,
+      "elevation_change_ft": 160,
+      "terrain": "Hilly",
+      "terrain_tags": [
+        "hilly"
+      ],
+      "route_family": "indian-portage",
+      "endpoint_basis": "official-label",
+      "detail_url": "https://www.nps.gov/thingstodo/portage-from-lake-richie-to-chippewa-harbor.htm"
+    },
+    {
+      "number": 7,
+      "id": "moskey-basin-lake-richie",
+      "official_label": "Moskey Basin - Lake Richie",
+      "from": "Moskey Basin",
+      "to": "Lake Richie",
+      "from_anchor_id": "moskey-basin",
+      "to_anchor_id": "lake-richie",
+      "distance_miles": 2,
+      "elevation_change_ft": 120,
+      "terrain": "Gradual but long",
+      "terrain_tags": [
+        "gradual",
+        "long"
+      ],
+      "route_family": "lake-richie-access",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 8,
+      "id": "lake-richie-lake-lesage",
+      "official_label": "Lake Richie - Lake LeSage",
+      "from": "Lake Richie",
+      "to": "Lake LeSage",
+      "from_anchor_id": "lake-richie",
+      "to_anchor_id": "lake-lesage",
+      "distance_miles": 0.6,
+      "elevation_change_ft": 100,
+      "terrain": "Steep grades, wet",
+      "terrain_tags": [
+        "steep",
+        "wet"
+      ],
+      "route_family": "indian-portage",
+      "endpoint_basis": "official-label",
+      "detail_url": "https://www.nps.gov/thingstodo/portage-from-lake-lesage-to-lake-richie.htm"
+    },
+    {
+      "number": 9,
+      "id": "lake-lesage-lake-livermore",
+      "official_label": "Lake LeSage - Lake Livermore",
+      "from": "Lake LeSage",
+      "to": "Lake Livermore",
+      "from_anchor_id": "lake-lesage",
+      "to_anchor_id": "lake-livermore",
+      "distance_miles": 0.4,
+      "elevation_change_ft": 80,
+      "terrain": "Steep grades, wet",
+      "terrain_tags": [
+        "steep",
+        "wet"
+      ],
+      "route_family": "indian-portage",
+      "endpoint_basis": "official-label",
+      "detail_url": "https://www.nps.gov/thingstodo/portage-from-lake-livermore-to-lake-lesage.htm"
+    },
+    {
+      "number": 10,
+      "id": "lake-livermore-chickenbone-lake",
+      "official_label": "Lake Livermore - Chickenbone Lake",
+      "from": "Lake Livermore",
+      "to": "Chickenbone Lake",
+      "from_anchor_id": "lake-livermore",
+      "to_anchor_id": "chickenbone-lake",
+      "distance_miles": 0.2,
+      "elevation_change_ft": 40,
+      "terrain": "Steep but short",
+      "terrain_tags": [
+        "steep",
+        "short"
+      ],
+      "route_family": "indian-portage",
+      "endpoint_basis": "official-label",
+      "detail_url": "https://www.nps.gov/thingstodo/portage-from-chickenbone-lake-to-lake-livermore.htm"
+    },
+    {
+      "number": 11,
+      "id": "chickenbone-lake-mccargoe-cove",
+      "official_label": "Chickenbone Lake - McCargoe Cove",
+      "from": "Chickenbone Lake",
+      "to": "McCargoe Cove",
+      "from_anchor_id": "chickenbone-lake",
+      "to_anchor_id": "mccargoe-cove",
+      "distance_miles": 1.2,
+      "elevation_change_ft": 80,
+      "terrain": "Hilly",
+      "terrain_tags": [
+        "hilly"
+      ],
+      "route_family": "indian-portage",
+      "endpoint_basis": "official-label",
+      "detail_url": "https://www.nps.gov/thingstodo/portage-from-mccargoe-cove-to-chickenbone-lake.htm"
+    },
+    {
+      "number": 12,
+      "id": "pickerel-cove",
+      "official_label": "Pickerel Cove",
+      "from": "Lake Superior",
+      "to": "Pickerel Cove",
+      "from_anchor_id": null,
+      "to_anchor_id": "pickerel-cove",
+      "distance_miles": 0.1,
+      "elevation_change_ft": 10,
+      "terrain": "Short and sweet",
+      "terrain_tags": [
+        "short"
+      ],
+      "route_family": "north-shore-short-carries",
+      "endpoint_basis": "map-inferred-exterior-endpoint",
+      "endpoint_note": "The 2026 Greenstone table names this portage only as Pickerel Cove. The external endpoint is represented as Lake Superior for planning/search matching; no landing coordinate is asserted."
+    },
+    {
+      "number": 13,
+      "id": "lane-cove-stockly-bay",
+      "official_label": "Lane Cove - Stockly Bay",
+      "from": "Lane Cove",
+      "to": "Stockly Bay",
+      "from_anchor_id": "lane-cove",
+      "to_anchor_id": "stockly-bay",
+      "distance_miles": 0.1,
+      "elevation_change_ft": 8,
+      "terrain": "Short and sweet",
+      "terrain_tags": [
+        "short"
+      ],
+      "route_family": "northeast-harbors",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 14,
+      "id": "five-finger-bay-duncan-bay",
+      "official_label": "Five Finger Bay - Duncan Bay",
+      "from": "Five Finger Bay",
+      "to": "Duncan Bay",
+      "from_anchor_id": "five-finger-bay",
+      "to_anchor_id": "duncan-bay",
+      "distance_miles": 0.2,
+      "elevation_change_ft": 8,
+      "terrain": "Short and sweet",
+      "terrain_tags": [
+        "short"
+      ],
+      "route_family": "northeast-harbors",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 15,
+      "id": "duncan-bay-tobin-harbor",
+      "official_label": "Duncan Bay - Tobin Harbor",
+      "from": "Duncan Bay",
+      "to": "Tobin Harbor",
+      "from_anchor_id": "duncan-bay",
+      "to_anchor_id": "tobin-harbor",
+      "distance_miles": 0.8,
+      "elevation_change_ft": 175,
+      "terrain": "Extremely steep",
+      "terrain_tags": [
+        "extremely-steep",
+        "steep"
+      ],
+      "route_family": "northeast-harbors",
+      "endpoint_basis": "official-label"
+    },
+    {
+      "number": 16,
+      "id": "tobin-harbor-rock-harbor",
+      "official_label": "Tobin Harbor - Rock Harbor",
+      "from": "Tobin Harbor",
+      "to": "Rock Harbor",
+      "from_anchor_id": "tobin-harbor",
+      "to_anchor_id": "rock-harbor",
+      "distance_miles": 0.2,
+      "elevation_change_ft": 40,
+      "terrain": "Gradual up and down",
+      "terrain_tags": [
+        "gradual",
+        "rolling"
+      ],
+      "route_family": "northeast-harbors",
+      "endpoint_basis": "official-label"
+    }
+  ],
+  "anchor_note": "Endpoint search anchors are deliberately generous waterbody/place centroids so a user click near a landing can be associated with a named corridor. Matching also requires the mapped trail length to agree with the NPS published distance; anchors never define route geometry."
+}

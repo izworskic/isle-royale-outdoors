@@ -1,0 +1,286 @@
+{
+  "version": "2.7.0",
+  "updated": "2026-08-31",
+  "route": "/isle-royale-map/",
+  "objective": "Build the most useful source-transparent Isle Royale planning map in the Chris Izworski tool network without pretending static cartography is authoritative GIS.",
+  "valueFunction": {
+    "formula": "V = .24D + .20T + .14U + .12P + .10R + .08A + .07S + .05N",
+    "dimensions": {
+      "D": {
+        "name": "decisionUtility",
+        "weight": 24,
+        "question": "Can a visitor make a better access, hiking, camping, boating or orientation decision?"
+      },
+      "T": {
+        "name": "dataTruthCoverage",
+        "weight": 20,
+        "question": "Are important layers present with authority/vintage/uncertainty represented honestly?"
+      },
+      "U": {
+        "name": "mapUsability",
+        "weight": 14,
+        "question": "Can users search, filter, inspect, zoom and recover without fighting the interface?"
+      },
+      "P": {
+        "name": "provenanceFreshness",
+        "weight": 12,
+        "question": "Can users tell where a feature came from, when it was updated, and whether it is current/reference/derived?"
+      },
+      "R": {
+        "name": "reliabilityPerformance",
+        "weight": 10,
+        "question": "Does the tool fail soft, avoid API keys, and remain useful when a remote layer fails?"
+      },
+      "A": {
+        "name": "accessibility",
+        "weight": 8,
+        "question": "Is core information reachable by keyboard and through a non-map feature list?"
+      },
+      "S": {
+        "name": "searchDiscovery",
+        "weight": 7,
+        "question": "Does the canonical page answer the Isle Royale map intent with strong entity/schema/discovery signals?"
+      },
+      "N": {
+        "name": "networkFit",
+        "weight": 5,
+        "question": "Does this connect cleanly to the existing Michigan/Great Lakes tool journey without cannibalization?"
+      }
+    },
+    "releaseTarget": 88,
+    "stretchTarget": 94
+  },
+  "benchmark": [
+    {
+      "id": "source-catalog",
+      "weight": 12,
+      "target": "All 16 NPMaps product families remain explicitly accounted for in the source manifest, with preferred upstream authority and a crawlable source desk/raw catalog link."
+    },
+    {
+      "id": "visitor-geometry",
+      "weight": 13,
+      "target": "Runtime visitor web-map ingestion supports trails, camps, routes and POIs without a commercial map key."
+    },
+    {
+      "id": "planning-flow",
+      "weight": 15,
+      "target": "One full-width map is the trip-building surface. Watercraft routes accept any number of ordered checkpoints, continuously preserve verified distance/time, and may automatically expand a failed canoe water leg through a verified chain of designated NPS portages before resuming mapped-water routing. Explicit P# selection remains an atomic constraint. Criteria sit below the map."
+    },
+    {
+      "id": "provenance",
+      "weight": 10,
+      "target": "Every live/derived layer exposes source and status; science layers expose dataset vintage."
+    },
+    {
+      "id": "safety",
+      "weight": 10,
+      "target": "No NPS Park Tiles reuse, no navigation claim, no unlabeled manually-derived geometry, regulation-sensitive layers point to current NPS."
+    },
+    {
+      "id": "fail-soft",
+      "weight": 10,
+      "target": "The map still loads a basemap, source catalog and fallback anchors if ArcGIS/OpenStreetMap supplementary services fail."
+    },
+    {
+      "id": "accessibility",
+      "weight": 8,
+      "target": "Keyboard controls, visible focus, status region and feature-list alternative are present."
+    },
+    {
+      "id": "search-entity",
+      "weight": 8,
+      "target": "Canonical, title/meta limits, Person node, WebApplication/Dataset schema and dateModified pass repo rules."
+    },
+    {
+      "id": "network",
+      "weight": 6,
+      "target": "At least three contextual links into relevant existing tools or authority surfaces."
+    },
+    {
+      "id": "deep-data-path",
+      "weight": 8,
+      "target": "Geology, vegetation, historic raster and boating-zone layers have explicit ETL/publication paths rather than fake client-side pins."
+    }
+  ],
+  "hardGates": [
+    "Do not use or hotlink NPS Park Tiles as the public basemap.",
+    "Do not present the map as a navigation chart or replacement for official NPS information.",
+    "Do not label approximate/manual fallback geometry as authoritative NPS GIS.",
+    "Do not expose newly discovered sensitive cultural/natural-resource coordinates automatically.",
+    "Do not ship a current-regulation layer without current NPS provenance.",
+    "Do not create a second canonical page for the same Isle Royale interactive-map intent.",
+    "Do not remove or silently substitute any of the 16 NPMaps completeness records.",
+    "Do not hide the entire source catalog behind JavaScript; preserve crawlable source rows and a raw catalog link.",
+    "Do not claim the measurement plan is complete unless all five privacy-safe Isle Royale product events are wired.",
+    "Do not call water routing smart if it is only a draggable straight-line sketch; water intelligence requires mapped-coastline avoidance plus route exposure/regulation/refuge analysis.",
+    "Do not call a multi-day water itinerary complete unless overnight recommendations require a current NPS Boat-In campground record, exclude current closure signals, and explicitly show a gap instead of inventing a campsite when no qualified stop fits the travel day.",
+    "Do not call scenario planning complete unless conservative, balanced, and ambitious plans are structurally distinct, applying a scenario preserves manual route points, source-backed overnight-stop truth gates remain intact, and scenario weather uses explicit itinerary target times across overnight layovers.",
+    "Do not call map-first routing complete if Build mode auto-exits after two points, map clicks scroll the user away from the map, campground clicks do not become explicit route stops, or map-selected NPS Boat-In camps can be silently replaced by scenario generation.",
+    "Do not call day-end planning complete unless users can explicitly set and clear campsite day ends from the route-building experience, those anchors override automatic day splitting across all scenarios, trip starts cannot become day ends, and water-trip day ends remain constrained by current NPS Boat-In/closure truth.",
+    "Do not call the route planner usable if the map remains reference-sized during Build mode, landscape tablet planning is constrained to a short viewport, full-map focus is unavailable, or Leaflet is not invalidated after responsive/focus layout changes.",
+    "Do not call Focus map complete if users must leave it to edit the trip, if its controls can drift from the side panel, or if Undo only deletes the last point instead of restoring full route-edit state with Redo support.",
+    "Do not call trip handoff complete if saving uploads route state, sharing puts route data in the server-visible query string, restored trips trust stale closure/Boat-In flags, or GPX can export a temporary straight fallback before trail/water routing resolves.",
+    "Do not call the planning surface usable if vegetation/change/fire controls reappear, if route stops lack leg+cumulative miles, if stop deletion depends on a tiny or hidden control, or if route planning is visually subordinate to feature browsing/prose.",
+    "Do not call Undo usable if speed/day/departure changes snapshot post-change DOM values, one click creates multiple history steps, no-op edits consume Undo, or the buttons cannot tell the user what action will be undone/redone.",
+    "Do not call water routing complete if route simplification can shortcut across coastline, selected on-land endpoints are drawn into the water route, failed water routing falls back to a straight line, or mileage is shown before a zero-crossing route resolves.",
+    "Do not call canoe trip creation complete if a designated mapped portage cannot be selected directly as one logical route step with entry landing, carry, and exit landing.",
+    "Do not call canoe trip creation time-aware if the builder shows miles but withholds active paddle/portage travel time until after the trip is finished.",
+    "Do not expose internal portage landing coordinates as two independent user trip stops; the canoeist-facing stop list must present the carry as one atomic P# step.",
+    "Do not duplicate the primary route-building workflow in the side/lower panel; map controls and map selections are the route builder.",
+    "Do not restrict route selection to feature records that already contain a point coordinate when a line/area feature supplies a valid clicked map coordinate.",
+    "Do not call the interface map-first if the map shares the primary horizontal space with a persistent planner/criteria sidebar.",
+    "Do not keep a second visible Focus Map cockpit after the route bar can perform the same trip-building actions.",
+    "Do not label the newest ordinary water checkpoint as the final destination while Build mode is active.",
+    "Do not treat intermediate water clicks as an error-recovery feature only; they are a primary route-building interaction.",
+    "Do not call two-point canoe routing complete unless a failed water-only leg can be expanded through a verified chain of designated NPS portages with mapped-water access to every entry/exit landing.",
+    "Do not permit a Chickenbone Lake to McCargoe Cove water shortcut through the closed outlet; vessel routing must use designated NPS P11."
+  ],
+  "initialBuildFit": {
+    "distinctSearchIntent": 24,
+    "networkFit": 19,
+    "uniqueUtility": 20,
+    "authorityAndSeasonFit": 14,
+    "measurementPlan": 10,
+    "cannibalizationSafety": 10,
+    "total": 97,
+    "threshold": 85,
+    "decision": "PRIORITY BUILD"
+  },
+  "tripCreationValueFunction": {
+    "formula": "TC = .25C + .20P + .15F + .15D + .10E + .07R + .05T + .03H",
+    "objective": "Maximize the canoeist's ability to construct a realistic, editable, day-by-day Isle Royale trip directly on the map.",
+    "dimensions": {
+      "C": {
+        "name": "travelContinuity",
+        "weight": 25,
+        "question": "Does every trip step connect in the mode the canoeist will actually use: paddle on water, carry on a designated portage, then resume on water?"
+      },
+      "P": {
+        "name": "portageIntegration",
+        "weight": 20,
+        "question": "Can a designated portage be selected as one first-class trip step with entry landing, official carry distance, exit landing, carry workload and time?"
+      },
+      "F": {
+        "name": "immediateFeedback",
+        "weight": 15,
+        "question": "After every trip choice, are the verified line, leg distance, cumulative distance and active travel time visible without submitting the whole route?"
+      },
+      "D": {
+        "name": "dayByDayPlanning",
+        "weight": 15,
+        "question": "Can the canoeist build Day 1, end at a qualified camp, continue Day 2 from that camp, and see day-specific distance/time while building?"
+      },
+      "E": {
+        "name": "editabilityRecovery",
+        "weight": 10,
+        "question": "Can points, portages and day ends be removed, reversed, undone, redone and reshaped without rebuilding the trip from scratch?"
+      },
+      "R": {
+        "name": "effortRealism",
+        "weight": 7,
+        "question": "Do travel estimates separate paddling, portage walking, single/double/triple carry workload, terrain effects and load/unload time?"
+      },
+      "T": {
+        "name": "truthSafety",
+        "weight": 5,
+        "question": "Are water-only routing, official portage identity, current camp truth and uncertainty preserved instead of inventing shortcuts or landings?"
+      },
+      "H": {
+        "name": "handoffReuse",
+        "weight": 3,
+        "question": "Can the finished trip be saved, restored, shared and exported without losing day ends or portage identity?"
+      }
+    },
+    "releaseTarget": 92,
+    "stretchTarget": 97,
+    "principles": [
+      "A real paddle route is an ordered sequence of user-chosen checkpoints, not merely a start and destination.",
+      "Intermediate water clicks are normal planning inputs: each one constrains the next leg, accumulates distance/time, and helps the paddler explore winding water.",
+      "Appending a checkpoint preserves every already-verified leg; only the unresolved tail may be recalculated.",
+      "The map occupies the primary full-width surface; trip criteria sit below it rather than beside it.",
+      "Focus mode reuses the same route bar; there is no second planning cockpit.",
+      "The map is the construction surface; the adjacent/lower panel sets criteria and filters, not a second route-building workflow.",
+      "Every mappable visitor feature can be selected directly while Build mode is active; line and area features use the exact clicked map position.",
+      "The route is the product: trip construction happens continuously on the map.",
+      "Plan by realistic active travel time as well as distance.",
+      "Portages are transitions between water networks, not decorative trail overlays.",
+      "Day boundaries are chosen during route construction, not imposed after the whole route is submitted.",
+      "Every edit preserves valid work and gives immediate feedback.",
+      "Detailed trip information follows the route the user actually built."
+    ],
+    "hardGates": [
+      "Watercraft Build mode must allow an arbitrary number of ordered water checkpoints and continuously accumulate verified distance and travel time through them.",
+      "Adding checkpoint N must preserve the verified geometry and measurements for checkpoints 1 through N-1 rather than clearing and rebuilding the whole route.",
+      "The water router must understand both Lake Superior coastline and mapped inland-water/waterway geometry; coastline-only routing is insufficient for Isle Royale canoe planning.",
+      "The primary layout must be full-width map first, criteria below; do not put trip criteria in a competing side column.",
+      "Focus Map must not reveal a second planning cockpit. The same map route bar handles Back, Finish day, Finish trip, and review actions.",
+      "The visible route panel must be criteria-only: mode, pace/speed, carry workload, hours/day, departure, search and layer filters; route stops, reports, scenarios, save/export controls and weather analysis must not compete with map construction there.",
+      "While Build mode is active, any loaded mappable feature geometry must be selectable directly from the map, including point, line and area features; official P# portages retain their dedicated atomic behavior.",
+      "A mapped designated portage must be selectable directly during Build mode as one logical trip step.",
+      "A canoe portage trip step must include a water-side entry landing, official portage corridor/distance, and water-side exit landing; never require the user to invent land-crossing pins.",
+      "Adding a new choice must preserve all previously verified route geometry, mileage and travel time while only the newest leg resolves.",
+      "A portage must remove and undo atomically rather than leaving a stranded entry or exit point.",
+      "A qualified campground must be able to close the current day while route building remains active for the next day.",
+      "Live day and trip feedback must include active travel time, not distance alone.",
+      "Saved/restored routes must retain portage group identity, direction and day-end state.",
+      "Focus Map must remain a complete trip-building surface.",
+      "Do not call two-point canoe routing complete unless a failed water-only leg can be expanded through a verified chain of designated NPS portages with mapped-water access to every entry/exit landing.",
+      "Do not permit a Chickenbone Lake to McCargoe Cove water shortcut through the closed outlet; vessel routing must use designated NPS P11."
+    ]
+  },
+  "multimodalRouteBuilderValueFunction": {
+    "formula": "RB = .28C + .16U + .15P + .12T + .12X + .09D + .08R",
+    "objective": "Maximize the probability that two or more map selections become a canoe-plausible, editable, source-transparent paddle-and-portage route rather than a geometric sketch.",
+    "dimensions": {
+      "C": {
+        "name": "routeCorrectness",
+        "weight": 28,
+        "question": "Does every paddle segment stay on mapped water and every land transition use a designated portage?"
+      },
+      "U": {
+        "name": "paddlerControl",
+        "weight": 16,
+        "question": "Can the paddler add, insert, delete, reorder, reverse and reshape ordered route intent without losing valid work?"
+      },
+      "P": {
+        "name": "portageIntelligence",
+        "weight": 15,
+        "question": "Are portages first-class complete transitions with mapped-water landings and official distance/identity?"
+      },
+      "T": {
+        "name": "travelTimeRealism",
+        "weight": 12,
+        "question": "Are paddle time, physical portage distance, carry walking multiplier, terrain and transition time modeled separately?"
+      },
+      "X": {
+        "name": "uxClarity",
+        "weight": 12,
+        "question": "Can a paddler build primarily from the map and understand verified, pending and failed route state?"
+      },
+      "D": {
+        "name": "dataIntegrity",
+        "weight": 9,
+        "question": "Are NPS connectivity/restrictions preserved and uncertain geometry never promoted as authoritative?"
+      },
+      "R": {
+        "name": "reliability",
+        "weight": 8,
+        "question": "Do route edits, save/restore and export preserve only verified geometry and fail without fake lines?"
+      }
+    },
+    "releaseTarget": 90,
+    "stretchTarget": 96,
+    "scenarios": [
+      "same-waterbody two-point route stays on water",
+      "peninsula/island route does not cut land",
+      "multi-point checkpoints are honored in order",
+      "two points on different interior waterbodies auto-expand through designated NPS portage chain",
+      "explicit P# selection remains atomic and directional",
+      "Chickenbone Lake to McCargoe Cove uses P11, never the closed outlet",
+      "water → portage → water → campground resolves continuously",
+      "delete/undo/reverse preserves route semantics",
+      "double carry reports 3x walking distance but unchanged physical portage distance",
+      "failed route preserves selected points and blocks GPX"
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+name: Isle Royale context GIS build
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/isle-royale-context-data.yml"
+      - "scripts/build-isle-royale-context-layers.py"
+      - "public/isle-royale-map/data/quiet-no-wake-zones.geojson"
+      - "public/isle-royale-map/data/vegetation-change-1996-2017.geojson"
+      - "public/isle-royale-map/data/horne-fire-burn-severity.geojson"
+      - "public/isle-royale-map/data/context-layer-manifest.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isle-royale-gis-writer-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-or-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Install GDAL for explicit rebuild
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin python3-gdal unzip
+
+      - name: Rebuild regulatory and change-context layers
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/build-isle-royale-context-layers.py
+
+      - name: Validate committed context GIS
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          root=pathlib.Path("public/isle-royale-map/data")
+          manifest=json.loads((root/"context-layer-manifest.json").read_text())
+          layers=manifest["layers"]
+          expected={
+              "quiet_no_wake":("quiet-no-wake-zones.geojson",22,5000000),
+              "vegetation_change":("vegetation-change-1996-2017.geojson",2738,15000000),
+              "horne_fire":("horne-fire-burn-severity.geojson",93,15000000),
+          }
+          for key,(filename,count,max_bytes) in expected.items():
+              meta=layers[key]
+              assert meta["status"]=="generated", (key,meta)
+              path=root/filename
+              data=path.read_bytes()
+              fc=json.loads(data)
+              assert fc["type"]=="FeatureCollection", key
+              assert len(fc["features"])==count, (key,len(fc["features"]),count)
+              assert len(data)<=max_bytes, (key,len(data),max_bytes)
+              assert meta["file"]==filename
+              assert meta["bytes"]==len(data)
+              assert meta["features"]==count
+              assert meta["sha256"]==hashlib.sha256(data).hexdigest()
+              print(key,count,len(data),meta["sha256"])
+          quiet=layers["quiet_no_wake"]
+          assert quiet["quiet_no_wake_features"]==19, quiet
+          assert quiet["no_wake_features"]==3, quiet
+          assert "irmaservices.nps.gov" in quiet["geometry_source"], quiet
+          PY
+
+      - name: Commit rebuilt context layers
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/isle-royale-map/data/context-layer-manifest.json
+          git add public/isle-royale-map/data/quiet-no-wake-zones.geojson
+          git add public/isle-royale-map/data/vegetation-change-1996-2017.geojson
+          git add public/isle-royale-map/data/horne-fire-burn-severity.geojson
+          if git diff --cached --quiet; then
+            echo "No generated context GIS changes to commit."
+            exit 0
+          fi
+          git commit -m "Generate Isle Royale context GIS layers"
+          git pull --rebase origin "${{ github.ref_name }}"
+          git push origin "HEAD:${{ github.ref_name }}"
+
+      - name: Upload rebuilt context GIS artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: isle-royale-context-gis
+          path: |
+            public/isle-royale-map/data/quiet-no-wake-zones.geojson
+            public/isle-royale-map/data/vegetation-change-1996-2017.geojson
+            public/isle-royale-map/data/horne-fire-burn-severity.geojson
+            public/isle-royale-map/data/context-layer-manifest.json
+          retention-days: 14
