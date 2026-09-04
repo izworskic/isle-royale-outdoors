@@ -933,8 +933,10 @@ test('multi-point checkpoint routing keeps earlier verified legs while extending
 });
 
 
-test('route planner opens ready to build a canoe trip', () => {
-  assert.match(js, /adding:true,[\s\S]{0,120}mode:'canoe'/);
+test('route planner opens ready to build a canoe trip once enabled', () => {
+  // Default config is canoe/build-ready; whether that default actually takes effect on load is
+  // gated by PLANNER_ENABLED, not hardcoded — see 'the planner is hidden behind one flag' below.
+  assert.match(js, /adding:PLANNER_ENABLED,[\s\S]{0,120}mode:'canoe'/);
   assert.match(html, /id="route-mode"[^>]*aria-pressed="true"[^>]*>Plan route<\/button>/);
   assert.match(html, /id="explore-mode"[^>]*aria-pressed="false"[^>]*>Inspect map<\/button>/);
   assert.match(html, /<option value="canoe" selected>Canoe \+ portage<\/option>/);
@@ -985,8 +987,14 @@ test('the planner is hidden behind one flag while its runtime is kept', () => {
   assert.match(js, /const PLANNER_ENABLED = false;/);
   assert.match(js, /if \(!PLANNER_ENABLED\) document\.body\.classList\.add\('planner-off'\)/);
   // Nothing may enter build mode while it is off, or a map click collects checkpoints against a UI
-  // the visitor cannot see.
+  // the visitor cannot see. Four separate places can set route.adding or offer route controls —
+  // a bug found in production let three of them ignore the flag entirely (the raw initial value,
+  // a snapshot restore, and every feature card's own "Add to route" button), so every one of them
+  // is pinned here individually rather than trusting that fixing one covers the others.
   assert.match(js, /route\.adding=PLANNER_ENABLED\?Boolean\(active\):false;/);
+  assert.match(js, /adding:PLANNER_ENABLED,/, 'the initial route state must not hardcode adding:true ahead of the flag');
+  assert.match(js, /route\.adding=PLANNER_ENABLED\?Boolean\(snapshot\.adding\):false;/, 'undo/redo snapshot restore must not be able to re-enable build mode');
+  assert.match(js, /const popupRoutePoint=PLANNER_ENABLED\?recordRoutePoint\(record\):null;/, 'feature-card route buttons must not render while the planner is off');
   for (const surface of ['mode-toggle planner-only', 'route-map-guide planner-only', 'route-build-bar planner-only', 'planning-cockpit planner-only']) {
     assert.ok(html.includes(surface), `planner surface not flagged: ${surface}`);
   }

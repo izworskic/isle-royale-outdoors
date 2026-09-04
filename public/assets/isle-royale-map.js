@@ -537,7 +537,7 @@
   let visitorGeometrySettled = false;
   const osmSeen = new Set();
   const route = {
-    adding:true,
+    adding:PLANNER_ENABLED,
     reviewing:false,
     points:[],
     resolvedPoints:[],
@@ -1233,7 +1233,11 @@
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record);
 
-    const popupRoutePoint=recordRoutePoint(record);
+    // Gated on PLANNER_ENABLED directly: recordRoutePoint() itself has no idea the planner is
+    // switched off, so without this every feature card would keep offering "Add to route" /
+    // "Start trip here" buttons that silently mutated route state with no visible route UI to
+    // show it happened — the exact leak that let route-building resurface after being turned off.
+    const popupRoutePoint=PLANNER_ENABLED?recordRoutePoint(record):null;
     if (popupRoutePoint) {
       const routeAction = document.createElement('button');
       routeAction.type = 'button';
@@ -4754,7 +4758,9 @@
     route.portageTransitionMinutes=10;
     route.tripName=cleanText(snapshot.tripName||'').slice(0,80);
     route.activeScenario=snapshot.activeScenario||'balanced';
-    route.adding=Boolean(snapshot.adding);
+    // Gated the same way setRouteAdding() gates it: a restored snapshot (undo/redo) must never be
+    // able to turn route-building back on when the planner is switched off at the top of this file.
+    route.adding=PLANNER_ENABLED?Boolean(snapshot.adding):false;
     els.routeModeSelect.value=route.mode;
     els.routeSpeed.value=String(route.speed);
     if(els.routePortageTrips)els.routePortageTrips.value=String(route.portageTrips);

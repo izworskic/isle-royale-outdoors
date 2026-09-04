@@ -428,7 +428,7 @@ const multiPointCheckpointRuntime = /Trace the trip with checkpoints/.test(html)
 
 const mapFirstRoutingRuntime = /id="explore-mode"[^>]*aria-pressed="false"[^>]*>Inspect map/.test(html)
   && /id="route-mode"[^>]*aria-pressed="true"[^>]*>Plan route/.test(html)
-  && /adding:true/.test(js)
+  && /adding:PLANNER_ENABLED/.test(js)
   && /if\(!sharedTripLoaded\) \{[\s\S]{0,140}setRouteAdding\(true\)/.test(js)
   && /id="route-map-guide"/.test(html)
   && /id="route-stop-list"/.test(html)
