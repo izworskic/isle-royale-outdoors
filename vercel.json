@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "functions": {
-    "api/isle-royale-water-intelligence.js": { "maxDuration": 30 },
     "api/**/*.js": { "maxDuration": 10 }
   },
   "headers": [
