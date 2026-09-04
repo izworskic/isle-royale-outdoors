@@ -1,5 +1,10 @@
 # Master build prompt — Isle Royale Interactive Map
 
+> **Sep 4 2026 — scope change.** The interactive route/trip-planning engine and the popup-drag
+> floating inspector described below were removed, not hidden. See the status note at the top of
+> `docs/isle-royale-map-plan.md` for why and where the prior implementation lives in git history
+> (tag `pre-route-removal-2026-09-04`). Read that note before treating anything below as current.
+
 You are the orchestrating engineering/research agent for the Isle Royale Interactive Map in `izworskic/chrisizworski-com`.
 
 ## Mission
