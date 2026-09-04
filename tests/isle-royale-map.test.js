@@ -1046,3 +1046,31 @@ test('the map offers three base maps and NOAA charts', () => {
   assert.match(js, /localStorage\.setItem\('isle-royale-basemap'/);
   assert.match(js, /localStorage\.setItem\('isle-royale-nautical'/);
 });
+
+test('a feature card renders one consolidated source line, not up to three stacked ones', () => {
+  // A card could previously carry the main map-source note, a separate deep-layer vintage note,
+  // AND a separate site-identifier attribution note, each in its own ".popup-source" box with
+  // overlapping wording — the concrete "redundant data" a visitor lands on after opening a popup.
+  // All three must now feed one shared array rendered as a single element.
+  assert.match(js, /const sourceNotes = \[\];/);
+  assert.match(js, /appendCampSiteIdentifiers\(wrap,record,sourceNotes\)/);
+  assert.match(js, /sourceNotes\.push\(`Vintage: /);
+  assert.match(js, /sourceNotes\.push\(record\.supplemental/);
+  assert.match(js, /source\.textContent = sourceNotes\.filter\(Boolean\)\.join\(' '\)/);
+  // The two other spots that used to create their own ".popup-source" div must be gone.
+  assert.doesNotMatch(js, /deepNote\.className = 'popup-source'/);
+  assert.doesNotMatch(js, /const source=document\.createElement\('div'\);\s*\n\s*source\.className='popup-source';\s*\n\s*source\.textContent='Site\/shelter identifiers/);
+});
+
+test('numbered campsite identifiers are collapsed behind a disclosure, not dumped open by default', () => {
+  // A big campground (Daisy Farm, Belle Isle, ...) can carry up to 40 of these chip buttons.
+  // Rendering them open-by-default was the literal "weird buttons to click" a visitor met
+  // immediately on opening what should be a short summary card; the fix is <details> without
+  // an `open` attribute, not fewer chips — the capability is unchanged, just not pre-expanded.
+  const fn = js.match(/function appendCampSiteIdentifiers\([^)]*\)\s*{[\s\S]*?\n  }/)[0];
+  assert.match(fn, /document\.createElement\('details'\)/);
+  assert.doesNotMatch(fn, /section\.open\s*=\s*true/);
+  assert.match(fn, /document\.createElement\('summary'\)/);
+  assert.match(fn, /Numbered sites & shelters \(\$\{identifiers\.length\}\)/);
+  assert.match(html, /\.popup-site-identifiers>summary\{cursor:pointer/);
+});
