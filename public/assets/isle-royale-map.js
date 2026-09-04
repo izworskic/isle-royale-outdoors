@@ -1031,14 +1031,18 @@
     }).slice(0,40);
   }
 
-  function appendCampSiteIdentifiers(wrap,record) {
+  function appendCampSiteIdentifiers(wrap,record,sourceNotes) {
     const identifiers=campSiteIdentifiersFor(record);
     if(!identifiers.length)return;
-    const section=document.createElement('div');
+    // Collapsed by default: a big campground (Daisy Farm, Belle Isle, ...) can carry up to 40 of
+    // these, and dumping them open-by-default was the "weird buttons to click" a visitor lands on
+    // immediately after opening what should be a short summary card. The capability is unchanged,
+    // it just costs a tap to reveal instead of arriving pre-expanded.
+    const section=document.createElement('details');
     section.className='popup-site-identifiers';
-    const heading=document.createElement('div');
+    const heading=document.createElement('summary');
     heading.className='popup-related-title';
-    heading.textContent='Numbered sites & shelters';
+    heading.textContent=`Numbered sites & shelters (${identifiers.length})`;
     const note=document.createElement('p');
     note.className='popup-site-note';
     note.textContent='Supplemental mapped identifiers near this NPS campground. This may not be a complete site inventory; verify posted numbers on arrival.';
@@ -1060,11 +1064,9 @@
       });
       chips.appendChild(chip);
     }
-    const source=document.createElement('div');
-    source.className='popup-source';
-    source.textContent='Site/shelter identifiers: OpenStreetMap contributors (supplemental). Campground totals and operating facts above remain NPS-sourced.';
-    section.append(heading,note,chips,source);
+    section.append(heading,note,chips);
     wrap.appendChild(section);
+    sourceNotes?.push('Site/shelter identifiers: OpenStreetMap contributors (supplemental). Campground totals and operating facts above remain NPS-sourced.');
   }
 
   function addPopupFact(container, label, value) {
@@ -1178,6 +1180,12 @@
   function popupNode(record) {
     const wrap = document.createElement('div');
     wrap.className = 'popup-detail';
+    // Every attribution/provenance sentence for this card collects here and renders as ONE source
+    // line at the end. Previously up to three separate ".popup-source" boxes could stack in a
+    // single card (site-identifier attribution, deep-layer vintage, and the main source line),
+    // each restating overlapping facts in slightly different words — the concrete "redundant data"
+    // this function used to produce.
+    const sourceNotes = [];
 
     const title = document.createElement('div');
     title.className = 'popup-title';
@@ -1231,7 +1239,7 @@
       addPopupFact(facts, 'Fire ring / grill', boater.fire_ring_grill);
     }
     if (facts.childElementCount) wrap.appendChild(facts);
-    appendCampSiteIdentifiers(wrap,record);
+    appendCampSiteIdentifiers(wrap,record,sourceNotes);
 
     // Gated on PLANNER_ENABLED directly: recordRoutePoint() itself has no idea the planner is
     // switched off, so without this every feature card would keep offering "Add to route" /
@@ -1289,22 +1297,21 @@
     }
 
     if (record.deepMeta) {
-      const deepNote = document.createElement('div');
-      deepNote.className = 'popup-source';
       const provenanceNote = record.deepMeta.accuracy_note || record.deepMeta.interpretation_note || record.deepMeta.regulation_note || '';
-      deepNote.textContent = `Vintage: ${record.deepMeta.vintage || 'see source manifest'}. ${provenanceNote}`.trim();
-      wrap.appendChild(deepNote);
+      sourceNotes.push(`Vintage: ${record.deepMeta.vintage || 'see source manifest'}.${provenanceNote ? ' '+provenanceNote : ''}`.trim());
     }
+
+    sourceNotes.push(record.supplemental
+      ? `Supplemental data source: ${record.sourceLabel}. This is community-mapped context, not an NPS operational source.`
+      : `Map source: ${record.sourceLabel}. Geometry status: ${record.sourceKind}.`);
+    if (record.campgroundProfile) sourceNotes.push('Campground capacity/access facts: NPS campground profile pages.');
+    else if (record.boater) sourceNotes.push('Campground facts: NPS Boat-In Campgrounds dataset, page updated June 23, 2026.');
+    if (record.liveAlert) sourceNotes.push('Closure signal: current NPS conditions feed fetched through this site.');
+    if (record.nameProvenance) sourceNotes.push(record.nameProvenance);
 
     const source = document.createElement('div');
     source.className = 'popup-source';
-    source.textContent = record.supplemental
-      ? `Supplemental data source: ${record.sourceLabel}. This is community-mapped context, not an NPS operational source.`
-      : `Map source: ${record.sourceLabel}. Geometry status: ${record.sourceKind}.`;
-    if (record.campgroundProfile) source.textContent += ' Campground capacity/access facts: NPS campground profile pages.';
-    else if (record.boater) source.textContent += ' Campground facts: NPS Boat-In Campgrounds dataset, page updated June 23, 2026.';
-    if (record.liveAlert) source.textContent += ' Closure signal: current NPS conditions feed fetched through this site.';
-    if (record.nameProvenance) source.textContent += ' ' + record.nameProvenance;
+    source.textContent = sourceNotes.filter(Boolean).join(' ');
     wrap.appendChild(source);
     return wrap;
   }
