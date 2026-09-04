@@ -1,0 +1,307 @@
+{
+  "generated": "2026-09-03",
+  "sourceNote": "Names cross-referenced by location against the National Park Service Isle Royale visitor-map point layer (2021 ArcGIS snapshot, service Isle_Royale_WFL1, cataloged in /isle-royale-map/catalog.json) and the current NPS Boat-In Campground table (nps.gov/isro). Coordinates are the current live NPS visitor-map geometry this map already renders; only the display name is supplied here. Verify signage, GPS, and current conditions against NPS resources before departure.",
+  "points": [
+    {
+      "layerTitle": "Campground",
+      "name": "Malone Bay",
+      "lat": 47.9837444,
+      "lon": -88.7819967,
+      "matchNote": "1.18 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Huginnin Cove",
+      "lat": 47.9337175,
+      "lon": -89.1746318,
+      "matchNote": "0.09 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Washington Creek",
+      "lat": 47.9223896,
+      "lon": -89.1307013,
+      "matchNote": "1.23 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Feldtmann Lake",
+      "lat": 47.8476841,
+      "lon": -89.1890103,
+      "matchNote": "0.36 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Grace Island",
+      "lat": 47.8816385,
+      "lon": -89.2173537,
+      "matchNote": "0.10 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Beaver Island",
+      "lat": 47.9043933,
+      "lon": -89.1727202,
+      "matchNote": "0.07 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Siskiwit Bay",
+      "lat": 47.8877606,
+      "lon": -89.0002165,
+      "matchNote": "0.18 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Island Mine",
+      "lat": 47.9279696,
+      "lon": -89.0422653,
+      "matchNote": "0.22 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Hay Bay",
+      "lat": 47.932453,
+      "lon": -88.9367224,
+      "matchNote": "0.18 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Little Todd",
+      "lat": 48.0187748,
+      "lon": -88.9234988,
+      "matchNote": "0.17 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "S. Lake Desor",
+      "lat": 47.9594154,
+      "lon": -88.9779914,
+      "matchNote": "0.78 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "N. Lake Desor",
+      "lat": 47.9884687,
+      "lon": -89.0138339,
+      "matchNote": "1.06 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Hatchet Lake",
+      "lat": 48.018307,
+      "lon": -88.8540117,
+      "matchNote": "0.25 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Todd Harbor",
+      "lat": 48.0502773,
+      "lon": -88.8218524,
+      "matchNote": "0.05 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Caribou Island",
+      "lat": 48.1234745,
+      "lon": -88.5889638,
+      "matchNote": "2.13 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "E. Chickenbone Lake",
+      "lat": 48.0825367,
+      "lon": -88.6579693,
+      "matchNote": "1.86 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Intermediate Lake",
+      "lat": 48.0237917,
+      "lon": -88.7000457,
+      "matchNote": "1.10 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Wood Lake",
+      "lat": 48.0066244,
+      "lon": -88.7421854,
+      "matchNote": "0.22 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Lake Whittlesey",
+      "lat": 48.0057205,
+      "lon": -88.711344,
+      "matchNote": "0.18 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "W. Chickenbone Lake",
+      "lat": 48.0620457,
+      "lon": -88.7454433,
+      "matchNote": "0.99 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Lake Richie Canoe",
+      "lat": 48.047622,
+      "lon": -88.7096141,
+      "matchNote": "0.52 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "McCargoe Cove",
+      "lat": 48.0880024,
+      "lon": -88.6974349,
+      "matchNote": "0.51 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Lake Richie",
+      "lat": 48.0560986,
+      "lon": -88.6805245,
+      "matchNote": "0.29 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Chippewa Harbor",
+      "lat": 48.0287797,
+      "lon": -88.6449451,
+      "matchNote": "0.25 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Moskey Basin",
+      "lat": 48.0613905,
+      "lon": -88.6465612,
+      "matchNote": "0.08 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Daisy Farm",
+      "lat": 48.0730528,
+      "lon": -88.6178898,
+      "matchNote": "1.66 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Lane Cove",
+      "lat": 48.1411402,
+      "lon": -88.5564352,
+      "matchNote": "0.25 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Pickerel Cove",
+      "lat": 48.1239419,
+      "lon": -88.629322,
+      "matchNote": "1.06 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Birch Island",
+      "lat": 48.1080399,
+      "lon": -88.685815,
+      "matchNote": "0.12 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Belle Isle",
+      "lat": 48.1507884,
+      "lon": -88.5858229,
+      "matchNote": "0.10 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Duncan Bay",
+      "lat": 48.1479196,
+      "lon": -88.5218455,
+      "matchNote": "0.18 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Three Mile",
+      "lat": 48.1215405,
+      "lon": -88.5325956,
+      "matchNote": "0.29 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Tookers Island",
+      "lat": 48.1271743,
+      "lon": -88.5025116,
+      "matchNote": "0.14 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Rock Harbor",
+      "lat": 48.1682517,
+      "lon": -88.5103653,
+      "matchNote": "1.88 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Duncan Narrows",
+      "lat": 48.1673346,
+      "lon": -88.4764085,
+      "matchNote": "0.16 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Campground",
+      "name": "Merritt Lane",
+      "lat": 48.1845474,
+      "lon": -88.4257233,
+      "matchNote": "0.19 mi from the 2021 NPS point of the same name"
+    },
+    {
+      "layerTitle": "Visitor Center",
+      "name": "Rock Harbor Visitor Center",
+      "lat": 48.1482941,
+      "lon": -88.4836301,
+      "matchNote": "0.15 mi from the 2021 NPS Rock Harbor Visitor Center point"
+    },
+    {
+      "layerTitle": "Visitor Center",
+      "name": "Malone Bay Ranger Station",
+      "lat": 47.9827853,
+      "lon": -88.8236012,
+      "matchNote": "0.77 mi from the 2021 NPS Malone Bay campground point; nearest named place"
+    },
+    {
+      "layerTitle": "Visitor Center",
+      "name": "Amygdaloid Island Ranger Station",
+      "lat": 48.1333008,
+      "lon": -88.6570047,
+      "matchNote": "0.05 mi from the 2021 NPS Amygdaloid boat launch point"
+    },
+    {
+      "layerTitle": "Isle Royale Points of Interest",
+      "name": "Mott Island — Park Headquarters",
+      "lat": 48.1062214,
+      "lon": -88.5453558,
+      "matchNote": "2021 NPS record's own NOTES field: nps:fcat Park Headquarters, ‘on Mott Island’"
+    },
+    {
+      "layerTitle": "Isle Royale Points of Interest",
+      "name": "Rock Harbor Marina",
+      "lat": 48.1461651,
+      "lon": -88.4860601,
+      "matchNote": "0.02 mi from Rock Harbor Visitor Center; matches live NPS Boater Table ‘Rock Harbor Marina’"
+    },
+    {
+      "layerTitle": "Isle Royale Points of Interest",
+      "name": "Tobin Harbor Dock",
+      "lat": 48.1568463,
+      "lon": -88.4761343,
+      "matchNote": "0.83 mi NE of Rock Harbor along the channel; matches live NPS Boater Table ‘Tobin Harbor Dock’"
+    },
+    {
+      "layerTitle": "Isle Royale Points of Interest",
+      "name": "Windigo — Trailhead",
+      "lat": 47.9140827,
+      "lon": -89.1564781,
+      "matchNote": "0.06 mi from Windigo Visitor Center; 2021 record tagged highway=trailhead"
+    }
+  ]
+}
