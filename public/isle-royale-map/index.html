@@ -111,7 +111,15 @@ button{cursor:pointer}
 .isle-detail-popup .leaflet-popup-content-wrapper{border-radius:12px}
 .isle-detail-popup .leaflet-popup-content{max-height:min(62vh,520px);overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;touch-action:pan-y}
 .isle-detail-popup .leaflet-popup-close-button{width:34px;height:34px;font-size:22px;line-height:30px}
-@media(max-width:620px){.isle-detail-popup .leaflet-popup-content{max-height:54vh}}
+@media(max-width:620px){
+  /* A popup anchored to the tapped point is positioned within the map's own box, which on a
+     phone can be shorter than the card needs — the card gets clipped or shoved somewhere
+     unreadable. Below this width the card detaches from the map entirely and centers in the
+     full screen instead, so its available room is the phone's viewport, not the map's height. */
+  .isle-detail-popup{position:fixed!important;left:50%!important;top:50%!important;bottom:auto!important;margin:0!important;transform:translate(-50%,-50%)!important;width:92vw;max-width:420px;z-index:1200}
+  .isle-detail-popup .leaflet-popup-tip-container{display:none}
+  .isle-detail-popup .leaflet-popup-content{max-height:74vh;width:auto!important}
+}
 .popup-detail{min-width:250px}
 .popup-title{font-weight:800;font-size:16px;line-height:1.25;margin-bottom:4px;color:#17241f}
 .popup-meta{color:#68736e;font-size:11px;text-transform:uppercase;letter-spacing:.04em}

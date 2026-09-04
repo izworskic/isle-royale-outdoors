@@ -476,3 +476,22 @@ test('the informational NPS portage layer survives the route-engine removal inta
   assert.match(html, /data-layer="official-portage"/);
   assert.match(html, /16 NPS 2026 carries/);
 });
+
+test('detail popups reposition to stay readable, and detach from the map box entirely on phones', () => {
+  // autoPan was off on all four popup bindings — a holdover from when the floating inspector
+  // took over positioning instead. Once the inspector was removed (this rebuild), nothing
+  // repositioned the card at all: tap a point near the edge of a short mobile map and the card
+  // could render clipped or off past the edge with no way to read it.
+  const popupBindingCount = (js.match(/\.bindPopup\(/g) || []).length;
+  const autoPanTrueCount = (js.match(/autoPan:true/g) || []).length;
+  assert.ok(popupBindingCount >= 4, `expected at least 4 popup bindings, found ${popupBindingCount}`);
+  assert.equal(autoPanTrueCount, popupBindingCount, 'every popup binding must set autoPan:true');
+  assert.doesNotMatch(js, /autoPan:false/);
+  // Even with autoPan, a card taller than the map's own box can't fully fit by panning alone —
+  // the map box is often shorter than the card on a phone. Below 620px the card detaches from
+  // map-relative positioning and centers in the full viewport instead, so its available room is
+  // the screen, not the map.
+  assert.match(html, /@media\(max-width:620px\)\{\s*\/\*/);
+  assert.match(html, /\.isle-detail-popup\{position:fixed!important/);
+  assert.match(html, /transform:translate\(-50%,-50%\)!important/);
+});

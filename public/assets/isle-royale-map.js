@@ -880,7 +880,7 @@
           latlng
         };
         enrichRecord(record);
-        layer.bindPopup(() => popupNode(record), {maxWidth:390, minWidth:280, autoPan:false, className:'isle-detail-popup'});
+        layer.bindPopup(() => popupNode(record), {maxWidth:390, minWidth:280, autoPan:true, autoPanPadding:[16,16], className:'isle-detail-popup'});
         layer.on('click', () => selectRecord(record));
       }
     });
@@ -1810,8 +1810,8 @@
           icon:L.divIcon({className:'official-portage-badge',html:'<span>P'+portage.number+'</span>',iconSize:[30,24],iconAnchor:[15,12]})
         });
         visual={geometryResolved:true,reference:Boolean(geometry.reference),points:geometry.points,mapped_miles:geometry.mapped_miles,line,badge};
-        line.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:false,className:'isle-detail-popup'});
-        badge.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:false,className:'isle-detail-popup'});
+        line.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
+        badge.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
         const open=event=>{
           if(event?.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
           line.setStyle({weight:7});
@@ -1838,7 +1838,7 @@
             icon:L.divIcon({className:'official-portage-badge unresolved',html:'<span>P'+portage.number+'?</span>',iconSize:[34,24],iconAnchor:[17,12]})
           });
           visual={geometryResolved:false,points:[],mapped_miles:null,marker,referenceAnchor:anchorPoint};
-          marker.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:false,className:'isle-detail-popup'});
+          marker.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
           marker.bindTooltip('P'+portage.number+' · official portage · mapped corridor unresolved',{direction:'top'});
           marker.on('click',event=>{
             if(event.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
