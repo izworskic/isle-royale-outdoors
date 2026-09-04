@@ -142,8 +142,58 @@
   map.createPane('portagePane');
   map.getPane('portagePane').style.zIndex = '555';
 
-  map.createPane('routePane');
-  map.getPane('routePane').style.zIndex = '610';
+  // Detail cards can be tall (facts, source notes, related links), and a Leaflet popup only
+  // knows how to anchor itself to the tapped point — it has no idea a phone's map box is short.
+  // autoPan and the mobile centered-popup CSS (see index.html) help, but a card can still land
+  // somewhere inconvenient. One small drag handle lets a visitor put it wherever is actually
+  // readable, on any screen size, without the drag-promotion machinery this used to require.
+  let cardDrag = null;
+  document.addEventListener('pointerdown', event => {
+    const handle = event.target.closest('.popup-drag-handle');
+    const popupEl = handle?.closest('.leaflet-popup');
+    if (!handle || !popupEl) return;
+    event.preventDefault();
+    const rect = popupEl.getBoundingClientRect();
+    const set = (prop,val) => popupEl.style.setProperty(prop,val,'important');
+    set('position','fixed');
+    set('margin','0');
+    set('transform','none');
+    set('bottom','auto');
+    set('left',rect.left+'px');
+    set('top',rect.top+'px');
+    cardDrag = {popupEl, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top};
+    handle.setPointerCapture(event.pointerId);
+  });
+  document.addEventListener('pointermove', event => {
+    if (!cardDrag) return;
+    const {popupEl, startX, startY, left, top} = cardDrag;
+    const w = popupEl.offsetWidth, h = popupEl.offsetHeight;
+    const nextLeft = Math.min(Math.max(4, left+(event.clientX-startX)), window.innerWidth-w-4);
+    const nextTop = Math.min(Math.max(4, top+(event.clientY-startY)), window.innerHeight-h-4);
+    popupEl.style.setProperty('left', nextLeft+'px', 'important');
+    popupEl.style.setProperty('top', nextTop+'px', 'important');
+  });
+  document.addEventListener('pointerup', () => { cardDrag = null; });
+  map.on('popupopen', event => {
+    const el = event.popup.getElement();
+    if (!el?.classList.contains('isle-detail-popup')) return;
+    const wrapper = el.querySelector('.leaflet-popup-content-wrapper');
+    if (!wrapper || wrapper.querySelector('.popup-drag-handle')) return;
+    const handle = document.createElement('div');
+    handle.className = 'popup-drag-handle';
+    handle.setAttribute('role','button');
+    handle.setAttribute('tabindex','0');
+    handle.setAttribute('aria-label','Drag to move this card');
+    handle.innerHTML = '<span aria-hidden="true">⠿</span> Move card';
+    wrapper.insertBefore(handle, wrapper.firstChild);
+  });
+  map.on('popupclose', event => {
+    // Clear any drag-time position so the next open starts from the normal anchored (desktop)
+    // or centered (mobile) position instead of wherever this popup was last dragged to.
+    const el = event.popup.getElement();
+    if (!el) return;
+    for (const prop of ['position','left','top','bottom','margin','transform']) el.style.removeProperty(prop);
+  });
 
   const osmContextGroup = L.layerGroup();
   const layerGroups = {

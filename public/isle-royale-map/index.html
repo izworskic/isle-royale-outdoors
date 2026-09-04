@@ -109,6 +109,9 @@ button{cursor:pointer}
 
 .leaflet-popup-content{font:12px/1.45 Inter,ui-sans-serif,system-ui,sans-serif;margin:14px 16px}
 .isle-detail-popup .leaflet-popup-content-wrapper{border-radius:12px}
+.popup-drag-handle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 0;background:#f3f5f1;border-bottom:1px solid #e1e1dc;border-radius:12px 12px 0 0;font-size:11px;font-weight:800;color:#4a564f;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.popup-drag-handle:active{cursor:grabbing;background:#e9ede9}
+.popup-drag-handle span{font-size:14px;letter-spacing:1px;line-height:1}
 .isle-detail-popup .leaflet-popup-content{max-height:min(62vh,520px);overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;touch-action:pan-y}
 .isle-detail-popup .leaflet-popup-close-button{width:34px;height:34px;font-size:22px;line-height:30px}
 @media(max-width:620px){

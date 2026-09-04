@@ -495,3 +495,22 @@ test('detail popups reposition to stay readable, and detach from the map box ent
   assert.match(html, /\.isle-detail-popup\{position:fixed!important/);
   assert.match(html, /transform:translate\(-50%,-50%\)!important/);
 });
+
+test('detail cards can be grabbed and dragged to wherever is actually readable', () => {
+  // autoPan and centering help, but cards vary a lot in height (facts, source notes, related
+  // links, numbered-site chips) and can still land somewhere inconvenient — especially on a
+  // short phone map box. A drag handle lets a visitor put the card exactly where they need it,
+  // without reinstating the old promotion/retry-polling machinery this used to take.
+  assert.match(js, /const handle = document\.createElement\('div'\);/);
+  assert.match(js, /handle\.className = 'popup-drag-handle'/);
+  assert.match(js, /wrapper\.insertBefore\(handle, wrapper\.firstChild\)/);
+  assert.match(js, /handle\.setPointerCapture\(event\.pointerId\)/);
+  assert.match(js, /popupEl\.style\.setProperty\('left',.*'important'\)/);
+  assert.match(js, /popupEl\.style\.setProperty\('top',.*'important'\)/);
+  // Drag position must be cleared on close, or a reopened popup starts wherever it was last
+  // dropped instead of its normal anchored/centered position.
+  assert.match(js, /map\.on\('popupclose', event => \{/);
+  assert.match(js, /el\.style\.removeProperty\(prop\)/);
+  assert.match(html, /\.popup-drag-handle\{[^}]*touch-action:none/);
+  assert.match(html, /\.popup-drag-handle\{[^}]*cursor:grab/);
+});
