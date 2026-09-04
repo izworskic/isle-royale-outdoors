@@ -2,6 +2,23 @@
 
 Updated: 2026-08-30
 
+> **Sep 4 2026 — scope change.** The interactive route/trip-planning engine described throughout
+> this plan (watercraft checkpoint routing, canoe/portage auto-expansion, itinerary, scenarios,
+> trip save/share/GPX) was removed from `public/assets/isle-royale-map.js`, not merely hidden
+> behind `PLANNER_ENABLED`. It had shipped fully built but flagged off since it failed real usage
+> twice (froze on portage add; broken again after a fix attempt) and was never usable enough to
+> ship. The full implementation remains in git history — tag `pre-route-removal-2026-09-04` — if
+> trip-building is ever revisited; that should be its own scoped project with real incremental
+> testing, not a patch onto this file. The popup-drag "floating inspector" panel was removed for
+> the same reason (dead code: it referenced a drag-handle element that was never actually created).
+> What ships now is the core informational map: live NPS/ArcGIS/OSM visitor-geometry ingestion,
+> the 16 official NPS portages as an informational layer (distance/terrain/both landings, no
+> route-building action), campground/dock/lighthouse/shipwreck/quiet-zone popups, search/filter,
+> and the deep/context science layers. The sections below describing route/trip planning are kept
+> as a historical record of that build, not a description of the current product. See
+> `benchmarks/isle-royale-map.json` (v3.0.0) and `tests/isle-royale-map.test.js` for what the
+> current product is actually held to.
+
 ## Product thesis
 
 The page should not be another brochure viewer. It should be the place where a visitor can search Isle Royale once and move between the island's operational visitor geography, boating rules, maritime history, science layers and old cartography without losing source context.

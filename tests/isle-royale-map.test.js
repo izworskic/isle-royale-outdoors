@@ -10,16 +10,12 @@ const sourceHtml = fs.readFileSync(path.join(root, 'public/isle-royale-map/sourc
 const js = fs.readFileSync(path.join(root, 'public/assets/isle-royale-map.js'), 'utf8');
 const api = fs.readFileSync(path.join(root, 'api/isle-royale.js'), 'utf8');
 const isleApiModule = require(path.join(root, 'api/isle-royale.js'));
-const routeWeatherApi = fs.readFileSync(path.join(root, 'api/isle-royale-route-weather.js'), 'utf8');
 const catalog = JSON.parse(fs.readFileSync(path.join(root, 'public/isle-royale-map/catalog.json'), 'utf8'));
 const deepManifest = JSON.parse(fs.readFileSync(path.join(root, 'public/isle-royale-map/data/deep-layer-manifest.json'), 'utf8'));
 const contextManifest = JSON.parse(fs.readFileSync(path.join(root, 'public/isle-royale-map/data/context-layer-manifest.json'), 'utf8'));
 const officialPortages = JSON.parse(fs.readFileSync(path.join(root, 'public/isle-royale-map/data/official-portages-2026.json'), 'utf8'));
 const benchmarkSpec = JSON.parse(fs.readFileSync(path.join(root, 'benchmarks/isle-royale-map.json'), 'utf8'));
 const contextBuilder = fs.readFileSync(path.join(root, 'scripts/build-isle-royale-context-layers.py'), 'utf8');
-const waterIntelJs = fs.readFileSync(path.join(root, 'public/assets/isle-royale-water-intelligence.js'), 'utf8');
-const waterIntelApi = fs.readFileSync(path.join(root, 'api/isle-royale-water-intelligence.js'), 'utf8');
-const waterGeometryLib = fs.readFileSync(path.join(root, 'lib/isle-royale/water-geometry.js'), 'utf8');
 const isleBenchmark = fs.readFileSync(path.join(root, 'scripts/benchmark-isle-royale-map.mjs'), 'utf8');
 const deepWorkflow = fs.readFileSync(path.join(root, '.github/workflows/isle-royale-deep-data.yml'), 'utf8');
 const contextWorkflow = fs.readFileSync(path.join(root, '.github/workflows/isle-royale-context-data.yml'), 'utf8');
@@ -137,7 +133,7 @@ test('source strategy and machine-readable source desk stay off the route-planni
 });
 
 test('planning, provenance, accessibility and safety hooks exist', () => {
-  for (const id of ['feature-search','layer-filters','feature-list','map-status','park-live-status','source-catalog','route-planner']) assert.ok(html.includes(`id="${id}"`), id);
+  for (const id of ['feature-search','layer-filters','feature-list','map-status','park-live-status','source-catalog']) assert.ok(html.includes(`id="${id}"`), id);
   assert.match(html, /not a navigation chart/i);
   assert.match(html, /National Park Service/i);
   assert.match(html, /Official reference maps/);
@@ -167,10 +163,10 @@ test('map points have large pointer tolerance and data-rich detail popups', () =
   assert.match(js, /NPS ferry, seaplane & transportation/);
   assert.match(js, /NPS lighthouses & places to go/);
   assert.match(js, /Open map-data source/);
-  // The planner is hidden, so this panel no longer sells trip building. What must still hold is
-  // the SHAPE the pin protected: map on top, one criteria panel beneath, and no second
+  // The planner is removed, so this panel no longer sells trip building. What must still hold is
+  // the SHAPE the pin protected: map on top, one info panel beneath, and no second
   // route-construction UI down there.
-  assert.match(html, /<div class="criteria-header">/);
+  assert.match(html, /<div class="panel-header">/);
   assert.match(html, /\.popup-action\{[^}]*min-height:42px/);
   assert.match(html, /\.isle-detail-popup \.leaflet-popup-content/);
 });
@@ -188,27 +184,6 @@ test('Isle Royale interaction script is cache-busted and not stored during activ
   assert.equal(headers['Cache-Control'], 'no-store, max-age=0');
   assert.equal(headers['CDN-Cache-Control'], 'no-store');
   assert.equal(headers['Vercel-CDN-Cache-Control'], 'no-store');
-});
-
-test('rich map cards promote into a readable floating inspector', () => {
-  for (const id of ['map-inspector','map-inspector-drag','map-inspector-body','map-inspector-center-point','map-inspector-center-card','map-inspector-close']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  assert.match(js, /function popupSafeBounds/);
-  assert.match(js, /function promotePopupToFloatingInspector/);
-  assert.match(js, /function scheduleFloatingInspectorPromotion/);
-  assert.match(js, /function sizeFloatingInspector/);
-  assert.match(js, /function centerFloatingInspector/);
-  assert.match(js, /floatingInspector\.body\.replaceChildren\(detail\)/);
-  assert.match(js, /popupEl\.classList\.add\('isle-popup-promoted'\)/);
-  assert.match(js, /map\.on\('popupopen'[\s\S]{0,500}scheduleFloatingInspectorPromotion\(popup\)/);
-  assert.match(js, /visibleMapOverlay\('\.planning-cockpit'\)/);
-  assert.match(js, /\['\.map-toolbar','\.route-map-guide'\]/);
-  assert.match(js, /visibleMapOverlay\('\.map-status'\)/);
-  assert.match(html, /\.map-inspector\{/);
-  assert.match(html, /\.map-inspector-body\{[^}]*overflow:auto/);
-  assert.match(html, /\.isle-popup-promoted\{visibility:hidden!important/);
-  assert.match(html, /body\.map-focus\.detail-popup-open \.planning-cockpit\{display:none\}/);
 });
 
 test('supplemental data is reversible and labels the feature before the data source', () => {
@@ -265,77 +240,6 @@ test('campground cards combine official NPS capacity with only explicit mapped s
   assert.doesNotMatch(js, /for\s*\([^)]*shelters[^)]*\).*Shelter #/i);
 });
 
-test('floating inspector drag moves the card itself instead of panning the map', () => {
-  assert.match(js, /function inspectorPosition/);
-  assert.match(js, /function wireFloatingInspectorDrag/);
-  assert.match(html, /Drag this card anywhere on the map/);
-  assert.match(js, /function centerInspectorPoint/);
-  assert.match(html, /Center card/);
-  assert.match(html, /Center point/);
-  assert.match(js, /window\.addEventListener\('pointermove',move/);
-  assert.match(js, /window\.addEventListener\('pointerup',end/);
-  assert.match(js, /shell\.style\.left=.*\+'px'/);
-  assert.match(js, /shell\.style\.top=.*\+'px'/);
-  const dragStart=js.indexOf('function wireFloatingInspectorDrag');
-  const dragEnd=js.indexOf('wireFloatingInspectorDrag();',dragStart);
-  assert.ok(dragStart>=0&&dragEnd>dragStart);
-  const dragBlock=js.slice(dragStart,dragEnd);
-  assert.match(dragBlock, /inspectorPosition\(/);
-  assert.doesNotMatch(dragBlock, /map\.panBy\(/);
-  assert.match(html, /\.map-inspector-drag\{/);
-  assert.match(html, /cursor:grab/);
-  assert.match(html, /touch-action:none/);
-  assert.match(html, /\.map-inspector-drag\.dragging\{cursor:grabbing/);
-});
-
-test('official portage cards promote into the same floating inspector', () => {
-  assert.match(js, /function officialPortagePopup/);
-  assert.match(js, /wrap\.className='popup-detail official-portage-popup'/);
-  assert.match(js, /line\.bindPopup\(\(\)=>officialPortagePopup\(portage,visual\)/);
-  assert.match(js, /badge\.bindPopup\(\(\)=>officialPortagePopup\(portage,visual\)/);
-  assert.match(js, /marker\.bindPopup\(\(\)=>officialPortagePopup\(portage,visual\)/);
-  assert.match(js, /className:'isle-detail-popup'/);
-  assert.match(js, /map\.on\('popupopen'[\s\S]{0,500}scheduleFloatingInspectorPromotion\(popup\)/);
-  assert.match(js, /floatingInspector\.body\.replaceChildren\(detail\)/);
-});
-
-test('route criteria stay below the map without duplicating route construction', () => {
-  for (const id of ['route-planner','route-mode-select','route-speed','route-departure','route-summary','route-weather-button','route-weather']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  // The planner is hidden, so this panel no longer sells trip building. What must still hold is
-  // the SHAPE the pin protected: map on top, one criteria panel beneath, and no second
-  // route-construction UI down there.
-  assert.match(html, /<div class="criteria-header">[\s\S]{0,400}<h2>[^<]+<\/h2>/);
-  assert.match(html, /class="panel-block route-planner criteria-panel planner-only"/);
-  assert.match(html, /The route bar on the map is the only build control/);
-  assert.match(html, /\.route-compat-controls\{display:none!important\}/);
-  assert.doesNotMatch(html, /<span class="route-badge">ROUTE INTELLIGENCE<\/span>/);
-  assert.match(js, /function addRoutePoint/);
-  assert.match(js, /function distanceMiles/);
-  assert.match(js, /function bearingDegrees/);
-  assert.match(js, /function routeForecastSamples/);
-  assert.match(js, /function relativeWind/);
-  assert.match(js, /Start route here/);
-  assert.match(js, /isle_royale_route_weather/);
-  assert.match(js, /\/api\/isle-royale-route-weather/);
-});
-
-test('route weather uses NWS marine grid data and Isle Royale NDBC wind stations', () => {
-  assert.match(routeWeatherApi, /api\.weather\.gov/);
-  assert.match(routeWeatherApi, /forecastGridData/);
-  assert.match(routeWeatherApi, /waveHeight/);
-  assert.match(routeWeatherApi, /wavePeriod/);
-  assert.match(routeWeatherApi, /waveDirection/);
-  assert.match(routeWeatherApi, /windSpeed/);
-  assert.match(routeWeatherApi, /windDirection/);
-  assert.match(routeWeatherApi, /PILM4/);
-  assert.match(routeWeatherApi, /ROAM4/);
-  assert.match(routeWeatherApi, /alerts\/active\?point=/);
-  assert.match(routeWeatherApi, /planning sketches, not navigational routes/i);
-});
-
-
 test('live operations feed is fail-soft and never claims no alerts from a parser no-match', () => {
   assert.match(api, /Promise\.allSettled/);
   assert.match(api, /degraded:/);
@@ -352,267 +256,6 @@ test('quiet/no-wake ETL is IRMA-first and fails closed on a stale regulatory set
   assert.match(contextBuilder, /quiet_count != 19/);
   assert.match(contextBuilder, /no_wake_count != 3/);
   assert.match(contextBuilder, /refusing to promote older\/mismatched geometry/);
-});
-
-test('water intelligence supports fine multi-point coast, inland-water, and waterway routing', () => {
-  assert.match(html, /id="route-day-hours"/);
-  assert.match(html, /isle-royale-water-intelligence\.js\?v=2026\d{4}-[a-z0-9-]+/);
-  // and both scripts must carry the SAME version, or a browser can load a new map script against a
-  // cached old engine
-  const mapVersion = html.match(/isle-royale-map\.js\?v=([a-z0-9-]+)/)?.[1];
-  const engineVersion = html.match(/isle-royale-water-intelligence\.js\?v=([a-z0-9-]+)/)?.[1];
-  assert.equal(mapVersion, engineVersion, 'map script and water engine must be cache-busted together');
-  assert.match(js, /async function resolveWaterRouteAsync\(seedLegs=\[\]\)/);
-  assert.match(js, /async function resolveCanoeRouteAsync\(seedLegs=\[\]\)/);
-  assert.match(js, /preserveVerifiedPrefix/);
-  assert.match(js, /kind:watercraft\?'water-checkpoint':'map-point'/);
-  assert.match(js, /Water checkpoint/);
-  assert.match(waterIntelJs, /function gridSpec/);
-  assert.match(waterIntelJs, /direct<=2\)\{step=\.0007/);
-  assert.match(waterIntelJs, /function centerlineRoute/);
-  assert.match(waterIntelJs, /function isMappedWater/);
-  assert.match(waterIntelJs, /waterPolygons/);
-  assert.match(waterIntelJs, /landPolygons/);
-  assert.match(waterIntelJs, /No mapped-water route found between these checkpoints/);
-  assert.match(waterIntelApi, /natural"="water"/);
-  assert.match(waterIntelApi, /waterway"~"river\|stream\|canal\|riverbank"/);
-  // The geometry payload is assembled in lib/isle-royale/water-geometry.js so the committed dataset
-  // and any live refresh are normalised by one implementation.
-  assert.match(waterGeometryLib, /land_polygons/);
-  assert.match(waterGeometryLib, /water_polygons/);
-  assert.match(waterGeometryLib, /water_centerlines/);
-  assert.match(waterIntelApi, /toPayload/);
-  assert.match(waterIntelApi, /not a navigation chart/i);
-  assert.match(isleBenchmark, /waterIntelligenceRuntime/);
-});
-
-test('marine forecast sampling grows with route distance rather than control-point count', () => {
-  assert.match(js, /Math\.ceil\(total\/4\)\+1/);
-  assert.doesNotMatch(js, /Math\.min\(max,Math\.max\(2,route\.points\.length\)\)/);
-});
-
-test('map-first route builder accepts every mappable feature and keeps criteria below the map', () => {
-  assert.match(html, /id="explore-mode"[^>]*aria-pressed="false"[^>]*>Inspect map/);
-  assert.match(html, /id="route-mode"[^>]*aria-pressed="true"[^>]*>Plan route/);
-  assert.match(html, /id="route-map-guide"/);
-  assert.match(html, /Trace the trip with checkpoints/);
-  // The planner is hidden, so this panel no longer sells trip building. What must still hold is
-  // the SHAPE the pin protected: map on top, one criteria panel beneath, and no second
-  // route-construction UI down there.
-  assert.match(html, /<div class="criteria-header">[\s\S]{0,400}<h2>[^<]+<\/h2>/);
-  assert.match(html, /The route bar on the map is the only build control/);
-  assert.match(js, /function featureRoutePoint/);
-  assert.match(js, /function addFeatureToRoute/);
-  assert.match(js, /if\(route\.adding\) \{/);
-  assert.match(js, /addFeatureToRoute\(record,\{latlng:event\.latlng\|\|recordRoutePoint\(record\)\}\)/);
-  assert.doesNotMatch(js, /route\.adding&&record\.latlng/);
-  assert.match(js, /record\.category==='campground'&&record\.liveAlert/);
-  assert.match(js, /sourceBackedBoatIn:Boolean\(record\?\.boater\)/);
-  assert.match(js, /if\(!route\.adding\)return;/);
-  assert.match(js, /function renderRouteStops/);
-  assert.doesNotMatch(js, /route\.points\.length===2\)setRouteAdding\(false\)/);
-});
-
-test('focused route building keeps controls, verified prefix mileage, and day-by-day actions visible', () => {
-  for (const id of ['route-build-bar','route-build-phase','route-build-metrics','route-back-point','route-finish-day','route-finish-build','route-review-actions','route-review-edit','route-review-save','route-review-share','route-review-gpx','cockpit-back-point','cockpit-finish-day','cockpit-finish-trip']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  assert.match(html, /Back one point/);
-  assert.match(html, />Finish day</);
-  assert.match(html, />Finish trip</);
-  assert.match(html, /body\.map-focus \.route-build-bar\{display:flex!important/);
-  assert.doesNotMatch(html, /body\.map-focus \.route-build-bar\{display:none!important/);
-  assert.match(js, /function verifiedRouteMiles/);
-  assert.match(js, /function currentDayVerifiedMiles/);
-  assert.match(js, /function finishCurrentDay/);
-  assert.match(js, /isle_royale_finish_day/);
-  assert.match(js, /function backOneRoutePoint/);
-  assert.match(js, /route\.points\.pop\(\)/);
-  assert.match(js, /isle_royale_route_back_point/);
-  assert.match(js, /els\.routeBackPoint\?\.addEventListener\('click',backOneRoutePoint\)/);
-  assert.match(js, /els\.routeFinishDay\?\.addEventListener\('click',finishCurrentDay\)/);
-  assert.match(js, /els\.cockpitFinishDay\?\.addEventListener\('click',finishCurrentDay\)/);
-  assert.match(js, /els\.cockpitFinishTrip\?\.addEventListener\('click',finishRouteBuild\)/);
-  assert.match(js, /routeFinishBuild\.disabled=pointCount<2\|\|/);
-  assert.match(js, /Finish is blocked until every paddle leg resolves on water/);
-  assert.match(js, /verified this day/);
-  assert.doesNotMatch(js, /Draft route · straight between selected points while mapped routing verifies/);
-});
-
-test('canoe resolved leg distance labels use the current route leg index', () => {
-  assert.match(js, /route\.smartState==='canoe-aware'/);
-  assert.match(js, /const canoeLeg=route\.mode==='canoe'\?route\.mixedLegs\[index-1\]\|\|null:null/);
-  assert.doesNotMatch(js, /route\.mixedLegs\[i-1\]\|\|null:null/);
-});
-
-test('trip intelligence uses researched pace presets and automatic carry math', () => {
-  for (const id of ['route-paddle-pace','route-portage-pace','route-portage-trips','route-trip-brief','route-export-plan']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  assert.doesNotMatch(html, /id="route-stroke-rate"|id="route-feet-per-stroke"|id="route-portage-speed"|id="route-portage-transition"/);
-  assert.match(html, /Easy · 2\.5 mph/);
-  assert.match(html, /Average · 3\.0 mph/);
-  assert.match(html, /Strong · 3\.5 mph/);
-  assert.match(html, /Easy · 1\.5 mph/);
-  assert.match(html, /Average · 2\.0 mph/);
-  assert.match(html, /Strong · 2\.5 mph/);
-  assert.match(html, /2 · double carry/);
-  assert.match(html, /3 · triple carry/);
-  assert.match(js, /const PADDLE_PACES=Object\.freeze/);
-  assert.match(js, /easy:\{label:'Easy',mph:2\.5\}/);
-  assert.match(js, /average:\{label:'Average',mph:3\}/);
-  assert.match(js, /strong:\{label:'Strong',mph:3\.5\}/);
-  assert.match(js, /const PORTAGE_PACES=Object\.freeze/);
-  assert.match(js, /easy:\{label:'Easy',mph:1\.5\}/);
-  assert.match(js, /average:\{label:'Average',mph:2\}/);
-  assert.match(js, /strong:\{label:'Strong',mph:2\.5\}/);
-  assert.match(js, /function paddlePaceSpeed/);
-  assert.match(js, /function portagePaceSpeed/);
-  assert.match(js, /function legacyPaddlePace/);
-  assert.match(js, /function legacyPortagePace/);
-  assert.match(js, /function normalizeCarryTrips/);
-  assert.match(js, /2\*trips-1/);
-  assert.match(js, /function portageTerrainFactor/);
-  assert.match(js, /extremely steep/);
-  assert.match(js, /wet/);
-  assert.match(js, /rocky/);
-  assert.match(js, /walkingHours\+transitionHours/);
-  assert.match(js, /function tripEffortSummary/);
-  assert.match(js, /function tripDays/);
-  assert.match(js, /function tripDescription/);
-  assert.match(js, /function renderTripBrief/);
-  assert.match(js, /Portage terrain adjustments are planning heuristics/);
-  assert.doesNotMatch(js, /paddleSpeedFromStrokes|strokeCountForMiles|estimated stroke cycles|strokes\/min|feet per stroke/);
-  assert.match(html, /\.trip-brief\{/);
-  assert.match(html, /\.trip-day\{/);
-});
-
-test('saved trips are visible, named, recoverable, and portable beyond one hidden localStorage slot', () => {
-  for (const id of ['route-trip-name','route-save-named','route-saved-list']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  assert.match(html, /id="route-saved-list"/);
-  assert.match(html, /route-compat-controls/);
-  assert.doesNotMatch(html, /<details class="saved-trip-panel" open>/);
-  assert.match(js, /TRIP_LIBRARY_KEY='isle-royale-trip-library-v1'/);
-  assert.match(js, /TRIP_AUTOSAVE_KEY='isle-royale-trip-autosave-v1'/);
-  assert.match(js, /function readTripLibrary/);
-  assert.match(js, /function writeTripLibrary/);
-  assert.match(js, /function autosaveTripDraft/);
-  assert.match(js, /function renderSavedTrips/);
-  assert.match(js, /Working route · autosaved/);
-  assert.match(js, /Saved “'\+name\+'” on this device/);
-  assert.match(js, /library_count:next\.length/);
-  assert.match(js, /function tripPlanHtml/);
-  assert.match(js, /function downloadTripPlan/);
-  assert.match(js, /format:'html-plan'/);
-  assert.match(js, /link\.download=name\+'-plan\.html'/);
-  assert.match(js, /renderSavedTrips\(\)/);
-});
-
-test('trip persistence stays local/share-fragment based and GPX exports only resolved geometry', () => {
-  assert.match(html, /id="route-save"/);
-  assert.match(html, /id="route-restore"/);
-  assert.match(html, /id="route-share"/);
-  assert.match(html, /id="route-export-gpx"/);
-  assert.match(html, /id="cockpit-save"/);
-  assert.match(html, /id="cockpit-share"/);
-  assert.match(html, /id="cockpit-gpx"/);
-  assert.match(js, /TRIP_STORAGE_KEY='isle-royale-trip-v1'/);
-  assert.match(js, /TRIP_LIBRARY_KEY='isle-royale-trip-library-v1'/);
-  assert.match(js, /TRIP_AUTOSAVE_KEY='isle-royale-trip-autosave-v1'/);
-  assert.match(js, /localStorage\.setItem\(TRIP_STORAGE_KEY/);
-  assert.match(js, /url\.hash='trip='/);
-  assert.match(js, /window\.history\.replaceState\(null,'',url\.toString\(\)\)/);
-  assert.match(js, /window\.location\.hash\.startsWith\('#trip='\)/);
-  assert.match(js, /sourceBackedBoatIn:false,liveAlert:false/);
-  assert.match(js, /function exportRouteGpx/);
-  assert.match(js, /application\/gpx\+xml/);
-  assert.match(js, /temporary fallback sketches are not exported/);
-  assert.match(js, /Planning export from Chris Izworski Isle Royale Map\. Not a navigation chart/);
-  assert.match(js, /const gpxReady=routeIsResolved\(\)/);
-});
-
-test('focus map uses the same route bar and never opens a second planning cockpit', () => {
-  assert.match(html, /id="planning-cockpit"/);
-  assert.match(html, /\.planning-cockpit\{display:none!important\}/);
-  assert.match(html, /body\.map-focus \.planning-cockpit\{display:none!important\}/);
-  assert.match(html, /body\.map-focus \.route-build-bar\{left:12px!important;right:12px!important;width:auto!important\}/);
-  assert.match(js, /function captureRouteSnapshot/);
-  assert.match(js, /function snapshotFingerprint/);
-  assert.match(js, /function rememberRouteEdit\(action='route edit'\)/);
-  assert.match(js, /function undoRouteEdit/);
-  assert.match(js, /function redoRouteEdit/);
-  assert.match(js, /function restoreRouteSnapshot/);
-  assert.match(js, /departure:route\.departure/);
-  assert.match(js, /adding:Boolean\(route\.adding\)/);
-});
-
-test('undo is one-action-per-step and restores planning settings instead of DOM-after-change values', () => {
-  assert.match(js, /speed:Number\(route\.speed\)\|\|3/);
-  assert.match(js, /hours:Number\(route\.hours\)\|\|6/);
-  assert.match(js, /departure:route\.departure\|\|els\.routeDeparture/);
-  assert.match(js, /if\(next===route\.departure\)return/);
-  assert.match(js, /if\(Math\.abs\(next-route\.speed\)<\.001\)/);
-  assert.match(js, /if\(Math\.abs\(next-route\.hours\)<\.001\)/);
-  assert.match(js, /last\?\.fingerprint===fingerprint/);
-  assert.match(js, /route\.future=\[\]/);
-  assert.match(js, /Choose a route start first, then use End day here/);
-  assert.match(js, /if\(!addedForDayEnd\)rememberRouteEdit/);
-  assert.match(js, /emitEvent\('isle_royale_route_undo'/);
-  assert.match(js, /emitEvent\('isle_royale_route_redo'/);
-});
-
-test('planning map is the dominant full-width surface with a full-viewport focus mode', () => {
-  assert.match(html, /id="focus-map"[^>]*aria-pressed="false"[^>]*>Focus map/);
-  assert.match(html, /\.shell\{display:grid!important;grid-template-columns:1fr!important/);
-  assert.match(html, /\.map-wrap\{position:relative!important;top:auto!important;height:clamp\(650px,78dvh,920px\)!important/);
-  assert.match(html, /\.route-building \.map-wrap\{height:clamp\(700px,84dvh,980px\)!important/);
-  assert.match(html, /@media\(max-width:760px\)[\s\S]*\.map-wrap\{height:72dvh!important/);
-  assert.match(html, /body\.map-focus \.map-wrap\{position:fixed;inset:0/);
-  assert.match(js, /function setMapFocus/);
-  assert.match(js, /map\.invalidateSize\(\{pan:false\}\)/);
-  assert.match(js, /isle_royale_map_focus/);
-});
-
-test('manual campsite day ends are explicit, source-aware route decisions', () => {
-  assert.match(js, /function setCampDayEnd/);
-  assert.match(js, /End next day here/);
-  assert.match(js, /End day here/);
-  assert.match(js, /manualDayEnd/);
-  assert.match(js, /manual_day_end/);
-  assert.match(js, /not in the current NPS Boat-In campground feed/);
-  assert.match(js, /CURRENT NPS CLOSURE/);
-  assert.match(waterIntelJs, /nextManual=candidates\.find/);
-  assert.match(waterIntelJs, /manual_day_end:Boolean\(chosen\?\.manual_day_end\)/);
-  assert.match(waterIntelJs, /under_target:Boolean\(chosen\?\.manual_day_end/);
-});
-
-test('scenario planner compares three trip structures without turning them into safety scores', () => {
-  assert.match(html, /id="route-scenarios"/);
-  assert.match(html, /Hours\/day/);
-  assert.match(js, /function renderRouteScenarios/);
-  assert.match(js, /function compareScenarioWeather/);
-  assert.match(js, /function applyScenarioPlan/);
-  assert.match(js, /filter\(point=>!point\.scenarioGenerated\)/);
-  assert.match(js, /isle_royale_scenario_apply/);
-  assert.match(js, /isle_royale_scenario_weather/);
-  assert.match(js, /Scenario names describe trip structure, not safety/);
-  assert.match(waterIntelJs, /Weather-conservative/);
-  assert.match(waterIntelJs, /Balanced/);
-  assert.match(waterIntelJs, /Ambitious/);
-  assert.match(isleBenchmark, /scenarioRuntime/);
-});
-
-test('multi-day route weather accepts explicit itinerary target times after overnight stops', () => {
-  const normalizeWaypoint = require('../api/isle-royale-route-weather.js')._test.normalizeWaypoint;
-  const target = '2026-09-02T14:30:00.000Z';
-  const waypoint = normalizeWaypoint({lat:48.05,lon:-88.75,distance_miles:12,target_time:target},0);
-  assert.equal(waypoint.target_time,target);
-  assert.match(routeWeatherApi, /Scheduled route sample falls outside the supported NWS forecast window/);
-  assert.match(routeWeatherApi, /Multi-day samples may use explicit itinerary target times after overnight stops/);
-  assert.match(js, /function routeScheduledForecastSamples/);
-  assert.match(js, /target_time:p\.target_time\|\|null/);
 });
 
 test('current NPS off-trail camping zone closures are parsed without fabricating polygons', () => {
@@ -717,24 +360,6 @@ test('GIS workflows validate on PRs and only rebuild or write on explicit dispat
 
 
 
-test('watercraft routes keep only verified safe prefixes and never fall back over land', () => {
-  assert.match(js, /!\['canoe-aware','canoe-partial'\]\.includes\(route\.smartState\)/);
-  assert.match(js, /!\['water-aware','water-partial'\]\.includes\(route\.smartState\)/);
-  assert.match(js, /route\.smartState==='water-aware'&&Number\(route\.waterStats\?\.land_crossings\|\|0\)===0/);
-  assert.match(js, /Water route failed zero-land-crossing validation/);
-  assert.match(js, /stats\.land_crossings!==0/);
-  assert.match(js, /route\.smartState=legs\.length\?'water-partial':'water-fallback'/);
-  assert.match(js, /route\.smartState=legs\.length\?'canoe-partial':'canoe-fallback'/);
-  assert.match(js, /route\.resolvedPoints=combineCanoeLegs\(legs\)/);
-  assert.match(js, /Earlier safe-water lines and measurements remain on the map/);
-  assert.match(js, /Earlier lines and measurements remain valid/);
-  assert.doesNotMatch(js, /Draft route · straight between selected points while mapped routing verifies/);
-  assert.match(waterIntelJs, /function crossingCount/);
-  assert.match(waterIntelJs, /shortcutSafe=!crosses/);
-  assert.match(waterIntelJs, /if\(crossingCount\(safe\)>0\)throw new Error\('Generated checkpoint route intersects mapped land or a water boundary'\)/);
-  assert.match(waterIntelJs, /if\(landCrossings>0\)throw new Error\('Multi-point water route failed final land-crossing validation'\)/);
-});
-
 test('2026 NPS portage dataset is complete, source-backed, and keeps anchors non-navigational', () => {
   assert.equal(officialPortages.schema_version, 1);
   assert.equal(officialPortages.source_vintage, 2026);
@@ -754,258 +379,6 @@ test('2026 NPS portage dataset is complete, source-backed, and keeps anchors non
   assert.ok(Object.values(officialPortages.endpoint_anchors).every(a => /not-landing/.test(a.role)));
 });
 
-test('canoe runtime promotes strong mapped matches to official NPS portages without using anchors as geometry', () => {
-  assert.match(html, /Official portage dataset/);
-  assert.match(js, /officialPortages: '\/isle-royale-map\/data\/official-portages-2026\.json'/);
-  assert.match(js, /function loadOfficialPortages/);
-  assert.match(js, /function matchOfficialPortage/);
-  assert.match(js, /NPS 2026 portage completeness validation failed/);
-  assert.match(js, /distanceBasis:'nps-published'/);
-  assert.match(js, /mapped_miles:mappedMiles/);
-  assert.match(js, /officialPortage:official/);
-  assert.match(js, /NPS Portage #/);
-  assert.match(js, /elevation change/);
-  assert.match(js, /endpoint search anchors are not landing coordinates/i);
-  assert.doesNotMatch(js, /L\.polyline\([^\n]*endpoint_anchors/);
-});
-
-test('official NPS portages are first-class atomic canoe trip steps', () => {
-  assert.match(html, /data-layer="official-portage" checked/);
-  assert.match(html, /16 NPS 2026 carries/);
-  assert.match(html, /Click a brown <strong>P#<\/strong> when you want that portage/);
-  assert.match(js, /function officialPortageMappedGeometry/);
-  assert.match(js, /function officialPortageLandingPair/);
-  // The planner now runs the engine's yielding search so a long or failing leg cannot freeze the
-  // page; the synchronous forms stay exported for tests and the refresh endpoint.
-  assert.match(js, /router\.landingNearAsync/);
-  assert.match(js, /router\.routeAsync/);
-  assert.match(waterIntelJs, /function landingNear/);
-  assert.match(waterIntelJs, /async function landingNearAsync/);
-  assert.match(waterIntelJs, /async function routeAsync/);
-  assert.match(waterIntelJs, /route,routeAsync,landingNear,landingNearAsync,analyze,coastDistance,boundaryDistance/);
-  assert.match(js, /function selectedOfficialPortageLeg/);
-  assert.match(js, /officialMatchMethod:'selected-portage-trip-node'/);
-  assert.match(js, /async function addOfficialPortageToTrip/);
-  assert.match(js, /kind:'official-portage-landing'/);
-  assert.match(js, /portageGroupId:groupId/);
-  assert.match(js, /portageRole:role/);
-  assert.match(js, /portageSide:side/);
-  assert.match(js, /if\(route\.adding\) \{[\s\S]{0,180}addOfficialPortageToTrip\(portage\.id\)/);
-  assert.match(js, /function removePortageGroup/);
-  assert.match(js, /route\.points=route\.points\.filter\(point=>point\.portageGroupId!==groupId\)/);
-  assert.match(js, /draggable:point\.kind!=='official-portage-landing'/);
-  assert.match(js, /P'\+\(point\.portageNumber/);
-  assert.match(js, /one canoe trip step/);
-  assert.match(js, /isle_royale_portage_add/);
-  assert.match(js, /isle_royale_portage_remove/);
-  assert.doesNotMatch(js, /officialPortageMappedGeometry[\s\S]{0,1600}L\.polyline\([^\n]*endpoint_anchors/);
-});
-
-test('canoe planner connects water to atomic official portages and back to water', () => {
-  assert.match(html, /<option value="canoe"(?: selected)?>Canoe \+ portage<\/option>/);
-  assert.match(js, /function resolveCanoeRouteAsync/);
-  assert.match(js, /function canoeWaterLegCandidate/);
-  assert.match(js, /function selectedOfficialPortageLeg/);
-  assert.match(js, /selectedLeg=b\.officialPortageId&&selectedOfficialPortageStillMatches/);
-  assert.match(js, /const trail=selectedLeg\|\|canoeTrailLegCandidate/);
-  assert.match(js, /if\(direct<=\.08&&!router\.crosses\(a,b\)\)/);
-  assert.match(js, /Watercraft routes never cross land except on a designated brown P# portage/);
-  assert.match(js, /attempts an overland crossing that is not a designated NPS portage/);
-  assert.match(js, /route\.mixedLegs\.every\(leg=>leg\?\.verified/);
-  assert.match(js, /distanceBasis:'nps-published'/);
-  assert.doesNotMatch(js, /function canoeManualLeg/);
-  assert.doesNotMatch(js, /drawn water leg/);
-});
-
-test('route stops expose leg and cumulative distances and can be deleted from list or marker', () => {
-  assert.match(js, /function routeControlDistances/);
-  assert.match(js, /function projectControlPointAlongPath/);
-  assert.match(js, /function removeRoutePoint/);
-  assert.match(js, /mi (?:leg|water).*mi total/);
-  assert.match(html, /\.route-distance/);
-  assert.match(js, /Remove from route/);
-  assert.match(js, /marker\.bindPopup/);
-  assert.match(js, /remove\.textContent='Remove'/);
-});
-
-test('smart route planner stays map-built while preserving hiking and canoe routing engines', () => {
-  assert.match(html, /<h3>Trip criteria<\/h3>/);
-  assert.match(html, /id="route-smart-status"/);
-  assert.match(html, /id="route-reverse"/);
-  assert.match(html, /Click as many points along the water as you need/);
-  assert.match(html, /Click a brown <strong>P#<\/strong> when you want that portage/);
-  assert.match(js, /const trailGraph = \{/);
-  assert.match(js, /function registerTrailGeometry/);
-  assert.match(js, /function shortestTrailPath/);
-  assert.match(js, /function resolveHikingRoute/);
-  assert.match(js, /function nearestTrailNode/);
-  assert.match(js, /trail-snapped/);
-  assert.match(js, /Those points are not connected through the currently loaded trail network/);
-  assert.match(js, /draggable:point\.kind!=='official-portage-landing'/);
-  assert.match(js, /nearestControlSegmentIndex/);
-  assert.match(js, /route\.points\.splice\(index,0/);
-  assert.match(js, /function reverseRoute/);
-});
-
-test('route point workflow stays map-first and weather follows resolved geometry', () => {
-  assert.match(js, /Start route here/);
-  assert.match(js, /Route to here/);
-  assert.match(js, /Add as route stop/);
-  assert.doesNotMatch(js, /if\(route\.points\.length===2\)setRouteAdding\(false\)/);
-  assert.match(js, /function routePathPoints/);
-  assert.match(js, /return route\.resolvedPoints\.length \? route\.resolvedPoints : route\.points/);
-  assert.match(js, /const points=routePathPoints\(\)/);
-  assert.match(js, /Smart hiking route:/);
-  assert.match(js, /Editable multi-point route:/);
-});
-
-
-test('canoe trip creation has its own weighted north-star value function', () => {
-  const vf = benchmarkSpec.tripCreationValueFunction;
-  assert.ok(vf);
-  assert.equal(vf.formula,'TC = .25C + .20P + .15F + .15D + .10E + .07R + .05T + .03H');
-  assert.equal(vf.releaseTarget,92);
-  assert.equal(vf.stretchTarget,97);
-  assert.equal(Object.values(vf.dimensions).reduce((sum,item)=>sum+item.weight,0),100);
-  assert.equal(vf.dimensions.C.name,'travelContinuity');
-  assert.equal(vf.dimensions.P.name,'portageIntegration');
-  assert.ok(vf.hardGates.some(gate=>/portage.*one logical trip step/i.test(gate)));
-  assert.ok(vf.hardGates.some(gate=>/active travel time/i.test(gate)));
-});
-
-test('saved canoe trips count a compound portage as one logical trip step', () => {
-  assert.match(js, /function logicalRoutePointCount/);
-  assert.match(js, /seenPortages\.has\(point\.portageGroupId\)/);
-  assert.match(js, /cloneRoutePoints\(\)\.slice\(0,80\)/);
-  assert.match(js, /raw\.points\)\?raw\.points:\[\]\)\.slice\(0,80\)/);
-  assert.match(js, /logicalRoutePointCount\(normalized\.points\).*trip steps/);
-});
-
-test('canoe trip builder reports active travel time while constructing days', () => {
-  assert.match(js, /function canoeLegActiveHours/);
-  assert.match(js, /function verifiedTripActiveHours/);
-  assert.match(js, /function currentDayVerifiedHours/);
-  assert.match(js, /formatDuration\(dayHours\).*active travel/);
-  assert.match(js, /active_hours:Number\(hours\.toFixed\(2\)\)/);
-  assert.match(js, /Designated NPS portage · one canoe trip step/);
-  assert.match(js, /mi walked · ~'\+formatDuration\(hours\)/);
-});
-
-
-test('map sits above a compact criteria strip and owns route construction', () => {
-  // The planner is hidden, so this panel no longer sells trip building. What must still hold is
-  // the SHAPE the pin protected: map on top, one criteria panel beneath, and no second
-  // route-construction UI down there.
-  assert.match(html, /<div class="criteria-header">[\s\S]{0,400}<h2>[^<]+<\/h2>/);
-  assert.match(html, /class="route-fields criteria-fields"/);
-  for (const id of ['route-mode-select','route-paddle-pace','route-portage-pace','route-portage-trips','route-day-hours','route-departure']) {
-    assert.ok(html.includes(`id="${id}"`), id);
-  }
-  assert.match(html, /\.shell\{display:grid!important;grid-template-columns:1fr!important/);
-  assert.match(html, /\.panel\{border-left:0!important;border-top:1px solid var\(--line\)!important/);
-  assert.match(html, /\.criteria-fields\{display:grid!important;grid-template-columns:repeat\(6,minmax\(120px,1fr\)\)!important/);
-  assert.match(html, /<details class="map-options">/);
-  assert.match(html, /<summary>Map locations &amp; layers<\/summary>/);
-  assert.match(html, /\.planning-cockpit\{display:none!important\}/);
-  assert.doesNotMatch(html, /<details class="saved-trip-panel" open>/);
-});
-
-test('line and area features use the clicked map coordinate as a trip location', () => {
-  assert.match(js, /function featureRoutePoint\(record,clickedLatLng=null\)/);
-  assert.match(js, /clickedLatLng&&Number\.isFinite\(clickedLatLng\.lat\)/);
-  assert.match(js, /return recordRoutePoint\(record\)/);
-  assert.match(js, /if\(route\.adding\) \{[\s\S]{0,220}addFeatureToRoute\(record,\{latlng:event\.latlng\|\|recordRoutePoint\(record\)\}\)/);
-});
-
-
-test('multi-point checkpoint routing keeps earlier verified legs while extending the tail', () => {
-  assert.match(html, /Click as many points along the water as you need/);
-  assert.match(html, /class="panel-block route-planner criteria-panel planner-only"/);
-  assert.match(html, /You do not need to stop at two points/);
-  assert.match(js, /const waterSeed=preserve\?\[\.\.\.\(route\.waterLegs\|\|\[\]\)\]:\[\]/);
-  assert.match(js, /const mixedSeed=preserve\?\[\.\.\.\(route\.mixedLegs\|\|\[\]\)\]:\[\]/);
-  assert.match(js, /for\(let i=legs\.length\+1;i<route\.points\.length;i\+\+\)/);
-  assert.match(js, /reroute\('Checkpoint added\.[^']+',\{preserveVerifiedPrefix:true\}\)/);
-  assert.match(js, /point\.kind==='water-checkpoint'/);
-  assert.match(js, /isCheckpoint\?'is-checkpoint'/);
-  assert.match(js, /route\.adding\?'Water checkpoint':'Water checkpoint'/);
-  assert.doesNotMatch(js, /point\.kind==='water-checkpoint'[\s\S]{0,100}return 'Destination'/);
-});
-
-
-test('route planner opens ready to build a canoe trip once enabled', () => {
-  // Default config is canoe/build-ready; whether that default actually takes effect on load is
-  // gated by PLANNER_ENABLED, not hardcoded — see 'the planner is hidden behind one flag' below.
-  assert.match(js, /adding:PLANNER_ENABLED,[\s\S]{0,120}mode:'canoe'/);
-  assert.match(html, /id="route-mode"[^>]*aria-pressed="true"[^>]*>Plan route<\/button>/);
-  assert.match(html, /id="explore-mode"[^>]*aria-pressed="false"[^>]*>Inspect map<\/button>/);
-  assert.match(html, /<option value="canoe" selected>Canoe \+ portage<\/option>/);
-  assert.match(js, /if\(!sharedTripLoaded\) \{[\s\S]{0,120}setRouteAdding\(true\)/);
-});
-
-test('unresolved water legs keep a visible checkpoint guide without inventing mileage', () => {
-  assert.match(js, /function routeDisplayPoints\(\) \{[\s\S]{0,180}return route\.points;/);
-  assert.match(js, /const draftDisplay=!routeIsResolved\(\)&&displayPath\.length>=2/);
-  assert.match(js, /Checkpoint guide only · safe water\/portage route is still verifying/);
-  assert.doesNotMatch(js, /route-distance-draft">Draft/);
-});
-
-test('canoe routing can auto-expand two points through the designated NPS portage graph', () => {
-  assert.match(waterIntelJs, /function candidatePortageAnchors/);
-  assert.match(waterIntelJs, /function findPortageChains/);
-  assert.match(js, /function autoPortageRouteCandidate/);
-  assert.match(js, /function autoPortageLandingPoint/);
-  assert.match(js, /autoGeneratedPortage:true/);
-  assert.match(js, /route\.points\.splice\(i,0,\.\.\.autoPortage\.points\)/);
-  assert.match(js, /return resolveCanoeRouteAsync\(legs\)/);
-  assert.match(js, /Auto · Water \+ NPS portages/);
-  assert.match(js, /function pruneAutoGeneratedPortages/);
-});
-
-test('Chickenbone to McCargoe cannot use the closed vessel outlet', () => {
-  assert.match(js, /function closedVesselWaterConnection/);
-  assert.match(js, /chickenbone-lake/);
-  assert.match(js, /mccargoe-cove/);
-  assert.match(js, /NPS closes the Chickenbone Lake outlet toward McCargoe Cove to vessels/);
-  assert.match(js, /use designated P11/);
-  assert.ok(benchmarkSpec.hardGates.some(gate=>/Chickenbone Lake.*McCargoe Cove.*P11/i.test(gate)));
-});
-
-test('multimodal route-builder value function is a 90-point release gate', () => {
-  const rb = benchmarkSpec.multimodalRouteBuilderValueFunction;
-  assert.equal(rb.releaseTarget,90);
-  assert.equal(Object.values(rb.dimensions).reduce((sum,item)=>sum+item.weight,0),100);
-  assert.equal(rb.dimensions.C.name,'routeCorrectness');
-  assert.equal(rb.dimensions.P.name,'portageIntelligence');
-  assert.ok(rb.scenarios.some(item=>/different interior waterbodies/i.test(item)));
-  assert.ok(rb.scenarios.some(item=>/Chickenbone Lake.*McCargoe Cove.*P11/i.test(item)));
-});
-
-test('the planner is hidden behind one flag while its runtime is kept', () => {
-  const js = fs.readFileSync(path.join(root, 'public/assets/isle-royale-map.js'), 'utf8');
-
-  assert.match(js, /const PLANNER_ENABLED = false;/);
-  assert.match(js, /if \(!PLANNER_ENABLED\) document\.body\.classList\.add\('planner-off'\)/);
-  // Nothing may enter build mode while it is off, or a map click collects checkpoints against a UI
-  // the visitor cannot see. Four separate places can set route.adding or offer route controls —
-  // a bug found in production let three of them ignore the flag entirely (the raw initial value,
-  // a snapshot restore, and every feature card's own "Add to route" button), so every one of them
-  // is pinned here individually rather than trusting that fixing one covers the others.
-  assert.match(js, /route\.adding=PLANNER_ENABLED\?Boolean\(active\):false;/);
-  assert.match(js, /adding:PLANNER_ENABLED,/, 'the initial route state must not hardcode adding:true ahead of the flag');
-  assert.match(js, /route\.adding=PLANNER_ENABLED\?Boolean\(snapshot\.adding\):false;/, 'undo/redo snapshot restore must not be able to re-enable build mode');
-  assert.match(js, /const popupRoutePoint=PLANNER_ENABLED\?recordRoutePoint\(record\):null;/, 'feature-card route buttons must not render while the planner is off');
-  for (const surface of ['mode-toggle planner-only', 'route-map-guide planner-only', 'route-build-bar planner-only', 'planning-cockpit planner-only']) {
-    assert.ok(html.includes(surface), `planner surface not flagged: ${surface}`);
-  }
-  assert.match(html, /body\.planner-off \.planner-only\{display:none!important\}/);
-
-  // Kept, not deleted: turning it back on must be the flag, not a rebuild.
-  assert.match(js, /async function resolveCanoeRouteAsync/);
-  assert.match(js, /function autoPortageRouteCandidate/);
-  assert.match(js, /routeAsync/);
-});
-
 test('the map offers satellite imagery and a way past itself', () => {
   const js = fs.readFileSync(path.join(root, 'public/assets/isle-royale-map.js'), 'utf8');
 
@@ -1017,17 +390,8 @@ test('the map offers satellite imagery and a way past itself', () => {
   // The map was eating the swipe, so reaching the guide below it cannot depend on one.
   assert.match(html, /id="map-peek"/);
   assert.match(js, /document\.getElementById\('map-peek'\)\?\.addEventListener/);
-  assert.match(html, /body\.planner-off \.map-wrap\{height:clamp\(360px,56dvh,540px\)/, 'the map must not fill a phone screen');
-});
-
-test('the guide no longer sells a planner it is not showing', () => {
-  const visible = html.slice(0, html.indexOf('id="route-planner"'));
-  assert.doesNotMatch(visible, /Start clicking the water to build a canoe route/);
-  assert.doesNotMatch(visible, /Build above\. Tune the trip below\./);
-  assert.doesNotMatch(visible, /Distance and time accumulate through every checkpoint/);
-  assert.doesNotMatch(visible, /use Canoe \+ portage mode/);
-  // Focus map existed to clear space for planning.
-  assert.match(html, /id="focus-map" class="planner-only"/);
+  assert.match(html, /\.map-wrap\{position:relative;height:clamp\(560px,78dvh,860px\)/, 'the map must have a defined responsive height');
+  assert.match(html, /@media\(max-width:980px\)\{\.shell\{grid-template-columns:1fr\}\.map-wrap\{height:clamp\(500px,70dvh,700px\)/, 'the map must not fill a phone screen');
 });
 
 test('the map offers three base maps and NOAA charts', () => {
@@ -1073,4 +437,42 @@ test('numbered campsite identifiers are collapsed behind a disclosure, not dumpe
   assert.match(fn, /document\.createElement\('summary'\)/);
   assert.match(fn, /Numbered sites & shelters \(\$\{identifiers\.length\}\)/);
   assert.match(html, /\.popup-site-identifiers>summary\{cursor:pointer/);
+});
+
+test('the interactive route/trip-planning engine and the popup-drag floating inspector are removed, not hidden', () => {
+  // Sep 4 2026 rebuild: the planner was previously shipped fully built behind a single
+  // PLANNER_ENABLED=false flag, and a bug once let three separate places ignore that flag
+  // (see git history / tag pre-route-removal-2026-09-04). Rather than trust a fourth flag
+  // check, the whole route engine and the floating-inspector popup-drag system were removed
+  // from the runtime. Pin their absence directly instead of pinning a flag.
+  for (const gone of [
+    'PLANNER_ENABLED', 'const route = {', 'function addFeatureToRoute', 'function setRouteAdding',
+    'function resolveCanoeRouteAsync', 'function resolveWaterRouteAsync', 'function buildRouteItinerary',
+    'function renderRouteWeather', 'function saveTripToDevice', 'function exportRouteGpx',
+    'function addOfficialPortageToTrip', 'function matchOfficialPortage', 'function undoRouteEdit',
+    'function promotePopupToFloatingInspector', 'function wireFloatingInspectorDrag', 'floatingInspector',
+  ]) {
+    assert.doesNotMatch(js, new RegExp(gone.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `should be gone: ${gone}`);
+  }
+  for (const gone of [
+    'route-planner', 'route-build-bar', 'planning-cockpit', 'route-map-guide', 'map-inspector',
+    'mode-toggle', 'focus-map', 'cockpit-', 'route-mode-select',
+  ]) {
+    assert.ok(!html.includes(gone), `HTML should not reference: ${gone}`);
+  }
+});
+
+test('the informational NPS portage layer survives the route-engine removal intact', () => {
+  // The 16 official portages are a first-class informational layer (distance, terrain, both
+  // landings), independent of the interactive route-building that was removed. Only the
+  // "add this portage to my trip" action goes; the display, its data, and its distance
+  // validation must not have been swept out along with it.
+  assert.match(js, /function loadOfficialPortages/);
+  assert.match(js, /function renderOfficialPortageLayer/);
+  assert.match(js, /function officialPortagePopup/);
+  assert.match(js, /function officialPortageMappedGeometry/);
+  assert.match(js, /NPS 2026 portage completeness validation failed/);
+  assert.doesNotMatch(js, /popup-route-action/);
+  assert.match(html, /data-layer="official-portage"/);
+  assert.match(html, /16 NPS 2026 carries/);
 });
