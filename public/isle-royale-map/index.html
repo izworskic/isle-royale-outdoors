@@ -107,23 +107,18 @@ button{cursor:pointer}
 .official-portage-badge.unresolved span{background:#fff8f1;color:#7a4327;border:2px dashed #9b512b;box-shadow:0 2px 8px rgba(0,0,0,.16)}
 .official-portage-popup .popup-title{color:#7a4327}
 
-.leaflet-popup-content{font:12px/1.45 Inter,ui-sans-serif,system-ui,sans-serif;margin:14px 16px}
-.isle-detail-popup .leaflet-popup-content-wrapper{border-radius:12px}
-.popup-drag-handle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 0;background:#f3f5f1;border-bottom:1px solid #e1e1dc;border-radius:12px 12px 0 0;font-size:11px;font-weight:800;color:#4a564f;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-.popup-drag-handle:active{cursor:grabbing;background:#e9ede9}
-.popup-drag-handle span{font-size:14px;letter-spacing:1px;line-height:1}
-.isle-detail-popup .leaflet-popup-content{max-height:min(62vh,520px);overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;touch-action:pan-y}
-.isle-detail-popup .leaflet-popup-close-button{width:34px;height:34px;font-size:22px;line-height:30px}
-@media(max-width:620px){
-  /* A popup anchored to the tapped point is positioned within the map's own box, which on a
-     phone can be shorter than the card needs — the card gets clipped or shoved somewhere
-     unreadable. Below this width the card detaches from the map entirely and centers in the
-     full screen instead, so its available room is the phone's viewport, not the map's height. */
-  .isle-detail-popup{position:fixed!important;left:50%!important;top:50%!important;bottom:auto!important;margin:0!important;transform:translate(-50%,-50%)!important;width:92vw;max-width:420px;z-index:1200}
-  .isle-detail-popup .leaflet-popup-tip-container{display:none}
-  .isle-detail-popup .leaflet-popup-content{max-height:74vh;width:auto!important}
-}
-.popup-detail{min-width:250px}
+/* Sep 4 2026: feature detail is a bottom sheet fixed to the screen, not a Leaflet popup anchored
+   to the tapped point. A popup anchored to the tap point sits inside the map's own box, which on
+   a phone can be shorter than the card needs, and no amount of auto-panning or dragging made that
+   reliably readable. A sheet fixed to the bottom of the screen is always in the same predictable
+   spot regardless of where on the map — or how tall the map box is — the tap happened. */
+.feature-detail-backdrop{position:fixed;inset:0;background:rgba(15,20,17,.35);opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:1300}
+.feature-detail-backdrop.open{opacity:1;pointer-events:auto}
+.feature-detail-sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:640px;transform:translate(-50%,100%);transition:transform .25s ease-out;z-index:1301;max-height:min(78vh,640px);background:#fffdf7;border-radius:16px 16px 0 0;box-shadow:0 -10px 34px rgba(20,30,25,.28);pointer-events:none}
+.feature-detail-sheet.open{transform:translate(-50%,0);pointer-events:auto}
+.feature-detail-close{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:999px;border:1px solid #d8d4ca;background:#fff;font-size:21px;line-height:1;color:#3a453f;cursor:pointer;z-index:1}
+.feature-detail-body{max-height:min(78vh,640px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:44px 16px 24px;scrollbar-gutter:stable}
+.popup-detail{min-width:0}
 .popup-title{font-weight:800;font-size:16px;line-height:1.25;margin-bottom:4px;color:#17241f}
 .popup-meta{color:#68736e;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
 .popup-description{margin:8px 0 6px;line-height:1.5;color:#34413b}
@@ -281,8 +276,13 @@ button{cursor:pointer}
   </details>
 </section>
 </main>
+<div id="feature-detail-backdrop" class="feature-detail-backdrop" hidden></div>
+<aside id="feature-detail-sheet" class="feature-detail-sheet" hidden aria-hidden="true" aria-label="Feature details">
+  <button type="button" id="feature-detail-close" class="feature-detail-close" aria-label="Close details">&times;</button>
+  <div id="feature-detail-body" class="feature-detail-body"></div>
+</aside>
 <footer class="footer">© 2026 Chris Izworski · Michigan and Great Lakes field tools <a href="/tools/">All tools</a></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-<script src="/assets/isle-royale-map.js?v=20260904-core-rebuild-1"></script>
+<script src="/assets/isle-royale-map.js?v=20260904-bottom-sheet"></script>
 </body>
 </html>

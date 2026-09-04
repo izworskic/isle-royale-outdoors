@@ -57,7 +57,11 @@
     catalog: document.getElementById('catalog-body'),
     liveStatus: document.getElementById('park-live-status'),
     deepStatus: document.getElementById('deep-layer-status'),
-    contextStatus: document.getElementById('context-layer-status')
+    contextStatus: document.getElementById('context-layer-status'),
+    detailBackdrop: document.getElementById('feature-detail-backdrop'),
+    detailSheet: document.getElementById('feature-detail-sheet'),
+    detailBody: document.getElementById('feature-detail-body'),
+    detailClose: document.getElementById('feature-detail-close')
   };
 
   const coarsePointer = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
@@ -142,58 +146,38 @@
   map.createPane('portagePane');
   map.getPane('portagePane').style.zIndex = '555';
 
-  // Detail cards can be tall (facts, source notes, related links), and a Leaflet popup only
-  // knows how to anchor itself to the tapped point — it has no idea a phone's map box is short.
-  // autoPan and the mobile centered-popup CSS (see index.html) help, but a card can still land
-  // somewhere inconvenient. One small drag handle lets a visitor put it wherever is actually
-  // readable, on any screen size, without the drag-promotion machinery this used to require.
-  let cardDrag = null;
-  document.addEventListener('pointerdown', event => {
-    const handle = event.target.closest('.popup-drag-handle');
-    const popupEl = handle?.closest('.leaflet-popup');
-    if (!handle || !popupEl) return;
-    event.preventDefault();
-    const rect = popupEl.getBoundingClientRect();
-    const set = (prop,val) => popupEl.style.setProperty(prop,val,'important');
-    set('position','fixed');
-    set('margin','0');
-    set('transform','none');
-    set('bottom','auto');
-    set('left',rect.left+'px');
-    set('top',rect.top+'px');
-    cardDrag = {popupEl, startX:event.clientX, startY:event.clientY, left:rect.left, top:rect.top};
-    handle.setPointerCapture(event.pointerId);
-  });
-  document.addEventListener('pointermove', event => {
-    if (!cardDrag) return;
-    const {popupEl, startX, startY, left, top} = cardDrag;
-    const w = popupEl.offsetWidth, h = popupEl.offsetHeight;
-    const nextLeft = Math.min(Math.max(4, left+(event.clientX-startX)), window.innerWidth-w-4);
-    const nextTop = Math.min(Math.max(4, top+(event.clientY-startY)), window.innerHeight-h-4);
-    popupEl.style.setProperty('left', nextLeft+'px', 'important');
-    popupEl.style.setProperty('top', nextTop+'px', 'important');
-  });
-  document.addEventListener('pointerup', () => { cardDrag = null; });
-  map.on('popupopen', event => {
-    const el = event.popup.getElement();
-    if (!el?.classList.contains('isle-detail-popup')) return;
-    const wrapper = el.querySelector('.leaflet-popup-content-wrapper');
-    if (!wrapper || wrapper.querySelector('.popup-drag-handle')) return;
-    const handle = document.createElement('div');
-    handle.className = 'popup-drag-handle';
-    handle.setAttribute('role','button');
-    handle.setAttribute('tabindex','0');
-    handle.setAttribute('aria-label','Drag to move this card');
-    handle.innerHTML = '<span aria-hidden="true">⠿</span> Move card';
-    wrapper.insertBefore(handle, wrapper.firstChild);
-  });
-  map.on('popupclose', event => {
-    // Clear any drag-time position so the next open starts from the normal anchored (desktop)
-    // or centered (mobile) position instead of wherever this popup was last dragged to.
-    const el = event.popup.getElement();
-    if (!el) return;
-    for (const prop of ['position','left','top','bottom','margin','transform']) el.style.removeProperty(prop);
-  });
+  // Sep 4 2026: a Leaflet popup anchors to the tapped point on the map. Autopan and drag were
+  // both tried to compensate for that on a short phone map box, and both were still hard to
+  // read reliably. Feature detail is not a Leaflet popup at all now — tapping any feature opens
+  // a bottom sheet fixed to the screen, always in the same spot, regardless of where on the map
+  // (or how tall the map box is) the tap happened.
+  let openPortageLine = null;
+  function showFeatureDetail(node) {
+    if (openPortageLine) { openPortageLine.setStyle({weight:5}); openPortageLine = null; }
+    els.detailBody.replaceChildren(node);
+    els.detailBackdrop.hidden = false;
+    els.detailSheet.hidden = false;
+    els.detailSheet.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => {
+      els.detailBackdrop.classList.add('open');
+      els.detailSheet.classList.add('open');
+    });
+  }
+  function closeFeatureDetail() {
+    if (els.detailSheet.hidden) return;
+    if (openPortageLine) { openPortageLine.setStyle({weight:5}); openPortageLine = null; }
+    els.detailBackdrop.classList.remove('open');
+    els.detailSheet.classList.remove('open');
+    els.detailSheet.setAttribute('aria-hidden', 'true');
+    window.setTimeout(() => {
+      els.detailBackdrop.hidden = true;
+      els.detailSheet.hidden = true;
+      els.detailBody.replaceChildren();
+    }, 260);
+  }
+  els.detailClose.addEventListener('click', closeFeatureDetail);
+  els.detailBackdrop.addEventListener('click', closeFeatureDetail);
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeFeatureDetail(); });
 
   const osmContextGroup = L.layerGroup();
   const layerGroups = {
@@ -930,7 +914,6 @@
           latlng
         };
         enrichRecord(record);
-        layer.bindPopup(() => popupNode(record), {maxWidth:390, minWidth:280, autoPan:true, autoPanPadding:[16,16], className:'isle-detail-popup'});
         layer.on('click', () => selectRecord(record));
       }
     });
@@ -1860,18 +1843,16 @@
           icon:L.divIcon({className:'official-portage-badge',html:'<span>P'+portage.number+'</span>',iconSize:[30,24],iconAnchor:[15,12]})
         });
         visual={geometryResolved:true,reference:Boolean(geometry.reference),points:geometry.points,mapped_miles:geometry.mapped_miles,line,badge};
-        line.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
-        badge.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
         const open=event=>{
           if(event?.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
           line.setStyle({weight:7});
-          line.openPopup();
+          openPortageLine = line;
+          showFeatureDetail(officialPortagePopup(portage,visual));
           emitEvent('isle_royale_portage_open',{portage_number:portage.number,mapped:true,action:'inspect'});
         };
         line.on('click',open);
         hit.on('click',open);
         badge.on('click',open);
-        line.on('popupclose',()=>line.setStyle({weight:5}));
         line.bindTooltip('P'+portage.number+' · '+portage.official_label+' · '+Number(portage.distance_miles).toFixed(1)+' mi'+(geometry.reference?' · official landings, trail line not mapped':''),{sticky:true});
         badge.bindTooltip(portage.official_label+' · '+Number(portage.distance_miles).toFixed(1)+' mi',{direction:'top'});
         group.addLayer(hit);group.addLayer(line);group.addLayer(badge);
@@ -1888,10 +1869,10 @@
             icon:L.divIcon({className:'official-portage-badge unresolved',html:'<span>P'+portage.number+'?</span>',iconSize:[34,24],iconAnchor:[17,12]})
           });
           visual={geometryResolved:false,points:[],mapped_miles:null,marker,referenceAnchor:anchorPoint};
-          marker.bindPopup(()=>officialPortagePopup(portage,visual),{maxWidth:390,minWidth:280,autoPan:true,autoPanPadding:[16,16],className:'isle-detail-popup'});
           marker.bindTooltip('P'+portage.number+' · official portage · mapped corridor unresolved',{direction:'top'});
           marker.on('click',event=>{
             if(event.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
+            showFeatureDetail(officialPortagePopup(portage,visual));
             emitEvent('isle_royale_portage_open',{portage_number:portage.number,mapped:false});
           });
           group.addLayer(marker);
@@ -1968,8 +1949,8 @@
       const bounds = record.layer.getBounds && record.layer.getBounds();
       if (bounds && bounds.isValid && bounds.isValid()) map.fitBounds(bounds.pad(.6), {maxZoom:14});
       else if (record.layer.getLatLng) map.flyTo(record.layer.getLatLng(), Math.max(map.getZoom(), 13));
-      record.layer.openPopup();
     } catch (_) {}
+    showFeatureDetail(popupNode(record));
   }
 
   function flyToFeature(index) {

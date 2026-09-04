@@ -168,7 +168,7 @@ test('map points have large pointer tolerance and data-rich detail popups', () =
   // route-construction UI down there.
   assert.match(html, /<div class="panel-header">/);
   assert.match(html, /\.popup-action\{[^}]*min-height:42px/);
-  assert.match(html, /\.isle-detail-popup \.leaflet-popup-content/);
+  assert.match(html, /\.feature-detail-body\{/);
 });
 
 
@@ -477,40 +477,34 @@ test('the informational NPS portage layer survives the route-engine removal inta
   assert.match(html, /16 NPS 2026 carries/);
 });
 
-test('detail popups reposition to stay readable, and detach from the map box entirely on phones', () => {
-  // autoPan was off on all four popup bindings — a holdover from when the floating inspector
-  // took over positioning instead. Once the inspector was removed (this rebuild), nothing
-  // repositioned the card at all: tap a point near the edge of a short mobile map and the card
-  // could render clipped or off past the edge with no way to read it.
-  const popupBindingCount = (js.match(/\.bindPopup\(/g) || []).length;
-  const autoPanTrueCount = (js.match(/autoPan:true/g) || []).length;
-  assert.ok(popupBindingCount >= 4, `expected at least 4 popup bindings, found ${popupBindingCount}`);
-  assert.equal(autoPanTrueCount, popupBindingCount, 'every popup binding must set autoPan:true');
-  assert.doesNotMatch(js, /autoPan:false/);
-  // Even with autoPan, a card taller than the map's own box can't fully fit by panning alone —
-  // the map box is often shorter than the card on a phone. Below 620px the card detaches from
-  // map-relative positioning and centers in the full viewport instead, so its available room is
-  // the screen, not the map.
-  assert.match(html, /@media\(max-width:620px\)\{\s*\/\*/);
-  assert.match(html, /\.isle-detail-popup\{position:fixed!important/);
-  assert.match(html, /transform:translate\(-50%,-50%\)!important/);
-});
-
-test('detail cards can be grabbed and dragged to wherever is actually readable', () => {
-  // autoPan and centering help, but cards vary a lot in height (facts, source notes, related
-  // links, numbered-site chips) and can still land somewhere inconvenient — especially on a
-  // short phone map box. A drag handle lets a visitor put the card exactly where they need it,
-  // without reinstating the old promotion/retry-polling machinery this used to take.
-  assert.match(js, /const handle = document\.createElement\('div'\);/);
-  assert.match(js, /handle\.className = 'popup-drag-handle'/);
-  assert.match(js, /wrapper\.insertBefore\(handle, wrapper\.firstChild\)/);
-  assert.match(js, /handle\.setPointerCapture\(event\.pointerId\)/);
-  assert.match(js, /popupEl\.style\.setProperty\('left',.*'important'\)/);
-  assert.match(js, /popupEl\.style\.setProperty\('top',.*'important'\)/);
-  // Drag position must be cleared on close, or a reopened popup starts wherever it was last
-  // dropped instead of its normal anchored/centered position.
-  assert.match(js, /map\.on\('popupclose', event => \{/);
-  assert.match(js, /el\.style\.removeProperty\(prop\)/);
-  assert.match(html, /\.popup-drag-handle\{[^}]*touch-action:none/);
-  assert.match(html, /\.popup-drag-handle\{[^}]*cursor:grab/);
+test('feature detail is a bottom sheet fixed to the screen, not a Leaflet popup on the map', () => {
+  // Two attempts at repositioning a Leaflet popup (autoPan, then a drag handle) both failed in
+  // real use on a phone — a popup fundamentally anchors to the tapped point, and no amount of
+  // panning or dragging changed that reliably. Sep 4 2026: feature detail is no longer a Leaflet
+  // popup at all. Tapping any feature opens a sheet fixed to the bottom of the screen — same
+  // spot every time, independent of where on the map (or how tall the map box is) the tap
+  // landed. No Leaflet popup machinery should remain anywhere in the client.
+  assert.doesNotMatch(js, /\.bindPopup\(/);
+  assert.doesNotMatch(js, /\.openPopup\(\)/);
+  assert.doesNotMatch(js, /autoPan/);
+  assert.doesNotMatch(js, /isle-detail-popup/);
+  assert.doesNotMatch(html, /leaflet-popup/);
+  // The sheet is a single shared element populated per-tap, wired through one function rather
+  // than scattered across every feature type that can be clicked.
+  assert.match(js, /function showFeatureDetail\(node\)/);
+  assert.match(js, /function closeFeatureDetail\(\)/);
+  assert.match(js, /els\.detailBody\.replaceChildren\(node\)/);
+  assert.match(js, /showFeatureDetail\(popupNode\(record\)\)/);
+  assert.match(js, /showFeatureDetail\(officialPortagePopup\(portage,visual\)\)/);
+  // Closeable by the explicit close button, tapping outside it, or Escape — not just by tapping
+  // a marker again, since the sheet is no longer part of Leaflet's own click-elsewhere handling.
+  assert.match(js, /els\.detailClose\.addEventListener\('click', closeFeatureDetail\)/);
+  assert.match(js, /els\.detailBackdrop\.addEventListener\('click', closeFeatureDetail\)/);
+  assert.match(js, /event\.key === 'Escape'\) closeFeatureDetail\(\)/);
+  // Fixed to the viewport, anchored to the bottom, and slides in — not centered mid-screen and
+  // not dependent on the map's own (possibly short) box for available height.
+  assert.match(html, /id="feature-detail-sheet"/);
+  assert.match(html, /id="feature-detail-backdrop"/);
+  assert.match(html, /\.feature-detail-sheet\{position:fixed;left:50%;bottom:0/);
+  assert.match(html, /\.feature-detail-sheet\.open\{transform:translate\(-50%,0\)/);
 });
