@@ -55,6 +55,57 @@ test('runtime supports source-backed web-map ingestion and fail-soft fallback', 
   assert.match(js, /loadArcGISService/);
 });
 
+test('featureName recognizes the current live NPS visitor-map name attributes', () => {
+  // The primary/current NPS "Isle Royale National Park Visitor Map" web map uses NAME1_/NAME2_ for
+  // Campground/Visitor Center/Point of Interest sublayers, and NAM for the Mine (GNIS) sublayer.
+  // Missing these left every point in those layers unnamed on the live map (generic layer title
+  // shown instead), which also silently broke campground detail-card enrichment (matched by name).
+  const featureNameFn = js.match(/function featureName\([^)]*\)\s*{[\s\S]*?\n {2}}/)[0];
+  for (const key of ['NAME1_', 'NAME2_', 'NAME1', 'NAME2', 'NAM']) {
+    assert.ok(featureNameFn.includes(`'${key}'`), `featureName should recognize ${key}`);
+  }
+});
+
+test('unnamed live NPS points are enriched from a verified, location-matched reference dataset, never silently mislabeled', () => {
+  assert.match(js, /function isGenericFeatureName/);
+  assert.match(js, /function matchPoiNameReference/);
+  assert.match(js, /function resolvedFeatureName/);
+  assert.match(js, /poiNameReference/);
+  assert.match(js, /loadPoiNameReference/);
+  assert.match(js, /unnamed in NPS map data/);
+  // Naming provenance must reach the card so a location-matched or genuinely unnamed point is never
+  // presented as if NPS itself supplied that name with no caveat.
+  assert.match(js, /record\.nameProvenance/);
+
+  const refPath = path.join(root, 'public/isle-royale-map/data/poi-name-reference.json');
+  assert.ok(fs.existsSync(refPath), 'poi-name-reference.json must exist');
+  const ref = JSON.parse(fs.readFileSync(refPath, 'utf8'));
+  assert.ok(Array.isArray(ref.points) && ref.points.length > 0);
+  assert.ok(typeof ref.sourceNote === 'string' && ref.sourceNote.length > 40, 'reference file must disclose its provenance');
+
+  const campgrounds = ref.points.filter(p => p.layerTitle === 'Campground');
+  // Isle Royale has 36 designated campgrounds; the live NPS Campground sublayer carries exactly
+  // that many unnamed points. Cross-check both the count and that every name is unique (a duplicate
+  // would mean two live points were matched to the same NPS campground in error).
+  assert.equal(campgrounds.length, 36, 'expected one reference entry per Isle Royale campground');
+  const names = new Set(campgrounds.map(p => p.name));
+  assert.equal(names.size, 36, 'campground reference names must be unique (no double-matched point)');
+  for (const p of ref.points) {
+    assert.ok(Number.isFinite(p.lat) && Math.abs(p.lat - 48.05) < 0.3, `${p.name} latitude out of Isle Royale range`);
+    assert.ok(Number.isFinite(p.lon) && Math.abs(p.lon - (-88.75)) < 0.6, `${p.name} longitude out of Isle Royale range`);
+  }
+});
+
+test('fail-soft reference anchors use verified NPS coordinates, not the old imprecise placeholders', () => {
+  // The previous Rock Harbor anchor (-88.553,48.145) sat roughly 3.3 miles from the real Rock
+  // Harbor Visitor Center; Passage Island's was off by about 5.5 miles of longitude. These only
+  // render if every live/fallback source fails, but a wrong "reference anchor" is still wrong.
+  assert.doesNotMatch(js, /coordinates:\[-88\.553,48\.145\]/);
+  assert.doesNotMatch(js, /coordinates:\[-88\.248,48\.222\]/);
+  assert.match(js, /coordinates:\[-88\.486263,48\.145945\]/);
+  assert.match(js, /coordinates:\[-88\.3665075,48\.2218296\]/);
+});
+
 test('catalog preserves original research families while retiring non-planning science layers', () => {
   const cats = catalog.items.map(x => x.npmapsCategory.toLowerCase()).join(' ');
   for (const term of ['current park map','regional map','rock harbor','windigo','camping','transportation','shipwreck','relief','lighthouse','geologic','vegetation','historical']) {

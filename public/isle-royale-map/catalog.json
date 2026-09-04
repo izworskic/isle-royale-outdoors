@@ -251,6 +251,18 @@
       "web_path": "/isle-royale-map/data/horne-fire-burn-severity.geojson",
       "vintage": "2021 Horne Fire; USGS data release published 2024",
       "notes": "Burn-severity assessment derived from pre/post-fire high-resolution imagery; use as historical ecological context, not a current fire-status layer. Retained in the source/research catalog but intentionally removed from the trip-planning layer controls because it does not improve route decisions."
+    },
+    {
+      "id": "poi-name-reference",
+      "npmapsCategory": "point of interest",
+      "label": "Point-name reference for unnamed live NPS points",
+      "kind": "structured planning dataset",
+      "state": "generated-runtime",
+      "publisher": "National Park Service (cross-referenced)",
+      "source": "https://www.arcgis.com/home/item.html?id=75e3ceba038a45f7b4d5a9d7c6a46ccf",
+      "notes": "The current live NPS visitor-map Campground, Visitor Center, and Point of Interest sublayers carry correct current geometry but leave the name attribute blank for most records (all 36 campgrounds, most visitor/ranger points). This dataset supplies the real NPS place name for each, matched by location against the 2021 NPS Isle Royale point inventory and the current NPS Boat-In Campground table, so markers and detail cards show an actual name instead of the generic layer title. Every match is distance-checked and disclosed per point; unmatched points are labeled as unnamed rather than guessed.",
+      "vintage": "generated 2026-09-03",
+      "web_path": "/isle-royale-map/data/poi-name-reference.json"
     }
   ],
   "updated": "2026-08-30"

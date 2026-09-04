@@ -610,6 +610,10 @@
     error:''
   };
   const sourceStatus = {arcgis:'starting', osm:'not loaded', fallback:false};
+  // Verified name lookup for live NPS points that carry geometry but no name attribute. See
+  // /isle-royale-map/data/poi-name-reference.json and the featureName()/resolvedFeatureName() note
+  // above for why this exists.
+  const poiNameReference = {state:'idle', promise:null, points:[], source:''};
   const operational = {
     boaterByName: new Map(),
     campgroundByName: new Map(),
@@ -843,7 +847,62 @@
 
   function featureName(feature, layerTitle='Isle Royale feature') {
     const p = feature.properties || {};
-    return firstProp(p, ['name','Name','NAME','title','Title','MAPLABEL','LABEL','label','TRLALTNAME','TRLNAME','TRAILNAME','TRAIL_NAME','POINAME','FACILITY','SITE_NAME','UNIT_NAME']) || layerTitle || 'Isle Royale feature';
+    return firstProp(p, ['name','Name','NAME','title','Title','MAPLABEL','LABEL','label','TRLALTNAME','TRLNAME','TRAILNAME','TRAIL_NAME','POINAME','FACILITY','SITE_NAME','UNIT_NAME','NAME1_','NAME2_','NAME1','NAME2','NAM']) || layerTitle || 'Isle Royale feature';
+  }
+
+  // The current live NPS visitor-map point layer (Campground, Visitor Center, Point of Interest
+  // sublayers) carries the correct, current geometry but leaves the name attribute blank for most
+  // records — featureName() above then falls back to the generic layer title, e.g. every one of the
+  // 36 campgrounds rendering as plain "Campground" with no way to tell one from another. That also
+  // silently breaks the campground detail-card enrichment further down, which matches by name.
+  // This reference dataset supplies real NPS-sourced names for those specific points, matched by
+  // location; see /isle-royale-map/data/poi-name-reference.json for full provenance per point.
+  function isGenericFeatureName(name, layerTitle) {
+    return Boolean(layerTitle) && cleanText(name) === cleanText(layerTitle);
+  }
+
+  function poiReferenceMatchThreshold(layerTitle) {
+    const key = cleanText(layerTitle);
+    if (key === 'Campground') return 2.2;
+    if (key === 'Visitor Center') return 1.0;
+    if (key === 'Isle Royale Points of Interest') return 0.5;
+    return 0.75;
+  }
+
+  function matchPoiNameReference(layerTitle, lon, lat) {
+    if (poiNameReference.state !== 'ready' || !poiNameReference.points.length) return null;
+    const maxMiles = poiReferenceMatchThreshold(layerTitle);
+    const key = cleanText(layerTitle);
+    let best = null;
+    for (const ref of poiNameReference.points) {
+      if (cleanText(ref.layerTitle) !== key) continue;
+      const distance = distanceMiles({lat, lng:lon}, {lat:ref.lat, lng:ref.lon});
+      if (distance <= maxMiles && (!best || distance < best.distance)) best = {name:ref.name, distance};
+    }
+    return best;
+  }
+
+  function resolvedFeatureName(feature, layerTitle) {
+    const rawName = cleanText(featureName(feature, layerTitle));
+    if (!isGenericFeatureName(rawName, layerTitle) || feature.geometry?.type !== 'Point') {
+      return {name:rawName, provenance:''};
+    }
+    const coords = feature.geometry.coordinates;
+    if (!Array.isArray(coords) || !Number.isFinite(coords[0]) || !Number.isFinite(coords[1])) {
+      return {name:rawName, provenance:''};
+    }
+    const [lon, lat] = coords;
+    const match = matchPoiNameReference(layerTitle, lon, lat);
+    if (match) {
+      return {
+        name: match.name,
+        provenance: `Name matched by location (${match.distance.toFixed(2)} mi) to the NPS Isle Royale point inventory; verify signage or GPS on arrival.`
+      };
+    }
+    return {
+      name: `${cleanText(layerTitle) || rawName} (unnamed in NPS map data)`,
+      provenance: 'This point carries no published name in current NPS map data.'
+    };
   }
 
   function classify(feature, layerTitle='') {
@@ -1241,6 +1300,7 @@
     if (record.campgroundProfile) source.textContent += ' Campground capacity/access facts: NPS campground profile pages.';
     else if (record.boater) source.textContent += ' Campground facts: NPS Boat-In Campgrounds dataset, page updated June 23, 2026.';
     if (record.liveAlert) source.textContent += ' Closure signal: current NPS conditions feed fetched through this site.';
+    if (record.nameProvenance) source.textContent += ' ' + record.nameProvenance;
     wrap.appendChild(source);
     return wrap;
   }
@@ -1296,7 +1356,7 @@
 
   function addGeoJSONFeature(feature, context={}) {
     if (!feature || !feature.geometry) return 0;
-    const name = cleanText(featureName(feature, context.layerTitle));
+    const {name, provenance:nameProvenance} = resolvedFeatureName(feature, context.layerTitle);
     const category = context.category || classify(feature, context.layerTitle);
     const sourceLabel = cleanText(context.sourceLabel || 'Public map source');
     const sourceKind = cleanText(context.sourceKind || 'source vector');
@@ -1310,6 +1370,7 @@
         const latlng = layer.getLatLng ? layer.getLatLng() : null;
         record = {
           name,
+          nameProvenance,
           category,
           layer,
           sourceLabel,
@@ -1438,10 +1499,10 @@
     const fallback = {
       type:'FeatureCollection',
       features:[
-        {type:'Feature',properties:{name:'Rock Harbor',kind:'visitor service',note:'Approximate reference anchor; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-88.553,48.145]}},
-        {type:'Feature',properties:{name:'Windigo',kind:'visitor service',note:'Approximate reference anchor; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-89.151,47.911]}},
-        {type:'Feature',properties:{name:'Mott Island',kind:'ranger station',note:'Approximate reference anchor; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-88.527,48.107]}},
-        {type:'Feature',properties:{name:'Passage Island',kind:'lighthouse area',note:'Approximate reference anchor; verify official NPS maps.'},geometry:{type:'Point',coordinates:[-88.248,48.222]}}
+        {type:'Feature',properties:{name:'Rock Harbor',kind:'visitor service',note:'Reference anchor at the Rock Harbor Visitor Center; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-88.486263,48.145945]}},
+        {type:'Feature',properties:{name:'Windigo',kind:'visitor service',note:'Reference anchor at the Windigo Visitor Center; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-89.157143,47.911805]}},
+        {type:'Feature',properties:{name:'Mott Island',kind:'ranger station',note:'Reference anchor at the NPS park headquarters office on Mott Island; public NPS/ArcGIS geometry is preferred.'},geometry:{type:'Point',coordinates:[-88.5453558,48.1062214]}},
+        {type:'Feature',properties:{name:'Passage Island',kind:'lighthouse area',note:'Reference anchor at Passage Island Lighthouse; verify official NPS maps.'},geometry:{type:'Point',coordinates:[-88.3665075,48.2218296]}}
       ]
     };
     let n = 0;
@@ -1453,8 +1514,35 @@
     return n;
   }
 
+  async function loadPoiNameReference() {
+    if (poiNameReference.state === 'ready' || poiNameReference.state === 'error') return poiNameReference;
+    if (poiNameReference.promise) return poiNameReference.promise;
+    poiNameReference.state = 'loading';
+    poiNameReference.promise = (async () => {
+      try {
+        const res = await fetch('/isle-royale-map/data/poi-name-reference.json', {headers:{Accept:'application/json'}});
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const points = Array.isArray(data?.points)
+          ? data.points.filter(p => p && p.name && p.layerTitle && Number.isFinite(p.lat) && Number.isFinite(p.lon))
+          : [];
+        poiNameReference.points = points;
+        poiNameReference.source = cleanText(data?.sourceNote || '');
+        poiNameReference.state = 'ready';
+      } catch (_) {
+        poiNameReference.points = [];
+        poiNameReference.state = 'error';
+      } finally {
+        poiNameReference.promise = null;
+      }
+      return poiNameReference;
+    })();
+    return poiNameReference.promise;
+  }
+
   async function loadVisitorGeometry() {
     status('Loading public Isle Royale visitor-map geometry…');
+    await loadPoiNameReference();
     let added = 0;
     for (const itemId of [CONFIG.primaryWebMap, CONFIG.fallbackWebMap]) {
       try {
