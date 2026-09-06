@@ -340,7 +340,13 @@
     other: {color:'#59645f', fillColor:'#59645f'}
   };
 
-  function status(message) { els.status.textContent = message; }
+  let statusFadeTimer = null;
+  function status(message) {
+    els.status.textContent = message;
+    els.status.classList.remove('is-quiet');
+    if (statusFadeTimer) clearTimeout(statusFadeTimer);
+    statusFadeTimer = setTimeout(() => els.status.classList.add('is-quiet'), 6000);
+  }
 
   function emitEvent(name, props={}) {
     const safe = {};
@@ -1070,7 +1076,7 @@
         if (added > 0) {
           sourceStatus.arcgis = `loaded ${added} public visitor features`;
           els.sourceStatus.textContent = `Preferred NPS/ArcGIS visitor geometry loaded (${added} features). Verified NPS boating zones and federal science layers are available as independent opt-in overlays.`;
-          status(`Loaded ${added} public visitor features. Search or filter the map; source and methodology details are available from the compact source disclosure below the planner.`);
+          status(`Loaded ${added.toLocaleString()} visitor features.`);
           visitorGeometrySettled = true;
           addPendingShipwrecks();
           renderOfficialPortageLayer();
@@ -1089,7 +1095,7 @@
       if (added > 0) {
         sourceStatus.arcgis = `loaded ${added} visitor features from 2021 public fallback service`;
         els.sourceStatus.textContent = `The preferred visitor web-map source was unavailable, so ${added} features were loaded from a public 2021 Isle Royale ArcGIS fallback dataset. Use current NPS pages for closures, regulations, campground status, transportation and other operational decisions.`;
-        status(`Loaded ${added} public visitor features from the 2021 fallback dataset. Current operational decisions still hand off to NPS.`);
+        status(`Loaded ${added.toLocaleString()} visitor features (2021 fallback dataset).`);
         visitorGeometrySettled = true;
         addPendingShipwrecks();
         renderOfficialPortageLayer();
