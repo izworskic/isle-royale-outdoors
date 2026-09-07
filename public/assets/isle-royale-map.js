@@ -174,7 +174,7 @@
   // (or how tall the map box is) the tap happened.
   let openPortageLine = null;
   // Bumped every time a card opens (of any kind, including portages) so an async lookup started for
-  // an earlier card -- see enrichMaritimeCardFromWikipedia() below -- can tell it's gone stale and
+  // an earlier card -- see enrichCardFromWikipedia() below -- can tell it's gone stale and
   // avoid writing its result into whatever card happens to be open by the time it resolves.
   let detailOpenToken = 0;
   function showFeatureDetail(node) {
@@ -733,10 +733,42 @@
     return null;
   }
 
+  // NPS's raw visitor-map feed for campgrounds carries no description field at all (verified against
+  // the live ArcGIS schema -- name, type, and two fields that are "Unknown" for nearly every record).
+  // The only real, differentiating facts that exist come from the boat-in campground CSV and the
+  // (currently unavailable) campground-profile pages -- so build the brief description FROM those,
+  // rather than from nothing. Only synthesizes a sentence when there's at least one real fact to put
+  // in it; a campground with none yet (mostly the hike-in-only sites, not covered by the boat-in CSV)
+  // gets no description rather than an identical generic filler line repeated across a dozen cards --
+  // that's the exact kind of "derivative" boilerplate this was meant to get away from.
+  function campgroundSummary(record) {
+    const boater = record.boater;
+    const profile = record.campgroundProfile;
+    if (!boater && !profile) return '';
+    const shelters = Number(profile?.shelters ?? boater?.shelters);
+    const tentSites = Number(profile?.tent_sites ?? boater?.tent_sites);
+    const totalSites = Number(profile?.total_sites);
+    const stayLimit = profile?.stay_limit || boater?.consecutive_night_limit;
+    const dockDepth = profile?.dock_depth || boater?.dock_depth;
+    const siteBits = [];
+    if (Number.isFinite(shelters) && shelters > 0) siteBits.push(`${shelters} shelter${shelters === 1 ? '' : 's'}`);
+    if (Number.isFinite(tentSites) && tentSites > 0) siteBits.push(`${tentSites} tent site${tentSites === 1 ? '' : 's'}`);
+    if (!siteBits.length && Number.isFinite(totalSites) && totalSites > 0) siteBits.push(`${totalSites} site${totalSites === 1 ? '' : 's'}`);
+    if (!siteBits.length && !stayLimit && !dockDepth) return '';
+    let sentence = boater ? 'Boat-accessible campground' : 'Backcountry campground';
+    if (siteBits.length) sentence += ` with ${siteBits.join(' and ')}`;
+    if (stayLimit) sentence += `, ${stayLimit}-night stay limit`;
+    if (dockDepth) sentence += `, dock depth ${dockDepth}`;
+    return sentence + '.';
+  }
   function enrichRecord(record) {
     if (!record) return;
     record.boater = record.category === 'campground' ? findBoaterRecord(record.name) : null;
     record.campgroundProfile = record.category === 'campground' ? findCampgroundProfile(record.name) : null;
+    if (record.category === 'campground' && !record.description) {
+      const summary = campgroundSummary(record);
+      if (summary) record.description = summary;
+    }
     record.liveAlert = findOperationalAlert(record.name);
     if(record.boater&&record.layer) {
       try {
@@ -923,14 +955,15 @@
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record,sourceNotes);
 
-    // Maritime-history cards (lighthouses, shipwrecks) have the thinnest NPS source data of any
-    // category on this map -- there's no narrative field in the feed at all, just a name and, for
-    // shipwrecks, a terse depth/buoy-status readout. Isle Royale's lighthouses and famous wrecks
-    // (Kamloops, Emperor, America...) are well covered on Wikipedia with real written history, so
-    // this placeholder gets filled in asynchronously right after the card opens -- see
-    // enrichMaritimeCardFromWikipedia(), called from selectRecord(). Quietly removed if no
-    // confident match is found; never left showing "Looking up..." forever.
-    if (record.category === 'maritime-history') {
+    // Maritime-history cards (lighthouses, shipwrecks) and named trails have the thinnest NPS source
+    // data of any categories on this map -- there's no narrative field in the feed at all. Isle
+    // Royale's lighthouses, famous wrecks (Kamloops, Emperor, America...) and its major named
+    // backpacking routes (Greenstone Ridge Trail) are well covered on Wikipedia with real written
+    // history, so this placeholder gets filled in asynchronously right after the card opens -- see
+    // enrichCardFromWikipedia(), called from selectRecord(). Quietly removed if no confident match is
+    // found (most short connector/campground-access trails won't have one); never left showing
+    // "Looking up..." forever.
+    if (record.category === 'maritime-history' || record.category === 'trail') {
       const pending = document.createElement('p');
       pending.className = 'popup-wiki-pending';
       pending.textContent = 'Looking up more on Wikipedia…';
@@ -2112,6 +2145,14 @@
     const isWreck = /shipwreck|ship wreck|\bwreck\b/i.test(hay);
     if (isLighthouse) return [`${record.name} Light`, `${record.name} Lighthouse`, `${record.name} Light Station`];
     if (isWreck) return [`SS ${record.name}`, `${record.name} (ship)`, `${record.name} (steamship)`, `${record.name} (shipwreck)`];
+    if (record.category === 'trail') {
+      // The named ridge/backpacking trails (Greenstone Ridge, Minong Ridge, ...) are real, independently
+      // documented hiking routes; most of the ~36 short connector/campground-access trails aren't. Direct
+      // title lookup naturally sorts this out on its own -- a connector trail just won't resolve to
+      // anything and falls through to no description, same as an un-covered campground does.
+      const base = /\btrail\b/i.test(record.name) ? record.name : `${record.name} Trail`;
+      return [base, record.name];
+    }
     return [];
   }
   function looksLikeGenuineMatch(record, summary) {
@@ -2129,9 +2170,14 @@
     // "Duncan Bay" wrongly matching "USS Isle Royale" and "Rock of Ages" wrongly matching the park's
     // own general article, neither of which share a real word with the name being searched for.
     const nameWords = record.name.toLowerCase().split(/\s+/).filter(w => w.length >= 4);
-    if (!nameWords.length) return true; // short names (e.g. "SS Cox") have nothing left to check against
-    const titleLower = summary.title.toLowerCase();
-    return nameWords.some(w => titleLower.includes(w));
+    const wordOverlapOk = !nameWords.length || nameWords.some(w => summary.title.toLowerCase().includes(w));
+    if (!wordOverlapOk) return false;
+    // Trail names share their ridge/landmark name with OTHER real, separately-documented things on
+    // it (a fire tower on Feldtmann Ridge, one on Greenstone Ridge) -- both wrongly passed every guard
+    // above during testing, since they genuinely are Isle Royale articles whose title shares a word
+    // with the trail's name. A trail article actually describes a trail; require the word to show up.
+    if (record.category === 'trail' && !/\btrail\b/i.test(summary.extract)) return false;
+    return true;
   }
   async function findWikipediaArticleFor(record) {
     for (const candidate of wikiCandidateTitles(record)) {
@@ -2148,7 +2194,7 @@
     if (!summary || !looksLikeGenuineMatch(record, summary)) return null;
     return summary;
   }
-  async function enrichMaritimeCardFromWikipedia(record, token) {
+  async function enrichCardFromWikipedia(record, token) {
     const cacheKey = record.name;
     let summary = wikiEnrichmentCache.has(cacheKey) ? wikiEnrichmentCache.get(cacheKey) : undefined;
     if (summary === undefined) {
@@ -2204,7 +2250,7 @@
       else if (record.layer.getLatLng) map.flyTo(record.layer.getLatLng(), Math.max(map.getZoom(), 13));
     } catch (_) {}
     const token = showFeatureDetail(popupNode(record));
-    if (record.category === 'maritime-history') enrichMaritimeCardFromWikipedia(record, token);
+    if (record.category === 'maritime-history' || record.category === 'trail') enrichCardFromWikipedia(record, token);
   }
 
   function flyToFeature(index) {
