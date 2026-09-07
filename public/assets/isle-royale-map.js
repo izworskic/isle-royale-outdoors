@@ -173,7 +173,12 @@
   // a bottom sheet fixed to the screen, always in the same spot, regardless of where on the map
   // (or how tall the map box is) the tap happened.
   let openPortageLine = null;
+  // Bumped every time a card opens (of any kind, including portages) so an async lookup started for
+  // an earlier card -- see enrichMaritimeCardFromWikipedia() below -- can tell it's gone stale and
+  // avoid writing its result into whatever card happens to be open by the time it resolves.
+  let detailOpenToken = 0;
   function showFeatureDetail(node) {
+    detailOpenToken += 1;
     if (openPortageLine) { openPortageLine.setStyle({weight:5}); openPortageLine = null; }
     els.detailBody.replaceChildren(node);
     els.detailBackdrop.hidden = false;
@@ -183,6 +188,7 @@
       els.detailBackdrop.classList.add('open');
       els.detailSheet.classList.add('open');
     });
+    return detailOpenToken;
   }
   function closeFeatureDetail() {
     if (els.detailSheet.hidden) return;
@@ -916,6 +922,20 @@
     }
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record,sourceNotes);
+
+    // Maritime-history cards (lighthouses, shipwrecks) have the thinnest NPS source data of any
+    // category on this map -- there's no narrative field in the feed at all, just a name and, for
+    // shipwrecks, a terse depth/buoy-status readout. Isle Royale's lighthouses and famous wrecks
+    // (Kamloops, Emperor, America...) are well covered on Wikipedia with real written history, so
+    // this placeholder gets filled in asynchronously right after the card opens -- see
+    // enrichMaritimeCardFromWikipedia(), called from selectRecord(). Quietly removed if no
+    // confident match is found; never left showing "Looking up..." forever.
+    if (record.category === 'maritime-history') {
+      const pending = document.createElement('p');
+      pending.className = 'popup-wiki-pending';
+      pending.textContent = 'Looking up more on Wikipedia…';
+      wrap.appendChild(pending);
+    }
 
     const links = relatedLinks(record);
     if (links.length) {
@@ -2063,6 +2083,117 @@
     return checkbox ? checkbox.checked : true;
   }
 
+  // Cache is keyed by feature name, not per-render: reopening the same lighthouse or wreck's card
+  // later in the session should feel instant, not re-hit Wikipedia every time. A cached `null` means
+  // "already looked, no confident match" -- also don't retry that every reopen.
+  const wikiEnrichmentCache = new Map();
+  async function fetchWikipediaSummary(title) {
+    const res = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title), {headers:{Accept:'application/json'}});
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.type !== 'standard' || !data.extract) return null;
+    return {
+      extract: data.extract,
+      title: data.title,
+      url: data.content_urls?.desktop?.page || ('https://en.wikipedia.org/wiki/' + encodeURIComponent(data.title.replace(/ /g,'_'))),
+      thumbnail: data.thumbnail?.source || null
+    };
+  }
+  // Tried a plain full-text search first (query the feature name + "Isle Royale") and it was too
+  // eager: MediaWiki's relevance ranking kept surfacing the big, heavily-linked "Isle Royale National
+  // Park" article (or, for "Duncan Bay", an unrelated "USS Isle Royale" Navy ship) ahead of the small,
+  // specific article that's actually the right match -- confirmed by running this against real feature
+  // names before shipping it, not just reasoning about it. Direct title lookups are exact-match, so
+  // they can't drift like that; try the naming conventions Wikipedia actually uses for this kind of
+  // subject first, and only fall back to search -- with a hard word-overlap requirement -- if none hit.
+  function wikiCandidateTitles(record) {
+    const hay = `${record.name} ${record.sourceLabel || ''}`;
+    const isLighthouse = /lighthouse|light station|\blight\b/i.test(hay);
+    const isWreck = /shipwreck|ship wreck|\bwreck\b/i.test(hay);
+    if (isLighthouse) return [`${record.name} Light`, `${record.name} Lighthouse`, `${record.name} Light Station`];
+    if (isWreck) return [`SS ${record.name}`, `${record.name} (ship)`, `${record.name} (steamship)`, `${record.name} (shipwreck)`];
+    return [];
+  }
+  function looksLikeGenuineMatch(record, summary) {
+    // Some multi-ship-name pages (e.g. "SS America", "Emperor (ship)") come back as type:'standard'
+    // rather than the dedicated 'disambiguation' type, but read as a bare list of unrelated vessels.
+    // Wikipedia's convention for these varies in wording -- "SS America may refer to: ..." vs.
+    // "Several merchant ships have been named Emperor..." -- confirmed by running this against real
+    // names before shipping (both slipped through an earlier, narrower version of this check; see PR
+    // history). A real one-vessel/one-lighthouse article doesn't open by telling you its name has
+    // been reused by several different, unrelated things.
+    if (/\bmay refer to\b|\bhave been named\b|\bships? (have been |were |are )?named\b/i.test(summary.extract)) return false;
+    if (!/isle royale|lake superior/i.test(summary.extract)) return false;
+    // Require at least one distinctive word (4+ letters, so "of"/"the"/"bay" alone can't pass) from the
+    // feature's own name to actually appear in the matched title -- this is what would have caught
+    // "Duncan Bay" wrongly matching "USS Isle Royale" and "Rock of Ages" wrongly matching the park's
+    // own general article, neither of which share a real word with the name being searched for.
+    const nameWords = record.name.toLowerCase().split(/\s+/).filter(w => w.length >= 4);
+    if (!nameWords.length) return true; // short names (e.g. "SS Cox") have nothing left to check against
+    const titleLower = summary.title.toLowerCase();
+    return nameWords.some(w => titleLower.includes(w));
+  }
+  async function findWikipediaArticleFor(record) {
+    for (const candidate of wikiCandidateTitles(record)) {
+      const summary = await fetchWikipediaSummary(candidate);
+      if (summary && looksLikeGenuineMatch(record, summary)) return summary;
+    }
+    const query = `${record.name} Isle Royale`;
+    const searchRes = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=1&srsearch=' + encodeURIComponent(query));
+    if (!searchRes.ok) return null;
+    const searchData = await searchRes.json();
+    const hit = searchData?.query?.search?.[0];
+    if (!hit?.title) return null;
+    const summary = await fetchWikipediaSummary(hit.title);
+    if (!summary || !looksLikeGenuineMatch(record, summary)) return null;
+    return summary;
+  }
+  async function enrichMaritimeCardFromWikipedia(record, token) {
+    const cacheKey = record.name;
+    let summary = wikiEnrichmentCache.has(cacheKey) ? wikiEnrichmentCache.get(cacheKey) : undefined;
+    if (summary === undefined) {
+      try { summary = await findWikipediaArticleFor(record); }
+      catch (_) { summary = null; }
+      // Only cache a genuine hit. Wikipedia's API was observed to be flaky enough during testing that
+      // a plain network blip can look identical to "no article exists" from here -- caching that as a
+      // permanent negative would mean one bad moment locks a real, findable article out for the rest
+      // of the session. A miss just means the next time this card opens, it tries again.
+      if (summary) wikiEnrichmentCache.set(cacheKey, summary);
+    }
+    if (token !== detailOpenToken || els.detailSheet.hidden) return; // a different card is open now
+    const pending = els.detailBody.querySelector('.popup-wiki-pending');
+    if (!pending) return;
+    if (!summary) { pending.remove(); return; }
+    const block = document.createElement('div');
+    block.className = 'popup-wiki';
+    if (summary.thumbnail) {
+      const img = document.createElement('img');
+      img.src = summary.thumbnail;
+      img.alt = '';
+      img.loading = 'lazy';
+      block.appendChild(img);
+    }
+    const body = document.createElement('div');
+    body.className = 'popup-wiki-body';
+    const extract = document.createElement('p');
+    extract.className = 'popup-wiki-extract';
+    extract.textContent = summary.extract;
+    body.appendChild(extract);
+    const attribution = document.createElement('a');
+    attribution.className = 'popup-wiki-attribution';
+    attribution.href = summary.url;
+    attribution.target = '_blank';
+    attribution.rel = 'noopener';
+    attribution.textContent = 'Read the full article on Wikipedia \u2197';
+    attribution.addEventListener('click', event => {
+      event.stopPropagation();
+      emitEvent('isle_royale_source_open', {source_id:'wikipedia'});
+      closeFeatureDetail();
+    });
+    body.appendChild(attribution);
+    block.appendChild(body);
+    pending.replaceWith(block);
+  }
   function selectRecord(record) {
     if (!record || !record.layer) return;
     emitEvent('isle_royale_feature_open', {feature_class:record.category, source_family:sourceFamily(record)});
@@ -2072,7 +2203,8 @@
       if (bounds && bounds.isValid && bounds.isValid()) map.fitBounds(bounds.pad(.6), {maxZoom:14});
       else if (record.layer.getLatLng) map.flyTo(record.layer.getLatLng(), Math.max(map.getZoom(), 13));
     } catch (_) {}
-    showFeatureDetail(popupNode(record));
+    const token = showFeatureDetail(popupNode(record));
+    if (record.category === 'maritime-history') enrichMaritimeCardFromWikipedia(record, token);
   }
 
   function flyToFeature(index) {
