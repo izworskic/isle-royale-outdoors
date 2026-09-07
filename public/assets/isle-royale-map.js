@@ -757,7 +757,18 @@
     a.target = '_blank';
     a.rel = 'noopener';
     a.textContent = link.label;
-    a.addEventListener('click', () => emitEvent('isle_royale_source_open', {source_id:link.sourceId || 'popup-related'}));
+    // These are external references (NPS/OSM/etc.) opened in a new tab, which is correct --
+    // but leaving the on-map card open behind them means whoever's on a phone comes back to
+    // the map, closes the browser's own "tab closed" toast, and lands back on the SAME card
+    // still sitting open on top of the map, which reads as something popping up unprompted.
+    // Tapping an outbound link is a clear signal the visitor is leaving this card, so close it
+    // here rather than leave it stranded -- the map is clean when they return. stopPropagation
+    // is defensive: nothing upstream should still receive this click as a map interaction.
+    a.addEventListener('click', event => {
+      event.stopPropagation();
+      emitEvent('isle_royale_source_open', {source_id:link.sourceId || 'popup-related'});
+      closeFeatureDetail();
+    });
     container.appendChild(a);
   }
 
