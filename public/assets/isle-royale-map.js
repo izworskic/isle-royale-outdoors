@@ -486,26 +486,60 @@
     return links.slice(0, 4);
   }
 
+  // The live NPS ArcGIS feed's field names don't match the ignore-list they were meant to hit --
+  // Esri's own export uses a DOUBLE underscore ("Shape__Length"), the list checked for a single one
+  // ("shape_length") -- so raw, unrounded geometry floats with no unit (e.g. "16760.04720892769" on
+  // Rock Harbor Trail) were slipping straight onto cards as if they were a real fact. Normalizing both
+  // sides (strip underscores, lowercase) before comparing makes this immune to that kind of drift.
+  const IGNORED_FACT_KEYS = new Set(['objectid','objectid1','fid','globalid','shape','shapelength','shapearea',
+    'id','osmid','name','title','label','maplabel','description','desc','descript','notes','details',
+    'unitname','poitype','trltype']); // poitype/trltype just restate the category already shown above the facts
+  // NPS's own source data leaves most of these "Unknown" for the vast majority of records (verified
+  // Sep 2026: every sampled trail's class/use/surface and every sampled campground's seasonal field).
+  // Showing the literal word "Unknown" as if it were a fact reads as broken, not honest -- omitting an
+  // unanswered field is more accurate than answering it with a non-answer.
+  const JUNK_FACT_VALUES = new Set(['unknown','n/a','na','none','null','undefined','tbd','not available','no data']);
+  // Real ArcGIS field aliases (queried directly from the live FeatureServer schema, Sep 2026) for the
+  // handful of raw field names that do carry real, non-"Unknown" values often enough to be worth
+  // showing -- humanizeKey() alone turns an all-caps Esri field like "TRLSURFACE" into "Trlsurface",
+  // which is better than shouting but still not a real label.
+  const FACT_KEY_ALIASES = {
+    trlsurface:'Trail surface', trlclass:'Trail class', trluse:'Trail use', trlaltname:'Alternate name',
+    opentopubl:'Open to public', seasonal:'Seasonal access'
+  };
+  function factLabel(key) {
+    const normalized = key.toLowerCase().replace(/_/g,'');
+    return FACT_KEY_ALIASES[normalized] || humanizeKey(key);
+  }
   function collectFeatureFacts(record) {
     const props = record?.properties || {};
     const facts = [];
     const seen = new Set();
-    const ignored = /^(objectid|fid|globalid|shape|shape_length|shape_area|id|osm_id|name|title|label|maplabel|description|desc|descript|notes|details)$/i;
-    const priority = /(type|kind|class|facility|site|trail|length|mile|distance|elev|depth|shelter|tent|dock|water|toilet|amenity|operator|access|season|status|historic|location|area|island|harbor|capacity|use)/i;
+    const priority = /(type|kind|class|facility|site|trail|length|mile|distance|elev|depth|shelter|tent|dock|water|toilet|amenity|operator|access|season|status|historic|location|area|island|harbor|capacity|use|surface)/i;
     for (const [key, value] of Object.entries(props)) {
       if (facts.length >= 8) break;
-      if (ignored.test(key) || !priority.test(key)) continue;
+      const normalizedKey = key.toLowerCase().replace(/_/g,'');
+      if (IGNORED_FACT_KEYS.has(normalizedKey) || !priority.test(key)) continue;
       if (value == null || typeof value === 'object') continue;
       const text = cleanText(value);
       if (!text || text.length > 100 || safeHttpUrl(text)) continue;
       const fingerprint = text.toLowerCase();
+      if (JUNK_FACT_VALUES.has(fingerprint)) continue;
       if (seen.has(fingerprint) || fingerprint === String(record.name || '').toLowerCase()) continue;
       seen.add(fingerprint);
-      facts.push({label:humanizeKey(key), value:text});
+      facts.push({label:factLabel(key), value:text});
     }
     return facts;
   }
 
+  // A generic "learn more" NPS page (camping guidance, hiking guidance, ...) is only informative the
+  // first time someone sees it -- there are 36 campgrounds, and every single one was carrying the exact
+  // same camping.htm link, so a visitor working through even a handful of them saw the identical "Related
+  // information" entry over and over. Tracked for the page session: a given generic URL is offered once,
+  // on whichever card happens to surface it first, then quietly omitted from every later card. Feature-
+  // specific links (this record's own source page, its OSM record, its coordinates) are never touched by
+  // this -- only the handful of shared NPS topic pages are subject to it.
+  const seenGenericTopicLinks = new Set();
   function relatedLinks(record) {
     const links = [];
     const seen = new Set();
@@ -515,24 +549,36 @@
       seen.add(safe);
       links.push({href:safe, label, sourceId});
     };
+    const addOncePerSession = (href, label, sourceId) => {
+      const safe = safeHttpUrl(href);
+      if (!safe || seenGenericTopicLinks.has(safe)) return;
+      seenGenericTopicLinks.add(safe);
+      add(safe, label, sourceId);
+    };
 
     for (const item of featureUrls(record.properties)) add(item.href, item.label || 'Feature website', 'feature-attribute');
 
     if (record.category === 'campground') {
-      add(CONFIG.campingUrl, 'NPS camping & campground guidance', 'nps-camping');
-      if (record.boater) add(CONFIG.boatInUrl, 'NPS boat-in campground details', 'nps-boat-in');
+      addOncePerSession(CONFIG.campingUrl, 'NPS camping & campground guidance', 'nps-camping');
+      if (record.boater) addOncePerSession(CONFIG.boatInUrl, 'NPS boat-in campground details', 'nps-boat-in');
     } else if (record.category === 'trail') {
-      add(CONFIG.dayHikingUrl, 'NPS hiking guidance', 'nps-hiking');
+      addOncePerSession(CONFIG.dayHikingUrl, 'NPS hiking guidance', 'nps-hiking');
     } else if (record.category === 'water-route') {
-      add(CONFIG.directionsUrl, 'NPS ferry, seaplane & transportation', 'nps-transportation');
+      addOncePerSession(CONFIG.directionsUrl, 'NPS ferry, seaplane & transportation', 'nps-transportation');
     } else if (record.category === 'visitor-service') {
-      add(CONFIG.placesUrl, 'NPS places to go & visitor areas', 'nps-places');
+      addOncePerSession(CONFIG.placesUrl, 'NPS places to go & visitor areas', 'nps-places');
     } else if (record.category === 'maritime-history') {
-      if (/shipwreck|wreck|scuba|dive/i.test(`${record.name} ${record.sourceLabel}`)) add(CONFIG.scubaUrl, 'NPS shipwreck & diving guidance', 'nps-scuba');
-      add(CONFIG.placesUrl, 'NPS lighthouses & places to go', 'nps-places');
+      if (/shipwreck|wreck|scuba|dive/i.test(`${record.name} ${record.sourceLabel}`)) addOncePerSession(CONFIG.scubaUrl, 'NPS shipwreck & diving guidance', 'nps-scuba');
+      addOncePerSession(CONFIG.placesUrl, 'NPS lighthouses & places to go', 'nps-places');
     }
 
-    if (record.sourceUrl) add(record.sourceUrl, /nps\.gov\/isro/i.test(record.sourceUrl) ? 'Open official source page' : 'Open map-data source', 'feature-source');
+    if (record.sourceUrl) add(record.sourceUrl, /nps\.gov\/isro/i.test(record.sourceUrl)
+      ? 'Open official source page'
+      // Most non-nps.gov source URLs here are the raw ArcGIS FeatureServer endpoint itself, not a
+      // readable page -- say so plainly rather than let 'Open map-data source' imply a normal page.
+      : /\/rest\/services\//i.test(record.sourceUrl)
+        ? 'Open raw map-data service (technical, not a visitor page)'
+        : 'Open map-data source', 'feature-source');
 
     const osmId = String(record.properties?.osm_id || '');
     if (/^(node|way|relation)\/\d+$/.test(osmId)) add(`https://www.openstreetmap.org/${osmId}`, 'Open supplemental-data source record', 'osm-feature');
@@ -543,7 +589,9 @@
       add(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`, 'Open this coordinate on the source map', 'coordinate');
     }
 
-    add(CONFIG.currentConditionsUrl, 'Verify current NPS conditions', 'nps-current-conditions');
+    // Dropped: "Verify current NPS conditions" used to be appended here on every single card, but it's
+    // already a permanent, always-visible link in the live-conditions panel (see els.liveStatus below) --
+    // repeating the identical link on every one of the ~400 loaded features added nothing.
     return links.slice(0, 6);
   }
 
