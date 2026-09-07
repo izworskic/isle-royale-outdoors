@@ -69,6 +69,27 @@
   const map = L.map('isle-map', {renderer:vectorRenderer, zoomControl:false, minZoom:6, maxZoom:18});
   L.control.zoom({position:'topright'}).addTo(map);
   map.fitBounds(CONFIG.islandBounds, {padding:[10,10]});
+
+  // Leaflet caches the pixel size of its container at creation time and never
+  // re-measures it on its own. Rotating a tablet changes the .map-wrap CSS
+  // (height clamp, and now position:sticky) without firing any event Leaflet
+  // listens for, so the map kept rendering at its stale pre-rotation size --
+  // tiles offset, markers misplaced, grey gaps. Watch the actual container
+  // for size changes (covers rotation, browser resize, and the layout's own
+  // breakpoint flips) and re-measure whenever it moves.
+  const mapWrapEl = document.querySelector('.map-wrap');
+  if (mapWrapEl && typeof ResizeObserver === 'function') {
+    let invalidateRaf = null;
+    const mapResizeObserver = new ResizeObserver(() => {
+      if (invalidateRaf) cancelAnimationFrame(invalidateRaf);
+      invalidateRaf = requestAnimationFrame(() => map.invalidateSize());
+    });
+    mapResizeObserver.observe(mapWrapEl);
+  }
+  // Belt-and-suspenders: some mobile browsers report the old viewport size to
+  // ResizeObserver for a moment during the rotation transition, so also
+  // re-check shortly after the orientation actually finishes changing.
+  window.addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(), 300));
   const baseLayers = {
     standard: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
