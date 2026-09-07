@@ -201,9 +201,42 @@
   document.addEventListener('keydown', event => { if (event.key === 'Escape') closeFeatureDetail(); });
 
   const osmContextGroup = L.layerGroup();
+
+  // The 16 official portages are legitimately bunched near Rock Harbor/Tobin
+  // Harbor -- that's real geography, not a bug -- so at an overview zoom
+  // their fixed-size badges collided into an unreadable pile. Portage LINES
+  // (the actual carry corridors) always stay drawn exactly as mapped; only
+  // the small "Pn" badge markers cluster, and only where they're genuinely
+  // close together in screen pixels at the current zoom. maxClusterRadius is
+  // deliberately tight (45px, well under the plugin's 80px default) so nearby-
+  // but-legible badges stay separate and only real pile-ups collapse.
+  // disableClusteringAtZoom stops any clustering once zoomed in far enough
+  // that showing each badge at its exact spot matters more than tidiness.
+  const officialPortageLines = L.layerGroup();
+  const officialPortageClusterGroup = L.markerClusterGroup({
+    maxClusterRadius: 45,
+    disableClusteringAtZoom: 15,
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: true,
+    zoomToBoundsOnClick: true,
+    iconCreateFunction: cluster => {
+      const numbers = cluster.getAllChildMarkers()
+        .map(child => child.isleRoyalePortageNumber)
+        .filter(n => n != null)
+        .sort((a, b) => a - b);
+      const count = cluster.getChildCount();
+      cluster.bindTooltip(
+        (numbers.length ? 'P' + numbers.join(', P') + ' \u00b7 ' : '')
+          + count + ' official portage' + (count === 1 ? '' : 's') + ' near here \u2014 click to zoom in',
+        {direction: 'top'}
+      );
+      return L.divIcon({className: 'official-portage-cluster', html: '<span>' + count + '</span>', iconSize: [34, 34], iconAnchor: [17, 17]});
+    }
+  });
+
   const layerGroups = {
     relief: reliefLayer,
-    'official-portage': L.layerGroup().addTo(map),
+    'official-portage': L.layerGroup([officialPortageLines, officialPortageClusterGroup]).addTo(map),
     trail: L.layerGroup().addTo(map),
     campground: L.layerGroup().addTo(map),
     'visitor-service': L.layerGroup().addTo(map),
@@ -1855,7 +1888,8 @@
   function renderOfficialPortageLayer() {
     const group=layerGroups['official-portage'];
     if(!group||officialPortages.state!=='ready')return;
-    group.clearLayers();
+    officialPortageLines.clearLayers();
+    officialPortageClusterGroup.clearLayers();
     officialPortages.visuals.clear();
     for(let i=featureIndex.length-1;i>=0;i--)if(featureIndex[i].category==='official-portage')featureIndex.splice(i,1);
 
@@ -1880,6 +1914,7 @@
           title:'NPS Portage #'+portage.number+' — '+portage.official_label,
           icon:L.divIcon({className:'official-portage-badge',html:'<span>P'+portage.number+'</span>',iconSize:[30,24],iconAnchor:[15,12]})
         });
+        badge.isleRoyalePortageNumber = portage.number;
         visual={geometryResolved:true,reference:Boolean(geometry.reference),points:geometry.points,mapped_miles:geometry.mapped_miles,line,badge};
         const open=event=>{
           if(event?.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
@@ -1893,7 +1928,7 @@
         badge.on('click',open);
         line.bindTooltip('P'+portage.number+' · '+portage.official_label+' · '+Number(portage.distance_miles).toFixed(1)+' mi'+(geometry.reference?' · official landings, trail line not mapped':''),{sticky:true});
         badge.bindTooltip(portage.official_label+' · '+Number(portage.distance_miles).toFixed(1)+' mi',{direction:'top'});
-        group.addLayer(hit);group.addLayer(line);group.addLayer(badge);
+        officialPortageLines.addLayer(hit);officialPortageLines.addLayer(line);officialPortageClusterGroup.addLayer(badge);
         primaryLayer=line;
       } else {
         const anchorId=portage.from_anchor_id||portage.to_anchor_id;
@@ -1908,12 +1943,13 @@
           });
           visual={geometryResolved:false,points:[],mapped_miles:null,marker,referenceAnchor:anchorPoint};
           marker.bindTooltip('P'+portage.number+' · official portage · mapped corridor unresolved',{direction:'top'});
+          marker.isleRoyalePortageNumber = portage.number;
           marker.on('click',event=>{
             if(event.originalEvent)L.DomEvent.stopPropagation(event.originalEvent);
             showFeatureDetail(officialPortagePopup(portage,visual));
             emitEvent('isle_royale_portage_open',{portage_number:portage.number,mapped:false});
           });
-          group.addLayer(marker);
+          officialPortageClusterGroup.addLayer(marker);
           primaryLayer=marker;
         }
       }
