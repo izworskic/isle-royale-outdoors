@@ -21,6 +21,12 @@
     islandBounds: [[47.79, -89.36], [48.33, -88.18]],
     arcgisRoot: 'https://www.arcgis.com/sharing/rest/content/items/',
     overpass: 'https://overpass-api.de/api/interpreter',
+    // overpass-api.de is a shared public instance that goes down or 503s on its own schedule,
+    // independent of anything this app does -- confirmed directly (Sep 2026): same query, at the same
+    // moment, failed on overpass-api.de with a gateway error but returned 180 real elements from this
+    // mirror without any changes. One flaky endpoint with no fallback made "Show supplemental data"
+    // silently add nothing whenever overpass-api.de happened to be the one having a bad day.
+    overpassFallback: 'https://overpass.kumi.systems/api/interpreter',
     operationsEndpoint: '/api/isle-royale',
     officialPortages: '/isle-royale-map/data/official-portages-2026.json',
     currentConditionsUrl: 'https://www.nps.gov/isro/planyourvisit/current-conditions-at-isle-royale.htm',
@@ -1445,16 +1451,41 @@
     btn.textContent = 'Loading supplemental data…';
     status('Adding supplemental visitor features…');
     const q = `[out:json][timeout:25];(nwr["tourism"~"camp_site|camp_pitch|viewpoint|information|museum"](47.79,-89.36,48.33,-88.18);nwr["amenity"~"shelter|toilets|drinking_water"](47.79,-89.36,48.33,-88.18);nwr["man_made"="lighthouse"](47.79,-89.36,48.33,-88.18);nwr["man_made"="pier"](47.79,-89.36,48.33,-88.18););out center tags;`;
+    // Try the primary Overpass instance, then the fallback mirror, before giving up -- see the note by
+    // overpassFallback above for why a single endpoint isn't reliable enough for this to work when a
+    // real visitor actually clicks it.
+    const endpoints = [CONFIG.overpass, CONFIG.overpassFallback].filter(Boolean);
+    let data = null;
+    let lastError = null;
+    for (const endpoint of endpoints) {
+      try {
+        const url = `${endpoint}?data=${encodeURIComponent(q)}`;
+        data = await fetchJSON(url, 26000);
+        break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
     try {
-      const url = `${CONFIG.overpass}?data=${encodeURIComponent(q)}`;
-      const data = await fetchJSON(url, 26000);
+      if (!data) throw lastError || new Error('No Overpass endpoint responded');
       let added = 0;
+      let skippedDuplicates = 0;
       for (const el of data.elements || []) {
         const f = osmFeatureToGeoJSON(el);
         if (!f) continue;
         const osmId = f.properties?.osm_id;
         if (osmId && osmSeen.has(osmId)) continue;
         if (osmId) osmSeen.add(osmId);
+        // OSM independently maps most of the same named campgrounds, lighthouses, etc. already shown
+        // by the official NPS layers -- confirmed directly (Sep 2026): of 180 raw OSM elements for
+        // this island, the named ones were almost entirely the same 36 campgrounds and 2 lighthouses
+        // already on the map under their official source, just a second pin for the same real place.
+        // Checked with no category restriction (not just e.g. 'campground') since the same real place
+        // can land in a different bucket here than it did officially, depending on incidental tag
+        // wording -- an unnamed feature (most piers/toilets/shelters) has nothing to compare against
+        // and is always kept, which is correct: that's the genuinely new content worth surfacing.
+        const osmName = cleanText(f.properties?.name || '');
+        if (osmName && hasMappedNamedFeature(osmName)) { skippedDuplicates++; continue; }
         added += addGeoJSONFeature(f, {
           layerTitle:'Supplemental visitor data',
           sourceLabel:'OpenStreetMap contributors',
@@ -1466,8 +1497,10 @@
       }
       osmContextLoaded = true;
       setOsmContextVisible(true);
-      status(`Added ${added} supplemental visitor features. Use the same button to hide or show them.`);
-      emitEvent('isle_royale_osm_context', {result:'success'});
+      status(added
+        ? `Added ${added} supplemental visitor features${skippedDuplicates ? ` (${skippedDuplicates} already shown under their official source were skipped)` : ''}. Use the same button to hide or show them.`
+        : `No new supplemental features to add${skippedDuplicates ? ` -- OpenStreetMap's ${skippedDuplicates} points here are already shown under their official source` : ' for this area'}.`);
+      emitEvent('isle_royale_osm_context', {result:'success', added, skipped_duplicates:skippedDuplicates});
     } catch (_) {
       sourceStatus.osm = 'unavailable';
       status('Supplemental visitor data could not be loaded. Core map and source catalog are unaffected.');
