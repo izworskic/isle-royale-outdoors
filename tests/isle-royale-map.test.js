@@ -216,6 +216,18 @@ test('supplemental data is reversible and labels the feature before the data sou
   assert.doesNotMatch(js, /textContent = 'Hide OSM context'|textContent = 'Show OSM context'|Loading OSM context/);
   assert.match(js, /targetGroup:osmContextGroup/);
   assert.match(js, /btn\.disabled = false/);
+  // Two real problems found by actually clicking the button and testing the live query, not just
+  // reading the code: (1) overpass-api.de is a shared public instance that goes down or 503s on its
+  // own schedule -- confirmed directly (Sep 2026): the exact same query failed there but returned 180
+  // real elements from a different mirror at the same moment, and one flaky endpoint with no fallback
+  // silently added nothing whenever it happened to be the one having a bad day; (2) named OSM points
+  // almost entirely duplicate the same campgrounds/lighthouses already on the map under their official
+  // source, so even a successful load looked like "nothing new" to a visitor scanning for something
+  // that wasn't already there -- confirmed directly: of 180 raw elements, 34 exact-name duplicates.
+  assert.match(js, /overpassFallback:/, 'a single Overpass endpoint is not reliable enough on its own');
+  assert.match(js, /const endpoints = \[CONFIG\.overpass, CONFIG\.overpassFallback\]/);
+  assert.match(js, /if \(osmName && hasMappedNamedFeature\(osmName\)\) \{ skippedDuplicates\+\+; continue; \}/,
+    'named OSM points already shown under their official source must not be re-added as if new');
 });
 
 test('campground cards combine official NPS capacity with only explicit mapped site identifiers', () => {
