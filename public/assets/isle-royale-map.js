@@ -26,6 +26,12 @@
     currentConditionsUrl: 'https://www.nps.gov/isro/planyourvisit/current-conditions-at-isle-royale.htm',
     boatInUrl: 'https://www.nps.gov/isro/planyourvisit/boat-in-campgrounds.htm',
     campingUrl: 'https://www.nps.gov/isro/planyourvisit/camping.htm',
+    // Real NPS policy text (pulled directly from camping.htm, Sep 2026), shown inline on every
+    // campground card instead of as an outbound link -- see popupNode(). It's the same short
+    // paragraph on all 36 cards, which is fine: reading a sentence that's already there costs
+    // nothing, unlike the outbound-tap-and-return-and-close-the-browser's-own-tab-toast round trip
+    // this replaces, which cost something every single time regardless of how many cards it was on.
+    campingGuidance: 'Camping permits are required for every overnight stay \u2014 campground, cross-country site, dock, or at anchor \u2014 regardless of group size. Free for parties of six or fewer, issued on arrival at Rock Harbor, Windigo, or aboard the Ranger III; sites are first-come, first-served and a permit doesn\u2019t reserve one. Parties of seven or more need an advance reservation ($25/permit). Fires only in designated metal rings or grills; pack out everything you bring in.',
     dayHikingUrl: 'https://www.nps.gov/isro/planyourvisit/day-hiking.htm',
     directionsUrl: 'https://www.nps.gov/isro/planyourvisit/directions.htm',
     placesUrl: 'https://www.nps.gov/isro/planyourvisit/placestogo.htm',
@@ -564,10 +570,7 @@
 
     for (const item of featureUrls(record.properties)) add(item.href, item.label || 'Feature website', 'feature-attribute');
 
-    if (record.category === 'campground') {
-      addOncePerSession(CONFIG.campingUrl, 'NPS camping & campground guidance', 'nps-camping');
-      if (record.boater) addOncePerSession(CONFIG.boatInUrl, 'NPS boat-in campground details', 'nps-boat-in');
-    } else if (record.category === 'trail') {
+    if (record.category === 'trail') {
       addOncePerSession(CONFIG.dayHikingUrl, 'NPS hiking guidance', 'nps-hiking');
     } else if (record.category === 'water-route') {
       addOncePerSession(CONFIG.directionsUrl, 'NPS ferry, seaplane & transportation', 'nps-transportation');
@@ -954,6 +957,20 @@
     }
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record,sourceNotes);
+
+    // Replaces what used to be an outbound "NPS camping & campground guidance" link -- the actual
+    // policy is short, stable, and public; there's no reason reading it should cost a tab switch.
+    if (record.category === 'campground') {
+      const guidance = document.createElement('div');
+      guidance.className = 'popup-camping-guidance';
+      const heading = document.createElement('div');
+      heading.className = 'popup-camping-guidance-title';
+      heading.textContent = 'Camping guidance (applies park-wide)';
+      const body = document.createElement('p');
+      body.textContent = CONFIG.campingGuidance;
+      guidance.append(heading, body);
+      wrap.appendChild(guidance);
+    }
 
     // Maritime-history cards (lighthouses, shipwrecks) and named trails have the thinnest NPS source
     // data of any categories on this map -- there's no narrative field in the feed at all. Isle
