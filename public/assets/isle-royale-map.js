@@ -29,6 +29,12 @@
     overpassFallback: 'https://overpass.kumi.systems/api/interpreter',
     operationsEndpoint: '/api/isle-royale',
     officialPortages: '/isle-royale-map/data/official-portages-2026.json',
+    // Trail Mileages Between Campgrounds -- NPS's own published distance matrix for the 21
+    // trail-connected campgrounds (not every campground is trail-linked; some are boat/paddle-in
+    // only, which is why this covers 21 of the 36). Real demand for exactly this ("trail map with
+    // mileage") checked directly (Sep 2026, alphabet-expanded autocomplete): it was the single most
+    // repeated phrase across the hiking/backcountry/trail/general-map query clusters.
+    trailMileage: '/isle-royale-map/data/isle-royale-trail-mileage-2026.json',
     currentConditionsUrl: 'https://www.nps.gov/isro/planyourvisit/current-conditions-at-isle-royale.htm',
     boatInUrl: 'https://www.nps.gov/isro/planyourvisit/boat-in-campgrounds.htm',
     campingUrl: 'https://www.nps.gov/isro/planyourvisit/camping.htm',
@@ -357,6 +363,14 @@
     // anchor id -> the navigable body it sits on, resolved once the water router loads. Two anchors
     // sharing a body can be paddled between; different bodies need a carry.
     waterBodies:new Map()
+  };
+  const trailMileage = {
+    state:'idle',
+    promise:null,
+    // name -> array of {to, miles}, sorted nearest-first. Built once the raw pairs load.
+    byCampground:new Map(),
+    source:null,
+    error:''
   };
   const campSiteIdentifiers = {
     state:'idle',
@@ -752,6 +766,13 @@
     return null;
   }
 
+  function findTrailMileageNeighbors(name) {
+    for (const alias of placeAliases(name)) {
+      if (trailMileage.byCampground.has(alias)) return trailMileage.byCampground.get(alias);
+    }
+    return null;
+  }
+
   function findOperationalAlert(name) {
     const aliases = placeAliases(name);
     for (const alert of operational.alerts) {
@@ -1016,7 +1037,42 @@
       guidance.append(heading, body);
       wrap.appendChild(guidance);
     }
+    // NPS's own published trail-mileage table only covers the 21 trail-connected campgrounds --
+    // boat/paddle-in-only sites (Beaver Island, Belle Isle, etc.) correctly get nothing here rather
+    // than a fabricated distance. The dataset loads at bootstrap and is small (25KB), so by the time
+    // anyone has actually clicked a specific campground it's virtually always already ready;
+    // rendering synchronously from current state avoids adding another async placeholder path for
+    // what is, in practice, never actually async from the user's side.
+    function appendTrailMileageBlock() {
+      if (trailMileage.state !== 'ready') return;
+      const neighbors = findTrailMileageNeighbors(record.name);
+      if (!neighbors || !neighbors.length) return;
+      const block = document.createElement('div');
+      block.className = 'popup-camping-guidance';
+      const heading = document.createElement('div');
+      heading.className = 'popup-camping-guidance-title';
+      heading.textContent = 'Nearest campgrounds by trail';
+      block.appendChild(heading);
+      const list = document.createElement('ul');
+      list.className = 'popup-mileage-list';
+      for (const {to, miles} of neighbors.slice(0, 4)) {
+        const item = document.createElement('li');
+        const name = document.createElement('span');
+        name.textContent = to;
+        const dist = document.createElement('b');
+        dist.textContent = `${miles} mi`;
+        item.append(name, dist);
+        list.appendChild(item);
+      }
+      block.appendChild(list);
+      const note = document.createElement('p');
+      note.className = 'popup-mileage-note';
+      note.textContent = 'Shortest trail route, not straight-line distance. NPS recommends 6-8 mi/day for beginning backpackers, 8-10 mi/day for experienced.';
+      block.appendChild(note);
+      wrap.appendChild(block);
+    }
     if (record.category === 'campground') {
+      appendTrailMileageBlock();
       appendGuidanceBlock('Camping guidance (applies park-wide)', CONFIG.campingGuidance);
     } else if (record.category === 'trail') {
       appendGuidanceBlock('Hiking guidance (applies park-wide)', CONFIG.hikingGuidance);
@@ -2209,6 +2265,60 @@
     return officialPortages.promise;
   }
 
+  async function loadTrailMileage() {
+    if(trailMileage.state==='ready')return trailMileage;
+    if(trailMileage.promise)return trailMileage.promise;
+    trailMileage.state='loading';
+    trailMileage.promise=(async()=>{
+      try {
+        const res=await fetch(CONFIG.trailMileage,{headers:{Accept:'application/json'}});
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        const data=await res.json();
+        const pairs=Array.isArray(data?.pairs)?data.pairs:[];
+        // Completeness check mirrors loadOfficialPortages(): 21 trail-connected campgrounds means
+        // exactly 21*20/2 = 210 unique pairs. Catches a truncated or malformed fetch before it
+        // silently renders a partial "nearest campgrounds" list as if it were complete.
+        if(pairs.length!==210)throw new Error('NPS trail mileage completeness validation failed');
+        // Keyed by placeAliases() normalized alias, same as operational.campgroundByName -- the PDF's
+        // own names ("Chickenbone E") don't always match the ArcGIS point layer's naming convention
+        // exactly, so exact-string lookup would silently miss real matches.
+        const byCampground=new Map();
+        const addEntry=(from,to,miles)=>{
+          if(!Number.isFinite(miles))return;
+          for(const alias of placeAliases(from)) {
+            if(!byCampground.has(alias))byCampground.set(alias,[]);
+            byCampground.get(alias).push({to,miles});
+          }
+        };
+        for(const pair of pairs) {
+          if(!pair?.from||!pair?.to)continue;
+          addEntry(pair.from,pair.to,Number(pair.miles));
+          // Directional: use the reverse-direction figure when NPS's own table states one (the one
+          // pair where their table itself disagrees by direction), otherwise the same figure both ways.
+          addEntry(pair.to,pair.from,Number(pair.miles_reverse ?? pair.miles));
+        }
+        for(const list of byCampground.values())list.sort((a,b)=>a.miles-b.miles);
+        trailMileage.byCampground=byCampground;
+        trailMileage.source={
+          authority:data.authority||'National Park Service',
+          url:data.source_url||'',
+          checked:data.source_last_checked||''
+        };
+        trailMileage.state='ready';
+        trailMileage.error='';
+        emitEvent('isle_royale_trail_mileage_dataset',{pairs:pairs.length,campgrounds:byCampground.size});
+        return trailMileage;
+      } catch(error) {
+        trailMileage.state='error';
+        trailMileage.error=cleanText(error?.message||'trail mileage dataset unavailable');
+        return trailMileage;
+      } finally {
+        trailMileage.promise=null;
+      }
+    })();
+    return trailMileage.promise;
+  }
+
   function isCategoryVisible(category) {
     const checkbox = els.filters.querySelector(`input[data-layer="${category}"]`);
     return checkbox ? checkbox.checked : true;
@@ -2445,6 +2555,7 @@
   renderFeatureList();
   loadCatalog();
   loadOfficialPortages().catch(()=>{});
+  loadTrailMileage().catch(()=>{});
   loadCampSiteIdentifiers().catch(()=>{});
   loadOperationalData();
   renderDeepStatus();

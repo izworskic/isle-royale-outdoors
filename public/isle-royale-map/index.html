@@ -26,8 +26,8 @@
   "@context":"https://schema.org",
   "@graph":[
     {"@type":"Person","@id":"https://chrisizworski.com/#person","name":"Chris Izworski","url":"https://chrisizworski.com/"},
-    {"@type":"WebApplication","@id":"https://chrisizworski.com/isle-royale-map/#app","name":"Isle Royale Map Guide","url":"https://chrisizworski.com/isle-royale-map/","dateModified":"2026-09-04","applicationCategory":"TravelApplication","operatingSystem":"Any","isAccessibleForFree":true,"author":{"@id":"https://chrisizworski.com/#person"},"publisher":{"@id":"https://chrisizworski.com/#person"},"description":"Interactive Isle Royale planning map combining source-backed visitor geography — trails, portages, campgrounds, docks, lighthouses and shipwrecks — with a catalog for boating, maritime history, geology, vegetation and historical maps."},
-    {"@type":"Dataset","name":"Isle Royale map source catalog","url":"https://chrisizworski.com/isle-royale-map/catalog.json","dateModified":"2026-09-04","creator":{"@id":"https://chrisizworski.com/#person"},"isBasedOn":["https://www.nps.gov/isro/planyourvisit/mapsbrochures.htm","https://www.arcgis.com/home/item.html?id=75e3ceba038a45f7b4d5a9d7c6a46ccf","https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park","https://catalog.data.gov/dataset/digital-geologic-gis-map-of-isle-royale-national-park-and-vicinity-michigan-nps-grd-g-1996"],"description":"A provenance-aware catalog of visitor, boating, science, history and reference map sources for Isle Royale National Park."}
+    {"@type":"WebApplication","@id":"https://chrisizworski.com/isle-royale-map/#app","name":"Isle Royale Map Guide","url":"https://chrisizworski.com/isle-royale-map/","dateModified":"2026-09-08","applicationCategory":"TravelApplication","operatingSystem":"Any","isAccessibleForFree":true,"author":{"@id":"https://chrisizworski.com/#person"},"publisher":{"@id":"https://chrisizworski.com/#person"},"description":"Interactive Isle Royale planning map combining source-backed visitor geography — trails, portages, campgrounds, docks, lighthouses and shipwrecks — with a catalog for boating, maritime history, geology, vegetation and historical maps."},
+    {"@type":"Dataset","name":"Isle Royale map source catalog","url":"https://chrisizworski.com/isle-royale-map/catalog.json","dateModified":"2026-09-08","creator":{"@id":"https://chrisizworski.com/#person"},"isBasedOn":["https://www.nps.gov/isro/planyourvisit/mapsbrochures.htm","https://www.arcgis.com/home/item.html?id=75e3ceba038a45f7b4d5a9d7c6a46ccf","https://catalog.data.gov/dataset/geospatial-data-for-the-vegetation-mapping-inventory-project-of-isle-royale-national-park","https://catalog.data.gov/dataset/digital-geologic-gis-map-of-isle-royale-national-park-and-vicinity-michigan-nps-grd-g-1996"],"description":"A provenance-aware catalog of visitor, boating, science, history and reference map sources for Isle Royale National Park."}
   ]
 }
 </script>
@@ -140,6 +140,10 @@ button{cursor:pointer}
 .popup-camping-guidance{margin:8px 0;padding:8px 9px;border-radius:7px;background:#eef4f0;border:1px solid #d3ddd6}
 .popup-camping-guidance-title{font-size:10px;font-weight:800;color:#34413b;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
 .popup-camping-guidance p{margin:0;line-height:1.5;color:#34413b;font-size:12px}
+.popup-mileage-list{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:3px}
+.popup-mileage-list li{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#34413b}
+.popup-mileage-list li b{font-weight:700;white-space:nowrap}
+.popup-mileage-note{margin:0;line-height:1.4;color:#5b6a62;font-size:10.5px;font-style:italic}
 @media(max-width:620px){.popup-facts{grid-template-columns:1fr}}
 .popup-fact{font-size:10px;color:#4c5953;min-width:0}
 .popup-fact b{display:block;color:#1e2d27;font-size:11px;overflow-wrap:anywhere}
@@ -297,6 +301,17 @@ button{cursor:pointer}
     </div>
   </details>
 </section>
+
+<section class="guide">
+  <div class="eyebrow">Before you go</div>
+  <h2>Isle Royale, answered plainly.</h2>
+  <div class="guide-grid">
+    <article class="guide-card"><h3>Is Isle Royale open year-round?</h3><p>No. It's the only U.S. national park that closes completely for the season, open April 16 through October 31 and closed November 1 through April 15 because of dangerous Lake Superior winter conditions. Ferries and seaplanes run mid-May through September, inside that window; outside it there's no scheduled way to reach the island at all.</p></article>
+    <article class="guide-card"><h3>Can you camp anywhere on Isle Royale?</h3><p>No. Camping is permit-only and limited to designated campgrounds, cross-country sites, docks, or anchor points, regardless of group size. Permits are free for parties of six or fewer and issued on arrival at Rock Harbor, Windigo, or aboard the Ranger III; sites are first-come, first-served, so a permit doesn't reserve a specific one. Fires are allowed only in designated metal rings or grills.</p></article>
+    <article class="guide-card"><h3>How do you get to Isle Royale?</h3><p>By ferry or seaplane only; there's no bridge or road access. Ferries and seaplanes depart from Houghton and Copper Harbor, Michigan, and Grand Portage, Minnesota, landing at Rock Harbor on the island's east end or Windigo on the west end. Crossings range from about 40 minutes by seaplane to roughly 6 hours by the Ranger III ferry.</p></article>
+    <article class="guide-card"><h3>What's the difference between Rock Harbor and Windigo?</h3><p>They're the island's two entry points, on opposite ends. Rock Harbor sits on the east end, reached from Houghton or Copper Harbor, Michigan. Windigo sits on the west end, reached from Grand Portage, Minnesota. Trails, campgrounds, and portages connect to one side or the other, so which one you arrive at shapes which routes are realistic for your trip.</p></article>
+  </div>
+</section>
 </main>
 <div id="feature-detail-backdrop" class="feature-detail-backdrop" hidden></div>
 <aside id="feature-detail-sheet" class="feature-detail-sheet" hidden aria-hidden="true" aria-label="Feature details">
@@ -307,6 +322,6 @@ button{cursor:pointer}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js" crossorigin="anonymous"></script>
-<script src="/assets/isle-royale-map.js?v=20260907-supplemental-dedup-fallback"></script>
+<script src="/assets/isle-royale-map.js?v=20260908-trail-mileage-faq"></script>
 </body>
 </html>
