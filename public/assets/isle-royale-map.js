@@ -32,6 +32,39 @@
     // nothing, unlike the outbound-tap-and-return-and-close-the-browser's-own-tab-toast round trip
     // this replaces, which cost something every single time regardless of how many cards it was on.
     campingGuidance: 'Camping permits are required for every overnight stay \u2014 campground, cross-country site, dock, or at anchor \u2014 regardless of group size. Free for parties of six or fewer, issued on arrival at Rock Harbor, Windigo, or aboard the Ranger III; sites are first-come, first-served and a permit doesn\u2019t reserve one. Parties of seven or more need an advance reservation ($25/permit). Fires only in designated metal rings or grills; pack out everything you bring in.',
+    // Same principle as camping guidance above -- real NPS text (pulled directly from the source page
+    // named in each key, Sep 2026), shown inline instead of as an outbound link.
+    hikingGuidance: 'Trails are rugged, uneven, and sometimes obstructed \u2014 wear sturdy, broken-in footwear and carry water, a map, a compass, rain gear, and a first-aid kit. Day hikes run from both Rock Harbor and Windigo; check current trail conditions before setting out, since services and rescue are limited once you\u2019re on the trail.',
+    transportationGuidance: 'Isle Royale is reachable only by ferry or seaplane, and only mid-May through September (the park itself is closed November 1 \u2013 April 15). Departures run from Houghton and Copper Harbor, Michigan, and Grand Portage, Minnesota, arriving at Rock Harbor (east end) or Windigo (west end); crossings range from about 40 minutes by seaplane to roughly 6 hours by the Ranger III ferry.',
+    divingGuidance: 'Diving is by permit only \u2014 register at Rock Harbor, Windigo, or Houghton before diving and return the completed permit afterward. Mark your boat with a diver-down flag and stay within 100 ft of it. Federal law protects every wreck: leave artifacts exactly where you find them. Lake Superior is cold (30s\u201350s\u00b0F) and help is far away, so dive within your training and always keep someone topside.',
+    // Real NPS one-line descriptions for named landmarks, lifted directly from the "Places To Go"
+    // directory page (placestogo.htm, Sep 2026) rather than a generic link to that same page. Matched
+    // by name via placeAliases() in enrichRecord(), same lookup already used for campground data --
+    // works for whichever category a feature happens to land in (overlook, fire tower, lighthouse,
+    // point of interest), and never overwrites a description a feature already has from elsewhere
+    // (a shipwreck's own operational description, a campground's synthesized summary, etc.).
+    placesToGoDescriptions: {
+      'minong ridge overlook': 'A moderate to hard hike on the west end overlooking the island and Lake Superior.',
+      'grace creek overlook': 'Located along the Feldtmann Ridge Trail.',
+      'mount ojibway': 'A rocky ridge located near the Ojibway fire tower.',
+      'lookout louise': 'Located on the east end of Isle Royale, looking towards Duncan Bay.',
+      'mount franklin': 'Located on the east end of Isle Royale along the Greenstone Ridge Trail.',
+      'scoville point': 'A rocky trail with one of the best views in the park.',
+      'feldtmann tower': 'Located on Feldtmann Ridge, this fire tower provides 360-degree views of the west end of Isle Royale.',
+      'feldtmann fire tower': 'Located on Feldtmann Ridge, this fire tower provides 360-degree views of the west end of Isle Royale.',
+      'ishpeming tower': 'Located at the junction of the Greenstone Ridge Trail and Ishpeming Trail.',
+      'ishpeming fire tower': 'Located at the junction of the Greenstone Ridge Trail and Ishpeming Trail.',
+      'ojibway tower': 'Located on the Greenstone Ridge on the eastern end of Isle Royale.',
+      'ojibway fire tower': 'Located on the Greenstone Ridge on the eastern end of Isle Royale.',
+      'passage island lighthouse': 'Guides ships on the northeast side of Isle Royale.',
+      'passage island light': 'Guides ships on the northeast side of Isle Royale.',
+      'rock harbor lighthouse': 'This protector of the Rock Harbor channel is the most viewed and most visited on the island.',
+      'rock harbor light': 'This protector of the Rock Harbor channel is the most viewed and most visited on the island.',
+      'rock of ages lighthouse': 'Found just outside Washington Harbor.',
+      'rock of ages light': 'Found just outside Washington Harbor.',
+      "suzy s cave": "A short hike from the Rock Harbor area.",
+      'edisen fishery': 'A historic fishing camp near Rock Harbor.'
+    },
     dayHikingUrl: 'https://www.nps.gov/isro/planyourvisit/day-hiking.htm',
     directionsUrl: 'https://www.nps.gov/isro/planyourvisit/directions.htm',
     placesUrl: 'https://www.nps.gov/isro/planyourvisit/placestogo.htm',
@@ -544,14 +577,6 @@
     return facts;
   }
 
-  // A generic "learn more" NPS page (camping guidance, hiking guidance, ...) is only informative the
-  // first time someone sees it -- there are 36 campgrounds, and every single one was carrying the exact
-  // same camping.htm link, so a visitor working through even a handful of them saw the identical "Related
-  // information" entry over and over. Tracked for the page session: a given generic URL is offered once,
-  // on whichever card happens to surface it first, then quietly omitted from every later card. Feature-
-  // specific links (this record's own source page, its OSM record, its coordinates) are never touched by
-  // this -- only the handful of shared NPS topic pages are subject to it.
-  const seenGenericTopicLinks = new Set();
   function relatedLinks(record) {
     const links = [];
     const seen = new Set();
@@ -561,25 +586,8 @@
       seen.add(safe);
       links.push({href:safe, label, sourceId});
     };
-    const addOncePerSession = (href, label, sourceId) => {
-      const safe = safeHttpUrl(href);
-      if (!safe || seenGenericTopicLinks.has(safe)) return;
-      seenGenericTopicLinks.add(safe);
-      add(safe, label, sourceId);
-    };
 
     for (const item of featureUrls(record.properties)) add(item.href, item.label || 'Feature website', 'feature-attribute');
-
-    if (record.category === 'trail') {
-      addOncePerSession(CONFIG.dayHikingUrl, 'NPS hiking guidance', 'nps-hiking');
-    } else if (record.category === 'water-route') {
-      addOncePerSession(CONFIG.directionsUrl, 'NPS ferry, seaplane & transportation', 'nps-transportation');
-    } else if (record.category === 'visitor-service') {
-      addOncePerSession(CONFIG.placesUrl, 'NPS places to go & visitor areas', 'nps-places');
-    } else if (record.category === 'maritime-history') {
-      if (/shipwreck|wreck|scuba|dive/i.test(`${record.name} ${record.sourceLabel}`)) addOncePerSession(CONFIG.scubaUrl, 'NPS shipwreck & diving guidance', 'nps-scuba');
-      addOncePerSession(CONFIG.placesUrl, 'NPS lighthouses & places to go', 'nps-places');
-    }
 
     if (record.sourceUrl) add(record.sourceUrl, /nps\.gov\/isro/i.test(record.sourceUrl)
       ? 'Open official source page'
@@ -772,6 +780,11 @@
       const summary = campgroundSummary(record);
       if (summary) record.description = summary;
     }
+    if (!record.description) {
+      for (const alias of placeAliases(record.name)) {
+        if (CONFIG.placesToGoDescriptions[alias]) { record.description = CONFIG.placesToGoDescriptions[alias]; break; }
+      }
+    }
     record.liveAlert = findOperationalAlert(record.name);
     if(record.boater&&record.layer) {
       try {
@@ -958,18 +971,29 @@
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record,sourceNotes);
 
-    // Replaces what used to be an outbound "NPS camping & campground guidance" link -- the actual
-    // policy is short, stable, and public; there's no reason reading it should cost a tab switch.
-    if (record.category === 'campground') {
+    // Real, stable NPS policy/safety text shown inline instead of as an outbound link -- see the
+    // CONFIG.*Guidance strings (pulled directly from the named nps.gov source page, Sep 2026) for
+    // what each one says and where it came from. There's no reason reading a short, public,
+    // rarely-changing paragraph should ever cost a tab switch.
+    function appendGuidanceBlock(title, text) {
       const guidance = document.createElement('div');
       guidance.className = 'popup-camping-guidance';
       const heading = document.createElement('div');
       heading.className = 'popup-camping-guidance-title';
-      heading.textContent = 'Camping guidance (applies park-wide)';
+      heading.textContent = title;
       const body = document.createElement('p');
-      body.textContent = CONFIG.campingGuidance;
+      body.textContent = text;
       guidance.append(heading, body);
       wrap.appendChild(guidance);
+    }
+    if (record.category === 'campground') {
+      appendGuidanceBlock('Camping guidance (applies park-wide)', CONFIG.campingGuidance);
+    } else if (record.category === 'trail') {
+      appendGuidanceBlock('Hiking guidance (applies park-wide)', CONFIG.hikingGuidance);
+    } else if (record.category === 'water-route') {
+      appendGuidanceBlock('Getting to the island (applies park-wide)', CONFIG.transportationGuidance);
+    } else if (record.category === 'maritime-history' && /shipwreck|wreck|scuba|dive/i.test(`${record.name} ${record.sourceLabel || ''}`)) {
+      appendGuidanceBlock('Diving guidance (applies park-wide)', CONFIG.divingGuidance);
     }
 
     // Maritime-history cards (lighthouses, shipwrecks) and named trails have the thinnest NPS source
