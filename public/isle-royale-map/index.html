@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="anonymous">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.css" crossorigin="anonymous">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -112,6 +113,10 @@ button{cursor:pointer}
 .official-portage-badge.unresolved span{background:#fff8f1;color:#7a4327;border:2px dashed #9b512b;box-shadow:0 2px 8px rgba(0,0,0,.16)}
 .official-portage-cluster{background:transparent;border:0}
 .official-portage-cluster span{display:grid;place-items:center;width:34px;height:34px;border-radius:999px;border:3px solid #fff;background:#7a3a1d;color:#fff;font-size:13px;font-weight:900;box-shadow:0 2px 10px rgba(0,0,0,.32)}
+/* The gesture-handling plugin's "use two fingers"/"ctrl+scroll" hint ships at z-index:461, below our
+   own map-toolbar (700) and map-peek (701) -- bump it so the hint is never left rendering underneath
+   either of those instead of clearly over the map. */
+.leaflet-container:after{z-index:900!important}
 .official-portage-popup .popup-title{color:#7a4327}
 
 /* Sep 4 2026: feature detail is a bottom sheet fixed to the screen, not a Leaflet popup anchored
@@ -301,6 +306,7 @@ button{cursor:pointer}
 <footer class="footer">© 2026 Chris Izworski · Michigan and Great Lakes field tools <a href="/tools/">All tools</a></footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin="anonymous"></script>
-<script src="/assets/isle-royale-map.js?v=20260907-inline-guidance-all-categories"></script>
+<script src="https://unpkg.com/leaflet-gesture-handling@1.2.2/dist/leaflet-gesture-handling.min.js" crossorigin="anonymous"></script>
+<script src="/assets/isle-royale-map.js?v=20260907-gesture-handling"></script>
 </body>
 </html>

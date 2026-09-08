@@ -105,7 +105,15 @@
 
   const coarsePointer = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
   const vectorRenderer = L.canvas({padding:.5, tolerance:coarsePointer ? 14 : 9});
-  const map = L.map('isle-map', {renderer:vectorRenderer, zoomControl:false, minZoom:6, maxZoom:18});
+  // Touching down inside a normal, always-interactive Leaflet map captures the whole gesture for
+  // panning/zooming -- on a phone, that means a one-finger swipe starting on the map never scrolls
+  // the page at all, so once the map fills most of the screen there's no way to reach the guide
+  // panel below it without already knowing about the "Guide, layers and sources" jump button (only
+  // shown <=1400px in the first place). gestureHandling flips the default: one finger scrolls the
+  // page like normal text, two fingers pan/zoom the map (desktop: plain scroll moves the page,
+  // ctrl/cmd+scroll zooms the map) -- with a small on-map hint the first time someone tries the
+  // "wrong" gesture, so it's discoverable rather than just silently different.
+  const map = L.map('isle-map', {renderer:vectorRenderer, zoomControl:false, minZoom:6, maxZoom:18, gestureHandling:true});
   L.control.zoom({position:'topright'}).addTo(map);
   map.fitBounds(CONFIG.islandBounds, {padding:[10,10]});
 
