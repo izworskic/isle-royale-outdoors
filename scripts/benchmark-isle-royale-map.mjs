@@ -89,10 +89,13 @@ const consolidatedPopupSourceRuntime = /const sourceNotes = \[\];/.test(js)
   && /appendCampSiteIdentifiers\(wrap,record,sourceNotes\)/.test(js)
   && /source\.textContent = sourceNotes\.filter\(Boolean\)\.join\(' '\)/.test(js);
 
-const campgroundDetailRuntime = /trail-accessible-campgrounds\.htm/.test(api)
-  && /lake-superior-accessible-campgrounds\.htm/.test(api)
-  && /inland-lake-paddling-campgrounds\.htm/.test(api)
-  && /function normalizeCampgroundProfiles/.test(api)
+// trail-accessible-campgrounds.htm/lake-superior-accessible-campgrounds.htm/inland-lake-paddling-
+// campgrounds.htm are gone (Sep 2026 NPS restructure -- confirmed live, those pages are now a
+// JS-rendered widget with no server-rendered data at all). Real, complete campground capacity data
+// (all 36 campgrounds) now comes from the same sortable_dataset CSV pattern as the boat-in table.
+const campgroundDetailRuntime = /campgroundTable:/.test(api)
+  && /isro-CampgroundTableversion1xlsb1\.csv/.test(api)
+  && /function normalizeCampgroundTableCsv/.test(api)
   && /campground_profiles:/.test(api)
   && /function findCampgroundProfile/.test(js)
   && /function loadCampSiteIdentifiers/.test(js)

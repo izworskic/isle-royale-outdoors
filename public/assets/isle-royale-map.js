@@ -551,7 +551,12 @@
   // Sep 2026: every sampled trail's class/use/surface and every sampled campground's seasonal field).
   // Showing the literal word "Unknown" as if it were a fact reads as broken, not honest -- omitting an
   // unanswered field is more accurate than answering it with a non-answer.
-  const JUNK_FACT_VALUES = new Set(['unknown','n/a','na','none','null','undefined','tbd','not available','no data']);
+  // "none" deliberately excluded: unlike "Unknown"/"N/A" (which mean the field was never answered),
+  // "None" is often a genuine, meaningful survey answer -- e.g. the campground table's "Fire Ring/
+  // Grill: None" means the site actually has neither, which is real information a backpacker wants,
+  // not a placeholder. Caught by wiring up real campground data and seeing "None" wrongly disappear
+  // from a fact that worked fine before this filter existed.
+  const JUNK_FACT_VALUES = new Set(['unknown','n/a','na','null','undefined','tbd','not available','no data']);
   // Real ArcGIS field aliases (queried directly from the live FeatureServer schema, Sep 2026) for the
   // handful of raw field names that do carry real, non-"Unknown" values often enough to be worth
   // showing -- humanizeKey() alone turns an all-caps Esri field like "TRLSURFACE" into "Trlsurface",
@@ -768,13 +773,18 @@
     const tentSites = Number(profile?.tent_sites ?? boater?.tent_sites);
     const totalSites = Number(profile?.total_sites);
     const stayLimit = profile?.stay_limit || boater?.consecutive_night_limit;
-    const dockDepth = profile?.dock_depth || boater?.dock_depth;
+    // "N/A" is the CSV's real answer for "no dock exists" on a hike-in-only site -- correct as data,
+    // but "dock depth N/A" printed in a sentence reads as broken. Filter it the same way addPopupFact
+    // does, and use it (rather than just "does a boater record exist") to decide the opening phrase --
+    // dock depth is now known for all 36 campgrounds, not just the 23 the boater dataset covers.
+    const dockDepthRaw = profile?.dock_depth || boater?.dock_depth;
+    const dockDepth = JUNK_FACT_VALUES.has(String(dockDepthRaw ?? '').trim().toLowerCase()) ? null : dockDepthRaw;
     const siteBits = [];
     if (Number.isFinite(shelters) && shelters > 0) siteBits.push(`${shelters} shelter${shelters === 1 ? '' : 's'}`);
     if (Number.isFinite(tentSites) && tentSites > 0) siteBits.push(`${tentSites} tent site${tentSites === 1 ? '' : 's'}`);
     if (!siteBits.length && Number.isFinite(totalSites) && totalSites > 0) siteBits.push(`${totalSites} site${totalSites === 1 ? '' : 's'}`);
     if (!siteBits.length && !stayLimit && !dockDepth) return '';
-    let sentence = boater ? 'Boat-accessible campground' : 'Backcountry campground';
+    let sentence = dockDepth ? 'Boat-accessible campground' : 'Backcountry campground';
     if (siteBits.length) sentence += ` with ${siteBits.join(' and ')}`;
     if (stayLimit) sentence += `, ${stayLimit}-night stay limit`;
     if (dockDepth) sentence += `, dock depth ${dockDepth}`;
@@ -883,6 +893,12 @@
 
   function addPopupFact(container, label, value) {
     if (value == null || String(value).trim() === '') return;
+    // Same discipline as collectFeatureFacts()'s JUNK_FACT_VALUES: the campground table CSV uses "N/A"
+    // for fields that plainly don't apply (dock depth and generator use on a hike-in-only site with no
+    // dock at all) -- accurate as a database placeholder, but "Dock depth: N/A" printed as if it were a
+    // real answer reads as broken. Newly exposed by wiring up the complete campground table (all 36
+    // sites, not just the 23 boat-in ones) -- this fact list was never exercised with "N/A" before that.
+    if (JUNK_FACT_VALUES.has(String(value).trim().toLowerCase())) return;
     const fact = document.createElement('div');
     fact.className = 'popup-fact';
     const strong = document.createElement('b');
@@ -972,9 +988,9 @@
       addPopupFact(facts, 'Stay limit', profile.stay_limit || boater.consecutive_night_limit);
       addPopupFact(facts, 'Access', profile.access);
       addPopupFact(facts, 'Dock depth', profile.dock_depth || boater.dock_depth);
-      addPopupFact(facts, 'Food lockers', boater.food_storage_lockers);
-      addPopupFact(facts, 'Generator use', boater.onboard_generator_use);
-      addPopupFact(facts, 'Fire ring / grill', boater.fire_ring_grill);
+      addPopupFact(facts, 'Food lockers', profile.food_storage_lockers ?? boater.food_storage_lockers);
+      addPopupFact(facts, 'Generator use', profile.onboard_generator_use ?? boater.onboard_generator_use);
+      addPopupFact(facts, 'Fire ring / grill', profile.fire_ring_grill ?? boater.fire_ring_grill);
     }
     if (facts.childElementCount) wrap.appendChild(facts);
     appendCampSiteIdentifiers(wrap,record,sourceNotes);

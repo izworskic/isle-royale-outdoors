@@ -2,9 +2,16 @@ const URLS = Object.freeze({
   boaterCampgrounds: "https://www.nps.gov/common/uploads/sortable_dataset/isro/2DF94ED6-9CAA-9B24-8BD6A700012D59F3/isro-BoaterTable.csv",
   currentConditions: "https://www.nps.gov/isro/planyourvisit/current-conditions-at-isle-royale.htm",
   boaterPage: "https://www.nps.gov/isro/planyourvisit/boat-in-campgrounds.htm",
-  trailCampgrounds: "https://www.nps.gov/isro/planyourvisit/trail-accessible-campgrounds.htm",
-  lakeSuperiorCampgrounds: "https://www.nps.gov/isro/planyourvisit/lake-superior-accessible-campgrounds.htm",
-  inlandCampgrounds: "https://www.nps.gov/isro/planyourvisit/inland-lake-paddling-campgrounds.htm",
+  // Replaces trailCampgrounds/lakeSuperiorCampgrounds/inlandCampgrounds below -- NPS restructured
+  // those three pages (Sep 2026) around a JavaScript-rendered "Campground__Listing" widget that
+  // fetches its own data client-side; the server-rendered HTML those three URLs return is just an
+  // empty skeleton (literally the text "Loading..." and SVG placeholder rectangles), so scraping them
+  // can never work again regardless of parsing logic. Found the real source instead: the linked
+  // "campground table" page (greenstone-campground-table.htm) uses NPS's older, still-functional
+  // DataTables + static CSV pattern -- same shape as the boat-in CSV above, and it's the complete,
+  // authoritative table (all 36 campgrounds, not just the 23 boat-in ones).
+  campgroundTable: "https://www.nps.gov/common/uploads/sortable_dataset/isro/360691E4-9D5E-9A3A-CCE019A2DA2F6E38/isro-CampgroundTableversion1xlsb1.csv",
+  campgroundTablePage: "https://www.nps.gov/isro/planyourvisit/greenstone-campground-table.htm",
   scubaPage: "https://www.nps.gov/isro/planyourvisit/scuba-diving.htm",
 });
 
@@ -116,6 +123,38 @@ function normalizeBoaterCsv(text = "") {
   }).filter(Boolean);
 }
 
+// The complete, authoritative campground table (all 36 campgrounds -- boat-in AND hike-in/paddle-in),
+// same "sortable_dataset" CSV pattern as the boat-in table above. Columns confirmed directly against
+// the live file (Sep 2026): Campgrounds, Consecutive Night Stay Limit, Individual Tent Sites, Shelters,
+// Group Tent Sites, Food Storage Lockers, Fire Ring/Grill, Depth at Dock, On-board Generator Use
+// Allowed. No "total sites" column exists; deliberately not synthesized here (e.g. tent+shelters)
+// since that's an assumption about what NPS means by "total," not something the source states --
+// the frontend already prefers real shelters/tent-site counts over a total_sites fallback anyway.
+function normalizeCampgroundTableCsv(text = "", sourceUrl = "") {
+  const parsed = parseCsv(text);
+  if (parsed.length < 2) return [];
+  const headers = parsed[0].map((header, index) => String(header || `column_${index + 1}`).trim());
+  return parsed.slice(1).map(values => {
+    const row = {};
+    headers.forEach((header, index) => { row[header] = values[index] ?? ""; });
+    const name = firstValue(row, [/^campgrounds?$/, /^campgroundname$/, /^name$/]) || String(values[0] || "").trim() || null;
+    if (!name) return null;
+    return {
+      name,
+      stay_limit: firstValue(row, [/consecutiv.*staylimit/, /staylimit/]),
+      tent_sites: firstValue(row, [/individual.*tentsites?/, /^tentsites?$/]),
+      shelters: firstValue(row, [/^shelters?$/]),
+      group_sites: firstValue(row, [/grouptentsites?/, /^group$/]),
+      food_storage_lockers: firstValue(row, [/foodstoragelockers?/]),
+      fire_ring_grill: firstValue(row, [/firering/, /grill/]),
+      dock_depth: firstValue(row, [/depthatdock/, /dockdepth/]),
+      onboard_generator_use: firstValue(row, [/onboardgenerator/, /generatoruse/]),
+      source_url: sourceUrl,
+      raw: row,
+    };
+  }).filter(Boolean);
+}
+
 
 function campgroundProfileKey(value = "") {
   return key(String(value).replace(/\bcampground\b/gi, "").replace(/\blake\s+ritchie\b/gi, "lake richie"));
@@ -187,22 +226,12 @@ function mergeCampgroundProfiles(groups = []) {
 }
 
 async function fetchCampgroundProfiles() {
-  const pages = [
-    URLS.trailCampgrounds,
-    URLS.lakeSuperiorCampgrounds,
-    URLS.inlandCampgrounds,
-  ];
-  const results = await Promise.allSettled(
-    pages.map(url => fetchText(url, "text/html,application/xhtml+xml")),
-  );
-  const groups = results.map((result, index) =>
-    result.status === "fulfilled" ? normalizeCampgroundProfiles(result.value, pages[index]) : []
-  );
-  const profiles = mergeCampgroundProfiles(groups);
-  if (!profiles.length) throw new Error("NPS campground profile pages did not yield any campground records");
+  const text = await fetchText(URLS.campgroundTable, "text/csv,text/plain;q=0.9,*/*;q=0.5");
+  const profiles = normalizeCampgroundTableCsv(text, URLS.campgroundTable);
+  if (!profiles.length) throw new Error("NPS campground table CSV did not yield any campground records");
   return {
     profiles,
-    pages: pages.map((url,index) => ({ url, available:results[index].status === "fulfilled" })),
+    pages: [{ url: URLS.campgroundTablePage, available: true }],
   };
 }
 
@@ -443,6 +472,7 @@ module.exports._test = {
   parseCsv,
   normalizeBoaterCsv,
   normalizeCampgroundProfiles,
+  normalizeCampgroundTableCsv,
   mergeCampgroundProfiles,
   parseLatLon,
   extractSortableDatasetUrl,
