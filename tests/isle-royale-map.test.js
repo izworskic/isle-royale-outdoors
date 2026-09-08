@@ -158,10 +158,22 @@ test('map points have large pointer tolerance and data-rich detail popups', () =
   assert.match(js, /properties:\{\.\.\.props\}/);
   assert.match(js, /Related information/);
   assert.match(js, /Open this coordinate on the source map/);
-  assert.match(js, /NPS camping & campground guidance/);
-  assert.match(js, /NPS hiking guidance/);
-  assert.match(js, /NPS ferry, seaplane & transportation/);
-  assert.match(js, /NPS lighthouses & places to go/);
+  // Category-generic NPS links (camping/hiking/ferry/places-to-go guidance) were replaced with real
+  // inline text -- see the PR that did it. Checking for the actual guidance content now, plus that
+  // the old outbound-link labels are genuinely gone rather than just relabeled.
+  assert.match(js, /campingGuidance:/);
+  assert.match(js, /hikingGuidance:/);
+  assert.match(js, /transportationGuidance:/);
+  assert.match(js, /divingGuidance:/);
+  assert.match(js, /placesToGoDescriptions:/);
+  assert.match(js, /Camping guidance \(applies park-wide\)/);
+  assert.match(js, /Hiking guidance \(applies park-wide\)/);
+  assert.match(js, /Getting to the island \(applies park-wide\)/);
+  assert.match(js, /Diving guidance \(applies park-wide\)/);
+  assert.doesNotMatch(js, /NPS camping & campground guidance/);
+  assert.doesNotMatch(js, /NPS hiking guidance/);
+  assert.doesNotMatch(js, /NPS ferry, seaplane & transportation/);
+  assert.doesNotMatch(js, /NPS lighthouses & places to go/);
   assert.match(js, /Open map-data source/);
   // The planner is removed, so this panel no longer sells trip building. What must still hold is
   // the SHAPE the pin protected: map on top, one info panel beneath, and no second
@@ -207,10 +219,18 @@ test('supplemental data is reversible and labels the feature before the data sou
 });
 
 test('campground cards combine official NPS capacity with only explicit mapped site identifiers', () => {
-  assert.match(api, /trail-accessible-campgrounds\.htm/);
-  assert.match(api, /lake-superior-accessible-campgrounds\.htm/);
-  assert.match(api, /inland-lake-paddling-campgrounds\.htm/);
+  // trail-accessible-campgrounds.htm/lake-superior-accessible-campgrounds.htm/inland-lake-paddling-
+  // campgrounds.htm are gone (Sep 2026): NPS restructured all three around a JS-rendered widget that
+  // fetches its own data client-side, so the server-rendered HTML those URLs returned was just an empty
+  // "Loading..." skeleton -- confirmed live, not a parsing bug. normalizeCampgroundProfiles is kept
+  // (still tested below) since it's harmless and the parsing logic itself remains valid against the old
+  // page shape, but it's no longer the live data path. Real, complete data (all 36 campgrounds, not
+  // just the 23 boat-in ones the old pages covered even when they worked) now comes from the same
+  // "sortable_dataset" CSV pattern already used for the boat-in table.
+  assert.match(api, /campgroundTable:/);
+  assert.match(api, /isro-CampgroundTableversion1xlsb1\.csv/);
   assert.match(api, /function normalizeCampgroundProfiles/);
+  assert.match(api, /function normalizeCampgroundTableCsv/);
   assert.match(api, /campground_profiles:/);
   const sample = [
     '<h3>Moskey Basin Campground</h3>',
@@ -224,6 +244,27 @@ test('campground cards combine official NPS capacity with only explicit mapped s
   assert.equal(profiles[0].shelters,6);
   assert.equal(profiles[0].tent_sites,2);
   assert.equal(profiles[0].group_sites,2);
+
+  // The live CSV (verified directly against the real file, Sep 2026): a boat-accessible site with a
+  // real dock depth, and a hike-in-only site where NPS's own "N/A" means no dock exists at all. The
+  // parser must pass "N/A" through as-is -- filtering it into something more presentable is the
+  // frontend's job (campgroundSummary/addPopupFact), not this raw-extraction layer's.
+  const csvSample = [
+    'Campgrounds,Consecutive Night Stay Limit,Individual Tent Sites,Shelters,Group Tent Sites,Food Storage Lockers,Fire Ring/Grill,Depth at Dock,On-board Generator Use Allowed',
+    "Moskey Basin,3,2,6,1,2,None,8',No",
+    'Chickenbone E.,2,3,0,1,1,None,N/A,N/A'
+  ].join('\n');
+  const tableProfiles = isleApiModule._test.normalizeCampgroundTableCsv(csvSample, 'https://www.nps.gov/example.csv');
+  assert.equal(tableProfiles.length, 2);
+  assert.equal(tableProfiles[0].name, 'Moskey Basin');
+  assert.equal(tableProfiles[0].shelters, '6');
+  assert.equal(tableProfiles[0].tent_sites, '2');
+  assert.equal(tableProfiles[0].stay_limit, '3');
+  assert.equal(tableProfiles[0].dock_depth, "8'");
+  assert.equal(tableProfiles[1].name, 'Chickenbone E.');
+  assert.equal(tableProfiles[1].dock_depth, 'N/A');
+  assert.equal(tableProfiles[1].fire_ring_grill, 'None');
+
   assert.match(js, /campgroundByName: new Map\(\)/);
   assert.match(js, /function findCampgroundProfile/);
   assert.match(js, /function loadCampSiteIdentifiers/);
@@ -391,7 +432,16 @@ test('the map offers satellite imagery and a way past itself', () => {
   assert.match(html, /id="map-peek"/);
   assert.match(js, /document\.getElementById\('map-peek'\)\?\.addEventListener/);
   assert.match(html, /\.map-wrap\{position:relative;height:clamp\(560px,78dvh,860px\)/, 'the map must have a defined responsive height');
-  assert.match(html, /@media\(max-width:980px\)\{\.shell\{grid-template-columns:1fr\}\.map-wrap\{height:clamp\(500px,70dvh,700px\)/, 'the map must not fill a phone screen');
+  // Breakpoint moved from 980/981px to 1400/1401px (PR #7): the squeezed map column in the 2-column
+  // layout needed ~1050px before the toolbar actually fit on one row, so every common tablet
+  // landscape width was crossing into that layout before it had room.
+  assert.match(html, /@media\(max-width:1400px\)\{\.shell\{grid-template-columns:1fr\}\.map-wrap\{height:clamp\(500px,70dvh,700px\)/, 'the map must not fill a phone screen');
+  assert.match(html, /@media\(min-width:1401px\)\{\.map-wrap\{position:sticky/, 'wide layout keeps the map in view instead of leaving dead space once the guide runs longer');
+  // A fully-interactive Leaflet map otherwise captures every touch that starts on it, so a one-finger
+  // swipe never reaches the page underneath at all -- gestureHandling is what actually makes "a way
+  // past itself" possible on a touch device, not just the jump-button escape hatch above.
+  assert.match(js, /gestureHandling:true/, 'one-finger touch must scroll the page, not get captured by the map');
+  assert.match(html, /leaflet-gesture-handling@[\d.]+\/dist\/leaflet-gesture-handling\.min\.(js|css)/);
 });
 
 test('the map offers three base maps and NOAA charts', () => {
