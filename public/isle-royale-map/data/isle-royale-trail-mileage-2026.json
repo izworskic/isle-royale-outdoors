@@ -1,0 +1,1273 @@
+{
+  "schema_version": 1,
+  "dataset_id": "isle-royale-trail-mileage-2026",
+  "title": "Isle Royale National Park Trail Mileages Between Campgrounds",
+  "authority": "National Park Service \u2014 Isle Royale National Park",
+  "source_url": "https://www.nps.gov/isro/planyourvisit/upload/ISRO_Web_Accessible_Trail_Mileage_Between_Campgrounds.pdf",
+  "source_context_url": "https://www.nps.gov/isro/planyourvisit/mapsbrochures.htm",
+  "source_last_checked": "2026-09-08",
+  "disclaimer": "Mileages are the shortest, most direct trail route between the 21 trail-connected campgrounds, as published by NPS. Not every campground on this map is trail-connected (some are boat-in/paddle-in only); those simply have no entries here. Recommended pace: 6-8 mi/day for beginning backpackers, 8-10 mi/day for experienced backpackers, per NPS.",
+  "campground_count": 21,
+  "pairs": [
+    {
+      "from": "Chickenbone E.",
+      "to": "Chickenbone W.",
+      "miles": 1.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Chippewa Harbor",
+      "miles": 9.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Daisy Farm",
+      "miles": 6.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Desor N.",
+      "miles": 19.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Desor S.",
+      "miles": 16.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Feldtmann Lake",
+      "miles": 35.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Hatchet Lake",
+      "miles": 9.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Huginnin Cove",
+      "miles": 30.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Island Mine",
+      "miles": 21.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Lake Richie",
+      "miles": 5.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Lane Cove",
+      "miles": 10.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Little Todd",
+      "miles": 15.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Malone Bay",
+      "miles": 19.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "McCargoe Cove",
+      "miles": 2.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Moskey Basin",
+      "miles": 7.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Rock Harbor",
+      "miles": 13.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Siskiwit Bay",
+      "miles": 25.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Three Mile",
+      "miles": 10.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Todd Harbor",
+      "miles": 8.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone E.",
+      "to": "Washington Creek",
+      "miles": 27.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Chippewa Harbor",
+      "miles": 7.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Daisy Farm",
+      "miles": 7.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Desor N.",
+      "miles": 19.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Desor S.",
+      "miles": 15.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Feldtmann Lake",
+      "miles": 34.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Hatchet Lake",
+      "miles": 7.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Huginnin Cove",
+      "miles": 29.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Island Mine",
+      "miles": 19.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Lake Richie",
+      "miles": 3.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Lane Cove",
+      "miles": 12.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Little Todd",
+      "miles": 16.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Malone Bay",
+      "miles": 18.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "McCargoe Cove",
+      "miles": 2.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Moskey Basin",
+      "miles": 5.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Rock Harbor",
+      "miles": 14.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Siskiwit Bay",
+      "miles": 24.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Three Mile",
+      "miles": 12.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Todd Harbor",
+      "miles": 9.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chickenbone W.",
+      "to": "Washington Creek",
+      "miles": 25.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Daisy Farm",
+      "miles": 9.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Desor N.",
+      "miles": 27.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Desor S.",
+      "miles": 22.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Feldtmann Lake",
+      "miles": 42.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Hatchet Lake",
+      "miles": 15.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Huginnin Cove",
+      "miles": 36.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Island Mine",
+      "miles": 27.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Lake Richie",
+      "miles": 4.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Lane Cove",
+      "miles": 16.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Little Todd",
+      "miles": 22.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Malone Bay",
+      "miles": 25.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "McCargoe Cove",
+      "miles": 10.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Moskey Basin",
+      "miles": 6.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Rock Harbor",
+      "miles": 16.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Siskiwit Bay",
+      "miles": 31.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Three Mile",
+      "miles": 14.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Todd Harbor",
+      "miles": 17.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Chippewa Harbor",
+      "to": "Washington Creek",
+      "miles": 33.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Desor N.",
+      "miles": 26.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Desor S.",
+      "miles": 22.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Feldtmann Lake",
+      "miles": 41.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Hatchet Lake",
+      "miles": 15.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Huginnin Cove",
+      "miles": 37.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Island Mine",
+      "miles": 27.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Lake Richie",
+      "miles": 5.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Lane Cove",
+      "miles": 6.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Little Todd",
+      "miles": 21.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Malone Bay",
+      "miles": 27.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "McCargoe Cove",
+      "miles": 8.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Moskey Basin",
+      "miles": 3.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Rock Harbor",
+      "miles": 7.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Siskiwit Bay",
+      "miles": 31.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Three Mile",
+      "miles": 4.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Todd Harbor",
+      "miles": 14.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Daisy Farm",
+      "to": "Washington Creek",
+      "miles": 33.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Desor S.",
+      "miles": 20.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Feldtmann Lake",
+      "miles": 21.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Hatchet Lake",
+      "miles": 12.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Huginnin Cove",
+      "miles": 14.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Island Mine",
+      "miles": 18.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Lake Richie",
+      "miles": 23.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Lane Cove",
+      "miles": 30.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Little Todd",
+      "miles": 5.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Malone Bay",
+      "miles": 23.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "McCargoe Cove",
+      "miles": 18.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Moskey Basin",
+      "miles": 25.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Rock Harbor",
+      "miles": 33.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Siskiwit Bay",
+      "miles": 23.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Three Mile",
+      "miles": 30.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Todd Harbor",
+      "miles": 11.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor N.",
+      "to": "Washington Creek",
+      "miles": 12.6,
+      "miles_reverse": 12.0
+    },
+    {
+      "from": "Desor S.",
+      "to": "Feldtmann Lake",
+      "miles": 20.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Hatchet Lake",
+      "miles": 8.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Huginnin Cove",
+      "miles": 14.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Island Mine",
+      "miles": 5.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Lake Richie",
+      "miles": 18.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Lane Cove",
+      "miles": 27.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Little Todd",
+      "miles": 15.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Malone Bay",
+      "miles": 10.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "McCargoe Cove",
+      "miles": 17.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Moskey Basin",
+      "miles": 20.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Rock Harbor",
+      "miles": 29.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Siskiwit Bay",
+      "miles": 9.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Three Mile",
+      "miles": 26.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Todd Harbor",
+      "miles": 11.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Desor S.",
+      "to": "Washington Creek",
+      "miles": 11.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Hatchet Lake",
+      "miles": 27.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Huginnin Cove",
+      "miles": 12.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Island Mine",
+      "miles": 14.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Lake Richie",
+      "miles": 37.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Lane Cove",
+      "miles": 46.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Little Todd",
+      "miles": 26.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Malone Bay",
+      "miles": 30.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "McCargoe Cove",
+      "miles": 37.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Moskey Basin",
+      "miles": 40.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Rock Harbor",
+      "miles": 49.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Siskiwit Bay",
+      "miles": 10.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Three Mile",
+      "miles": 46.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Todd Harbor",
+      "miles": 31.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Feldtmann Lake",
+      "to": "Washington Creek",
+      "miles": 8.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Huginnin Cove",
+      "miles": 25.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Island Mine",
+      "miles": 13.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Lake Richie",
+      "miles": 11.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Lane Cove",
+      "miles": 20.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Little Todd",
+      "miles": 7.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Malone Bay",
+      "miles": 11.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "McCargoe Cove",
+      "miles": 10.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Moskey Basin",
+      "miles": 13.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Rock Harbor",
+      "miles": 22.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Siskiwit Bay",
+      "miles": 17.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Three Mile",
+      "miles": 19.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Todd Harbor",
+      "miles": 4.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Hatchet Lake",
+      "to": "Washington Creek",
+      "miles": 18.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Island Mine",
+      "miles": 10.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Lake Richie",
+      "miles": 32.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Lane Cove",
+      "miles": 41.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Little Todd",
+      "miles": 19.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Malone Bay",
+      "miles": 24.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "McCargoe Cove",
+      "miles": 31.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Moskey Basin",
+      "miles": 34.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Rock Harbor",
+      "miles": 44.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Siskiwit Bay",
+      "miles": 14.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Three Mile",
+      "miles": 41.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Todd Harbor",
+      "miles": 24.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Huginnin Cove",
+      "to": "Washington Creek",
+      "miles": 4.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Lake Richie",
+      "miles": 23.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Lane Cove",
+      "miles": 32.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Little Todd",
+      "miles": 20.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Malone Bay",
+      "miles": 15.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "McCargoe Cove",
+      "miles": 22.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Moskey Basin",
+      "miles": 25.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Rock Harbor",
+      "miles": 34.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Siskiwit Bay",
+      "miles": 4.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Three Mile",
+      "miles": 31.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Todd Harbor",
+      "miles": 16.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Island Mine",
+      "to": "Washington Creek",
+      "miles": 6.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Lane Cove",
+      "miles": 12.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Little Todd",
+      "miles": 18.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Malone Bay",
+      "miles": 21.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "McCargoe Cove",
+      "miles": 6.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Moskey Basin",
+      "miles": 2.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Rock Harbor",
+      "miles": 12.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Siskiwit Bay",
+      "miles": 27.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Three Mile",
+      "miles": 10.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Todd Harbor",
+      "miles": 13.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lake Richie",
+      "to": "Washington Creek",
+      "miles": 28.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Little Todd",
+      "miles": 26.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Malone Bay",
+      "miles": 30.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "McCargoe Cove",
+      "miles": 13.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Moskey Basin",
+      "miles": 10.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Rock Harbor",
+      "miles": 6.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Siskiwit Bay",
+      "miles": 36.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Three Mile",
+      "miles": 4.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Todd Harbor",
+      "miles": 19.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Lane Cove",
+      "to": "Washington Creek",
+      "miles": 38.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Malone Bay",
+      "miles": 18.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "McCargoe Cove",
+      "miles": 13.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Moskey Basin",
+      "miles": 22.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Rock Harbor",
+      "miles": 28.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Siskiwit Bay",
+      "miles": 24.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Three Mile",
+      "miles": 25.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Todd Harbor",
+      "miles": 7.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Little Todd",
+      "to": "Washington Creek",
+      "miles": 17.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "McCargoe Cove",
+      "miles": 20.9,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Moskey Basin",
+      "miles": 23.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Rock Harbor",
+      "miles": 34.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Siskiwit Bay",
+      "miles": 20.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Three Mile",
+      "miles": 31.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Todd Harbor",
+      "miles": 15.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Malone Bay",
+      "to": "Washington Creek",
+      "miles": 21.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Moskey Basin",
+      "miles": 8.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Rock Harbor",
+      "miles": 15.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Siskiwit Bay",
+      "miles": 27.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Three Mile",
+      "miles": 12.6,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Todd Harbor",
+      "miles": 6.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "McCargoe Cove",
+      "to": "Washington Creek",
+      "miles": 28.4,
+      "miles_reverse": null
+    },
+    {
+      "from": "Moskey Basin",
+      "to": "Rock Harbor",
+      "miles": 11.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Moskey Basin",
+      "to": "Siskiwit Bay",
+      "miles": 29.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Moskey Basin",
+      "to": "Three Mile",
+      "miles": 8.3,
+      "miles_reverse": null
+    },
+    {
+      "from": "Moskey Basin",
+      "to": "Todd Harbor",
+      "miles": 15.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Moskey Basin",
+      "to": "Washington Creek",
+      "miles": 31.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Rock Harbor",
+      "to": "Siskiwit Bay",
+      "miles": 38.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Rock Harbor",
+      "to": "Three Mile",
+      "miles": 2.7,
+      "miles_reverse": null
+    },
+    {
+      "from": "Rock Harbor",
+      "to": "Todd Harbor",
+      "miles": 22.2,
+      "miles_reverse": null
+    },
+    {
+      "from": "Rock Harbor",
+      "to": "Washington Creek",
+      "miles": 40.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Siskiwit Bay",
+      "to": "Three Mile",
+      "miles": 36.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Siskiwit Bay",
+      "to": "Todd Harbor",
+      "miles": 21.1,
+      "miles_reverse": null
+    },
+    {
+      "from": "Siskiwit Bay",
+      "to": "Washington Creek",
+      "miles": 11.0,
+      "miles_reverse": null
+    },
+    {
+      "from": "Three Mile",
+      "to": "Todd Harbor",
+      "miles": 19.5,
+      "miles_reverse": null
+    },
+    {
+      "from": "Three Mile",
+      "to": "Washington Creek",
+      "miles": 37.8,
+      "miles_reverse": null
+    },
+    {
+      "from": "Todd Harbor",
+      "to": "Washington Creek",
+      "miles": 23.0,
+      "miles_reverse": null
+    }
+  ]
+}

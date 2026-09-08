@@ -570,3 +570,49 @@ test('feature detail is a bottom sheet fixed to the screen, not a Leaflet popup 
   assert.match(html, /\.feature-detail-sheet\{position:fixed;left:50%;bottom:0/);
   assert.match(html, /\.feature-detail-sheet\.open\{transform:translate\(-50%,0\)/);
 });
+
+test('trail mileage between campgrounds is real NPS data, not a link out', () => {
+  // Real demand check (Sep 2026, alphabet-expanded autocomplete): "trail map with mileage" was the
+  // single most repeated phrase across the hiking/backcountry/trail/general-map query clusters. NPS
+  // publishes exactly this as a static distance matrix; wired it in directly rather than just linking
+  // to the PDF, so the answer stays on this page instead of costing a tab switch.
+  const fs2 = require('node:fs');
+  const path2 = require('node:path');
+  const datasetPath = path.join(root, 'public/isle-royale-map/data/isle-royale-trail-mileage-2026.json');
+  assert.ok(fs2.existsSync(datasetPath), 'trail mileage dataset file must exist');
+  const dataset = JSON.parse(fs2.readFileSync(datasetPath, 'utf8'));
+  assert.equal(dataset.pairs.length, 210, '21 trail-connected campgrounds means exactly 21*20/2 unique pairs');
+  assert.ok(dataset.source_url.includes('nps.gov'), 'must cite the real NPS source, not be invented');
+  assert.match(js, /trailMileage:\s*'\/isle-royale-map\/data\/isle-royale-trail-mileage-2026\.json'/);
+  assert.match(js, /async function loadTrailMileage/);
+  assert.match(js, /if\(pairs\.length!==210\)throw new Error\('NPS trail mileage completeness validation failed'\)/,
+    'a truncated or malformed fetch must not silently render a partial list as if complete');
+  assert.match(js, /function findTrailMileageNeighbors/);
+  // Uses the same normalized-alias matching as findCampgroundProfile, not exact string equality --
+  // the PDF's own names ("Chickenbone E") don't always match the ArcGIS layer's naming convention.
+  assert.match(js, /findTrailMileageNeighbors\(name\) \{[\s\S]{0,120}placeAliases\(name\)/);
+  assert.match(js, /function appendTrailMileageBlock/);
+  assert.match(js, /Nearest campgrounds by trail/);
+  // Not every campground is trail-connected (some are boat\/paddle-in only) -- must render nothing
+  // for those rather than a fabricated distance.
+  assert.match(js, /if \(!neighbors \|\| !neighbors\.length\) return;/);
+  assert.match(js, /loadTrailMileage\(\)\.catch\(\(\)=>\{\}\);/);
+});
+
+test('a visible, self-contained Q&A section answers repeatedly-confirmed real demand', () => {
+  // Same real demand pull: "can you camp on isle royale" / "can you go to isle royale" / "is isle
+  // royale open [x]" / ferry+seaplane logistics / windigo+rock harbor all recurred across multiple
+  // independent query clusters. FAQPage schema deliberately NOT added (network-wide finding: Google
+  // fully deprecated FAQ rich results May 7 2026) -- the value is the visible Q&A itself.
+  assert.match(html, /Is Isle Royale open year-round\?/);
+  assert.match(html, /only U\.S\. national park that closes completely for the season/);
+  assert.match(html, /Can you camp anywhere on Isle Royale\?/);
+  assert.match(html, /How do you get to Isle Royale\?/);
+  assert.match(html, /What's the difference between Rock Harbor and Windigo\?/);
+  // Self-containment check, same bar as the network's citation-readiness work: each answer must
+  // stand alone without leaning on the surrounding page ("as shown above", "on this page", etc.).
+  const qaSection = html.slice(html.indexOf('Isle Royale, answered plainly.'), html.indexOf('</main>'));
+  assert.doesNotMatch(qaSection, /as shown above|on this page|see above|this map shows/i);
+  // Still exactly one ld+json block network-wide -- visible Q&A content only, no second schema block.
+  assert.equal((html.match(/<script type="application\/ld\+json"/g) || []).length, 1);
+});
