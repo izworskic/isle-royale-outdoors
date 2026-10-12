@@ -32,13 +32,38 @@ async function walk(dir) {
     }
     if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.html')) continue;
     scanned += 1;
-    const html = await readFile(fullPath, 'utf8');
+    let html = await readFile(fullPath, 'utf8');
+    const isFerry = path.relative(ROOT, fullPath).split(path.sep).join('/') === 'isle-royale-ferry/index.html';
+    if (isFerry) {
+      // The canonical HTML is externally rewritten into chrisizworski.com.
+      // Independently routed external CSS/JS was missing for mobile readers.
+      // Bundle the critical presentation and engine together in the HTML.
+      const criticalAssets = [
+        ['<link rel="stylesheet" href="/assets/grand-portage-ferry-v2.css">', 'grand-portage-ferry-v2.css', 'style'],
+        ['<script src="/assets/grand-portage-ferry.js" defer></script>', 'grand-portage-ferry.js', 'script'],
+        ['<script src="/assets/grand-portage-ferry-v2.js" defer></script>', 'grand-portage-ferry-v2.js', 'script'],
+      ];
+      for (const [tag, asset, kind] of criticalAssets) {
+        const marker = 'data-ferry-inline="' + asset + '"';
+        if (html.includes(marker)) continue;
+        if (!html.includes(tag)) throw new Error('Ferry cannot ship without source tag for ' + asset);
+        const code = await readFile(path.join(ROOT, 'assets', asset), 'utf8');
+        if (code.includes('</script>') || code.includes('</style>')) throw new Error('Unsafe HTML delimiter in ' + asset);
+        const replacement = kind === 'style'
+          ? '<style ' + marker + '>\n' + code + '\n</style>'
+          : '<script ' + marker + '>\n' + code + '\n</script>';
+        html = html.replace(tag, replacement);
+      }
+      // The screenshot shows an injected, first-screen-sized ad ahead of the tool.
+      // Keep this first-party decision tool free of auto-placement for now.
+      html = html.replace(/<script\b[^>]*src=["'][^"']*pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js[^"']*["'][^>]*><\/script>/gi, '');
+    }
     const needsGa4 = !html.includes(MEASUREMENT_ID);
-    const needsAdsense = !/<script\b[^>]*src=["'][^"']*pagead\/js\/adsbygoogle\.js\b/i.test(html);
+    const needsAdsense = !isFerry && !/<script\b[^>]*src=["'][^"']*pagead\/js\/adsbygoogle\.js\b/i.test(html);
 
     if (!needsGa4) ga4AlreadyTagged += 1;
     if (!needsAdsense) adsenseAlreadyTagged += 1;
-    if (!needsGa4 && !needsAdsense) continue;
+    if (!needsGa4 && !needsAdsense) { if (isFerry) await writeFile(fullPath, html); continue; }
 
     if (!/<\/head>/i.test(html)) {
       throw new Error(`Cannot inject site tags: missing </head> in ${path.relative(ROOT, fullPath)}`);
