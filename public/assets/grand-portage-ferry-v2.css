@@ -95,3 +95,58 @@ body{background:#fafbf8;color:var(--ink);font:16px/1.52 system-ui,-apple-system,
   .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:355px){.routes{grid-template-columns:1fr}.fields{grid-template-columns:1fr}}
+
+
+/* Grand Portage ferry geography module — source-grounded docks, dedicated full-width decision surface */
+.map-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;margin:17px 0 18px;border:1px solid #cadfe0;background:#edf5f2;border-radius:6px}
+.map-cta a{font-weight:750;font-size:13px;text-decoration:none;color:#155970}
+.map-cta a:hover{text-decoration:underline}
+.map-cta span{font-size:11px;color:#4f6b71}
+.geography{margin:39px 0 35px;padding:0 0 28px;border-bottom:1px solid var(--line)}
+.geography-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin:0 0 19px}
+.geography-head>div{max-width:800px}
+.geography-head h2{font:normal clamp(30px,3.7vw,43px)/1.12 Georgia,serif;letter-spacing:-.028em;margin:5px 0 12px}
+.geography-head p:not(.kicker){font-size:14px;line-height:1.68;color:#46606a;max-width:780px;margin:0}
+.geo-official{font-size:13px;white-space:nowrap;font-weight:750;margin-bottom:4px}
+.geo-key{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 13px}
+.geo-key-option{display:flex;gap:13px;align-items:center;min-width:0;padding:14px 17px;border:1px solid #d7e2e2;border-radius:7px;background:#fff;transition:border-color .16s,opacity .16s,background .16s}
+.geo-key-option strong{font-size:14px;color:#234a57;display:block}
+.geo-key-option small{font-size:12px;line-height:1.45;color:#58717a;display:block;margin-top:4px}
+.geo-stroke{display:block;width:36px;flex:0 0 36px;height:5px;border-radius:8px;background:#08738c}
+.geo-key-option.is-long .geo-stroke{background:repeating-linear-gradient(90deg,#b17a3c 0,#b17a3c 9px,transparent 9px,transparent 13px)}
+.geo-key-option.is-long{opacity:.63}
+.ferry-map-container[data-active-route^="rock-harbor"] ~ .geo-nothing{display:block}
+.geography:has(.ferry-map-container[data-active-route^="rock-harbor"]) .geo-key-option.is-day{opacity:.58}
+.geography:has(.ferry-map-container[data-active-route^="rock-harbor"]) .geo-key-option.is-long{opacity:1;background:#fff9ed;border-color:#dabd8a}
+.geography:has(.ferry-map-container[data-active-route^="windigo"]) .geo-key-option.is-day{opacity:1;background:#eaf4f4;border-color:#a2c9cc}
+.ferry-map-container{position:relative;height:clamp(365px,42vw,510px);border-radius:10px;overflow:hidden;border:1px solid #c4d8db;background:#c9e3e9;isolation:isolate}
+#ferry-map-live{position:absolute;inset:0;z-index:2;opacity:0;transition:opacity .15s;background:#b9dbe1}
+.ferry-map-container.is-live #ferry-map-live{opacity:1}
+.ferry-map-fallback{position:absolute;z-index:3;inset:0;display:flex;flex-direction:column;background:#b7dae3;justify-content:center}
+.ferry-map-fallback svg{display:block;width:100%;height:100%;object-fit:cover}
+.ferry-map-fallback>p{position:absolute;bottom:13px;right:14px;margin:0;background:#ffffffec;padding:7px 10px;border-radius:5px;font-size:11px}
+.ferry-map-fallback a{font-weight:750;color:#175c6b}
+.ferry-map-container.is-live .ferry-map-fallback{display:none}
+.geo-svg-long{opacity:.31}
+.ferry-map-container[data-active-route^="rock-harbor"] .geo-svg-long{opacity:1}
+.ferry-map-container[data-active-route^="rock-harbor"] .geo-svg-day{opacity:.30}
+.geo-map-tools{position:absolute;z-index:5;top:14px;right:14px;display:flex;gap:7px}
+.geo-map-tool{border:1px solid #aac7ce;color:#23556b;font-size:12px;font-weight:750;border-radius:5px;background:#fffffff2;padding:9px 12px;min-height:42px;box-shadow:0 2px 9px #1b3c4531}
+.geo-map-tool:hover{background:#e8f2f2}
+.geo-bottom{display:flex;gap:23px;justify-content:space-between;align-items:start;margin-top:15px}
+.geo-bottom p{font-size:13px;line-height:1.65;margin:0}
+.geo-bottom p:first-child{flex:1;max-width:615px;color:#2d505c}
+.geo-bottom .geo-map-disclaimer{font-size:11px;color:#657980;max-width:465px}
+.ferry-map-container .leaflet-container{font:13px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:#b9dbe1}
+.ferry-map-container .leaflet-tooltip{font:750 12px system-ui,-apple-system,Segoe UI,sans-serif;padding:6px 10px;border-radius:5px;border:1px solid #adcad0;color:#184657;box-shadow:0 2px 8px #172f3540;white-space:nowrap}
+.ferry-map-container .leaflet-tooltip.is-windigo{background:#e2f4f3;border-color:#6fb3b9;color:#07576c}
+.ferry-map-container .leaflet-tooltip.is-rock{background:#fff2de;border-color:#d3a975;color:#805528}
+.ferry-map-container .leaflet-tooltip.is-portage{background:#fff}
+.ferry-map-container .leaflet-control-attribution{font-size:10px;background:#fffffff2}
+.ferry-map-container .leaflet-control-zoom a{background:#fff;font-family:system-ui;border-color:#c9d8db}
+.ferry-map-container .leaflet-popup-content{font:13px/1.55 system-ui,sans-serif;min-width:190px}
+.ferry-map-container .leaflet-popup-content strong{display:block;font-size:15px;margin-bottom:5px;color:#174759}
+.ferry-map-container .leaflet-popup-content p{margin:0 0 6px}
+@media(max-width:900px){.geography-head{align-items:start;flex-direction:column;gap:9px}.geo-key-option{padding:12px}.geo-bottom{flex-direction:column;gap:10px}.geo-bottom .geo-map-disclaimer{max-width:none}.ferry-map-container{height:420px}}
+@media(max-width:640px){.geography{margin:28px 0 26px}.geography-head h2{font-size:31px}.geography-head p:not(.kicker){font-size:13px}.geo-key{grid-template-columns:1fr;gap:8px;margin:0 0 12px}.geo-key-option{padding:10px 13px}.geo-key-option strong{font-size:13px}.geo-key-option small{font-size:11px}.ferry-map-container{height:345px;border-radius:7px}.geo-map-tools{top:10px;right:8px;gap:5px}.geo-map-tool{padding:7px 9px;min-height:39px;font-size:11px}.geo-bottom p{font-size:12px}.geo-bottom .geo-map-disclaimer{font-size:11px}.ferry-map-container .leaflet-tooltip{font-size:11px;padding:5px 7px}}
+@media(prefers-reduced-motion:reduce){#ferry-map-live,.geo-key-option{transition:none}}
