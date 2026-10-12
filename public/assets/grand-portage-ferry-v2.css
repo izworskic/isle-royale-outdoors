@@ -150,3 +150,39 @@ body{background:#fafbf8;color:var(--ink);font:16px/1.52 system-ui,-apple-system,
 @media(max-width:900px){.geography-head{align-items:start;flex-direction:column;gap:9px}.geo-key-option{padding:12px}.geo-bottom{flex-direction:column;gap:10px}.geo-bottom .geo-map-disclaimer{max-width:none}.ferry-map-container{height:420px}}
 @media(max-width:640px){.geography{margin:28px 0 26px}.geography-head h2{font-size:31px}.geography-head p:not(.kicker){font-size:13px}.geo-key{grid-template-columns:1fr;gap:8px;margin:0 0 12px}.geo-key-option{padding:10px 13px}.geo-key-option strong{font-size:13px}.geo-key-option small{font-size:11px}.ferry-map-container{height:345px;border-radius:7px}.geo-map-tools{top:10px;right:8px;gap:5px}.geo-map-tool{padding:7px 9px;min-height:39px;font-size:11px}.geo-bottom p{font-size:12px}.geo-bottom .geo-map-disclaimer{font-size:11px}.ferry-map-container .leaflet-tooltip{font-size:11px;padding:5px 7px}}
 @media(prefers-reduced-motion:reduce){#ferry-map-live,.geo-key-option{transition:none}}
+
+
+/* Visible ferry fares, weekdays and direct booking */
+.ferry-purchase{margin:13px 0 27px;padding:0;background:#fff;border:1px solid #c9dad7;border-radius:9px;overflow:hidden;box-shadow:0 6px 22px #123a3b0b}
+.ferry-purchase-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(225px,305px);gap:24px;align-items:center;padding:25px 27px;background:#edf5f2}
+.ferry-purchase-head h2{font:normal clamp(28px,3vw,37px)/1.15 Georgia,serif;color:#173b47;margin:0 0 10px}
+.ferry-purchase-head p:not(.kicker){font-size:13px;color:#3f5b61;line-height:1.65;margin:0}
+.purchase-buttons{display:flex;flex-direction:column;gap:8px}
+.purchase-buttons a:first-child{background:#153e4d;color:#fff;padding:15px;border-radius:5px;text-align:center;font-size:14px;font-weight:800;text-decoration:none}
+.purchase-buttons small{font-size:11px;line-height:1.55;color:#51676c}
+.ferry-sailing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.ferry-sailing{padding:23px 27px;min-width:0}
+.ferry-sailing+.ferry-sailing{border-left:1px solid #dbe6e4}
+.ferry-sailing h3{font:normal 27px Georgia,serif;color:#23505d;margin:3px 0 7px}
+.ferry-sailing>p{font-size:12px;line-height:1.6;color:#4e6870}
+.ferry-sailing .season{font-weight:750;color:#205969}
+.ferry-ticket{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f1f7f4;border:1px solid #d7e6e0;border-radius:5px;padding:11px 13px;margin:13px 0}
+.ferry-ticket span{font-size:12px;line-height:1.4;color:#4b646c}
+.ferry-ticket>strong{font:normal 27px Georgia,serif;white-space:nowrap;color:#124859}
+.ferry-timing{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+.ferry-timing div{background:#edf4f2;padding:10px;border-radius:5px}
+.ferry-timing small{display:block;font-size:10px;color:#577079}
+.ferry-timing strong{font-size:15px;color:#183f4d}
+.ferry-sailing table{border-collapse:collapse;font-size:12px;line-height:1.45;width:100%}
+.ferry-sailing table caption{text-align:left;font-weight:800;color:#315c65;padding:9px 0 5px}
+.ferry-sailing th,.ferry-sailing td{padding:7px 4px;border-bottom:1px solid #dfeae7;text-align:left;vertical-align:top}
+.ferry-sailing th{font-size:10px;text-transform:uppercase;color:#537177;letter-spacing:.02em}
+.ferry-purchase-bottom{border-top:1px solid #dce8e5;padding:17px 27px;background:#fbfdfb;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.ferry-purchase-bottom p{font-size:11px;line-height:1.65;color:#48656b;margin:0}
+.ferry-purchase-bottom a{font-size:12px;font-weight:750}
+.ferry-price-calc{background:#e8f1ed;border:1px solid #c6dbd2;border-left:4px solid #578f83;border-radius:5px;margin:14px 0;padding:14px 17px}
+.ferry-price-calc h3{font:normal 20px Georgia,serif;margin:3px 0 6px}
+.ferry-price-calc strong{display:block;color:#114457;font-size:17px}
+.ferry-price-calc p:not(.kicker){font-size:11px;line-height:1.55;color:#4e6b6f;margin:7px 0 0}
+@media(max-width:820px){.ferry-purchase-head,.ferry-purchase-bottom{grid-template-columns:1fr}.purchase-buttons{max-width:390px}.ferry-sailing-grid{grid-template-columns:1fr}.ferry-sailing+.ferry-sailing{border-left:0;border-top:1px solid #dce6e4}}
+@media(max-width:600px){.ferry-purchase-head{padding:19px 16px}.ferry-sailing{padding:19px 16px}.ferry-purchase-bottom{padding:15px 16px}.ferry-sailing h3{font-size:24px}.ferry-ticket>strong{font-size:23px}.ferry-sailing table{font-size:11px}}

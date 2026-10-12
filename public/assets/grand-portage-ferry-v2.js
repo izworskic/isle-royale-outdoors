@@ -106,6 +106,16 @@ const geographicMap=setupGeographicMap(root,$);
 function update(track){
  const model=recommendJourney(selected),data={year:$("season").value,trip:model.trip,destination:model.destination,depart:$("depart").value,returnDate:$("returnDate").value,adults:$("adults").value,children:$("children").value,pass:$("pass").checked},evald=engine.evaluate(data);
  last={model,evald,data};
+ const price=$("ferry-reference-price");
+ if(price){
+  const a=Math.min(20,Math.max(0,Number(data.adults)||0)),c=Math.min(20,Math.max(0,Number(data.children)||0));
+  if(model.veto)price.textContent="No same-day Rock Harbor passage exists from Grand Portage";
+  else if(!a&&!c)price.textContent="Enter at least one traveler for a 2026 fare reference";
+  else{
+   const day=model.trip==="day",total=a*(day?120.50:221)+c*(day?110.50:201),count=a+c;
+   price.textContent="$"+total.toFixed(2)+" · "+count+" traveler"+(count===1?"":"s")+" · "+(day?"2026 Windigo day-trip fare":"2026 two one-way passage fares");
+  }
+ }
  geographicMap.setMode(selected);
  $("trip").value=model.trip;$("destination").value=model.destination;
  $("status").textContent=model.veto?"ITINERARY NOT POSSIBLE":evald.state==="ARCHIVE_MATCH"?"HISTORICAL TIMETABLE MATCH — NOT AVAILABLE":evald.state==="UNPUBLISHED"?"TRIP TYPE IDENTIFIED · FUTURE DATES UNVERIFIED":"PUBLISHED 2026 TIMETABLE REFERENCE";
