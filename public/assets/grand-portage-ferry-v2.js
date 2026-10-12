@@ -11,14 +11,102 @@ const MODELS={
 "rock-harbor-day":{destination:"Rock Harbor",trip:"day",heading:"Rock Harbor is not a same-day Grand Portage ferry trip.",boat:"No matching same-day ferry",note:"Voyageur II normally reaches Rock Harbor during the outbound circumnavigation and returns on a different day's south-side route. Sea Hunter III serves Windigo, not Rock Harbor.",sequence:[["01","Choose the overnight Rock Harbor itinerary if you need to reach Rock Harbor."],["02","For a day trip from Grand Portage, choose Windigo and check the next operator timetable."],["03","Never assume that two island place names share the same return boat."]],veto:true}
 };
 function recommendJourney(id){return MODELS[id]||MODELS["windigo-day"];}
+
+/* Published destination dock geography, NOT operator ship-tracking or a navigable track.
+   Grand Portage Hat Point: 402 Upper Rd; Windigo: Washington Harbor; Rock Harbor: NPS visitor area. */
+const DOCKS=Object.freeze({
+ grandPortage:Object.freeze({lat:47.96246,lng:-89.65196,name:"Grand Portage · Hat Point",popup:"Both Minnesota ferries embark at Hat Point Marina, 402 Upper Road. Verify boarding and parking with the operator."}),
+ windigo:Object.freeze({lat:47.91185,lng:-89.1578,name:"Windigo",popup:"The western Isle Royale landing and Sea Hunter III day-trip destination. Island clocks use Eastern Time."}),
+ rockHarbor:Object.freeze({lat:48.1459,lng:-88.4863,name:"Rock Harbor",popup:"Northeastern Isle Royale landing. From Grand Portage, Voyageur II reaches this dock as part of the longer route."})
+});
+// Corridors are visually indicative only. Do not use these intermediate points for marine navigation.
+const DISPLAY_CORRIDORS=Object.freeze({
+ day:Object.freeze([[47.96246,-89.65196],[47.957,-89.50],[47.932,-89.315],[47.91185,-89.1578]]),
+ long:Object.freeze([[47.96246,-89.65196],[47.957,-89.50],[47.932,-89.315],[47.91185,-89.1578],[47.984,-89.199],[48.071,-89.17],[48.133,-89.064],[48.19,-88.913],[48.22,-88.735],[48.207,-88.56],[48.1459,-88.4863]])
+});
+function mapRouteType(mode){return /^rock-harbor/.test(mode||"")?"long":"day";}
+function setupGeographicMap(win,get){
+ const container=get("ferry-map-container");
+ if(!container)return {setMode:function(){}};
+ let mode="windigo-day",map=null,dayLine=null,longLine=null,viewAll=false;
+ const zoomToRoute=()=>{
+  if(!map||!win.L)return;
+  const L=win.L,points=viewAll?[DOCKS.grandPortage,DOCKS.windigo,DOCKS.rockHarbor]:mapRouteType(mode)==="long"?[DOCKS.grandPortage,DOCKS.windigo,DOCKS.rockHarbor]:[DOCKS.grandPortage,DOCKS.windigo];
+  const bounds=L.latLngBounds(points.map(p=>[p.lat,p.lng]));
+  map.fitBounds(bounds.pad(.33),{padding:[45,44],maxZoom:10,animate:false});
+ };
+ const setMode=(m)=>{
+  mode=m;
+  container.setAttribute("data-active-route",m);
+  const target=get("geo-route-explanation");
+  if(target){
+   const entries={
+    "windigo-day":"Windigo is the Grand Portage day-trip destination. Sea Hunter III goes to Windigo and returns to Minnesota on its scheduled operating days; no Rock Harbor visit is included.",
+    "windigo-overnight":"Windigo is on Isle Royale’s western end. An overnight trip needs a compatible outbound and return sailing; Sea Hunter III and Voyageur II have different published patterns.",
+    "rock-harbor-overnight":"Rock Harbor lies at the island’s northeast end. Voyageur II continues beyond Windigo on its two-day island circuit, so plan an overnight stay and a separate return leg.",
+    "rock-harbor-day":"There is no same-day Grand Portage-to-Rock Harbor ferry trip. The amber route illustrates the longer Voyageur II itinerary, not a return you could make that same day."
+   };
+   target.textContent=entries[m]||entries["windigo-day"];
+  }
+  const long=mapRouteType(m)==="long";
+  if(dayLine){dayLine.setStyle({opacity:long?.26:1,weight:long?4:6});longLine.setStyle({opacity:long?1:.25,weight:long?5:3});}
+  viewAll=false;zoomToRoute();
+ };
+ function init(){
+  if(map||!win.L)return;
+  const L=win.L;
+  try{
+   map=L.map(get("ferry-map-live"),{
+    zoomControl:true,scrollWheelZoom:false,
+    dragging:!(win.matchMedia&&win.matchMedia("(max-width:640px)").matches),
+    doubleClickZoom:true,worldCopyJump:false,attributionControl:true
+   });
+   const tile=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>',
+    minZoom:6,maxZoom:14,maxNativeZoom:14,
+    detectRetina:false
+   });
+   tile.on("tileload",function(){container.classList.add("is-live")});
+   tile.addTo(map);
+   longLine=L.polyline(DISPLAY_CORRIDORS.long,{color:"#b17a3c",weight:3,opacity:.25,dashArray:"11 9",lineJoin:"round",interactive:false}).addTo(map);
+   dayLine=L.polyline(DISPLAY_CORRIDORS.day,{color:"#08738c",weight:6,opacity:1,lineCap:"round",interactive:false}).addTo(map);
+   const destinations=[
+    {key:"grandPortage",color:"#1d4455",tooltip:"Grand Portage · Hat Point",className:"is-portage",side:"top"},
+    {key:"windigo",color:"#08738c",tooltip:"Windigo · day-trip dock",className:"is-windigo",side:"bottom"},
+    {key:"rockHarbor",color:"#b17a3c",tooltip:"Rock Harbor",className:"is-rock",side:"top"}
+   ];
+   destinations.forEach(d=>{
+    const p=DOCKS[d.key];
+    L.circleMarker([p.lat,p.lng],{radius:d.key==="windigo"?11:9,weight:3,color:"#fff",fillColor:d.color,fillOpacity:1})
+     .addTo(map)
+     .bindTooltip(d.tooltip,{permanent:true,direction:d.side,className:d.className,offset:[0,d.side==="bottom"?12:-10]})
+     .bindPopup("<strong>"+p.name+"</strong><p>"+p.popup+"</p>");
+   });
+   zoomToRoute();
+   // Only remove the self-contained fallback once a geographic basemap tile is actually received.
+   win.addEventListener("resize",function(){if(map){map.invalidateSize();zoomToRoute()}});
+  }catch(error){
+   if(map){try{map.remove()}catch(ignore){}map=null;}
+   container.classList.remove("is-live");
+  }
+ }
+ const f=get("geo-focus-route"),a=get("geo-show-all");
+ if(f)f.addEventListener("click",function(){viewAll=false;zoomToRoute()});
+ if(a)a.addEventListener("click",function(){viewAll=true;zoomToRoute()});
+ if(win.document.readyState==="loading")win.document.addEventListener("DOMContentLoaded",init,{once:true});
+ else init();
+ return {setMode};
+}
 function mount(root){
 const d=root.document,engine=root.GrandPortageFerry;if(!engine)return;
 const $=id=>d.getElementById(id),form=$("trip-form");if(!form)return;
 let selected="windigo-day",last=null;
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const geographicMap=setupGeographicMap(root,$);
 function update(track){
  const model=recommendJourney(selected),data={year:$("season").value,trip:model.trip,destination:model.destination,depart:$("depart").value,returnDate:$("returnDate").value,adults:$("adults").value,children:$("children").value,pass:$("pass").checked},evald=engine.evaluate(data);
  last={model,evald,data};
+ geographicMap.setMode(selected);
  $("trip").value=model.trip;$("destination").value=model.destination;
  $("status").textContent=model.veto?"ITINERARY NOT POSSIBLE":evald.state==="ARCHIVE_MATCH"?"HISTORICAL TIMETABLE MATCH — NOT AVAILABLE":evald.state==="UNPUBLISHED"?"TRIP TYPE IDENTIFIED · FUTURE DATES UNVERIFIED":"PUBLISHED 2026 TIMETABLE REFERENCE";
  $("decision-heading").textContent=model.heading;
@@ -40,5 +128,5 @@ form.addEventListener("submit",e=>{e.preventDefault();update(true);$("answer").s
 $("copy-plan").addEventListener("click",async()=>{if(!last)return;const x=$("copy-note"),m=last.model,r=last.evald,v=last.data;const text=["Grand Portage → Isle Royale ferry trip plan",m.heading,m.boat,m.note,"Date pair: "+v.depart+" → "+v.returnDate,"Verification: "+r.state,...m.sequence.map(x=>x[0]+". "+x[1]),"Book with operator: https://www.isleroyaleboats.com/schedules.html","NPS park fees: https://www.nps.gov/isro/planyourvisit/fees.htm","2026 historical timetable only; future sailings and seats unverified."].join("\n");try{await root.navigator.clipboard.writeText(text);x.textContent="Trip checklist copied."}catch(e){x.textContent="Copy unavailable; use the linked operator and NPS sources."}});
 update(false);
 }
-return {MODELS,recommendJourney,mount};
+return {MODELS,recommendJourney,DOCKS,DISPLAY_CORRIDORS,mapRouteType,mount};
 });
