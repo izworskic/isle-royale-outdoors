@@ -15,6 +15,8 @@
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5D2V2W7HN"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-Y5D2V2W7HN');</script>
 <link rel="stylesheet" href="/assets/grand-portage-ferry-v2.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
 </head><body>
 <a href="#voyage-desk" class="skip">Skip to ferry decision</a>
 <header class="top"><div class="bar"><a class="brand" href="/">Chris Izworski</a><nav aria-label="Site navigation"><a href="/tools/">Tools</a><a href="/national-tools/">National tools</a><a href="/isle-royale-map/">Isle Royale map</a></nav></div></header>
@@ -44,16 +46,48 @@
 </section>
 <section class="panel pad answer" id="answer" aria-live="polite" aria-atomic="true"><p class="kicker">02 / THE ANSWER</p><p class="state" id="status">ROUTE FIT / PUBLISHED SOURCES</p>
 <h2 id="decision-heading">Windigo is the one-day ferry destination.</h2><p id="decision-desc">Sea Hunter III is the seasonal one-day service to Windigo. Confirm the operator's future calendar before booking.</p>
-<div class="route-graphic"><svg viewBox="0 0 660 210" role="img" aria-label="Illustrative ferry routes: Grand Portage on the Minnesota mainland, Windigo on the western Isle Royale shore, Rock Harbor on the eastern shore. Voyageur II connects farther east than Sea Hunter III. Not a navigable chart.">
- <rect x="1" y="1" width="658" height="208" rx="9" fill="#e7f3f4"/><path d="M450 48L610 28L634 100L570 170L420 156L405 89Z" fill="#8eb49b" stroke="#4b846e" stroke-width="2"/><path d="M30 13L150 27L175 168L43 198Z" fill="#94b29d"/><path d="M165 118Q252 91 430 101" stroke="#1b748b" stroke-width="5" stroke-dasharray="11 9" fill="none"/><path d="M435 102Q516 86 575 88" stroke="#bd8c4e" stroke-width="5" stroke-dasharray="9 8" fill="none"/><circle cx="147" cy="119" r="10" fill="#123c4d"/><circle cx="436" cy="102" r="10" fill="#123c4d"/><circle cx="571" cy="88" r="10" fill="#b27d3a"/>
- <g font-family="system-ui" fill="#204958" font-weight="700" font-size="15"><text x="22" y="87">Grand</text><text x="22" y="104">Portage</text><text x="394" y="127">Windigo</text><text x="535" y="68">Rock</text><text x="526" y="84">Harbor</text></g><text x="215" y="76" font-size="12" font-family="system-ui" fill="#17657e">Sea Hunter III / Windigo</text><text x="484" y="152" font-size="11" font-family="system-ui" fill="#805c36">Voyageur II continues east</text>
- </svg><p class="diagram-caption">Geographic relationships simplified: this is a route schematic, not a chart of ship positions or a 2027 timetable.</p></div>
+<p class="map-cta"><a href="#ferry-route-map">See the actual docks on the map <span aria-hidden="true">↓</span></a><span>Grand Portage, Windigo &amp; Rock Harbor</span></p>
 <div class="vessel"><p class="kicker">Service fit</p><strong id="recommended-boat">Sea Hunter III / Windigo</strong><p id="vessel-explain">Seasonal day-trip pattern; subject to published sailing days.</p></div>
 <h3>How this journey works</h3><ol class="schedule" id="journey"></ol>
 <div id="calendar-result" class="warning" aria-label="Calendar check"></div>
 <div class="source-links"><a href="https://www.isleroyaleboats.com/schedules.html" target="_blank" rel="noopener noreferrer">Verify operator schedule ↗</a><a href="https://www.isleroyaleboats.com/" target="_blank" rel="noopener noreferrer">Reserve through ferry operator ↗</a><a href="https://www.nps.gov/isro/planyourvisit/permits.htm" target="_blank" rel="noopener noreferrer">NPS permits ↗</a></div><button id="copy-plan" class="button" type="button">Copy trip checklist</button><p id="copy-note" class="fine" role="status"></p>
 </section>
 </div>
+<section class="geography" id="ferry-route-map" aria-labelledby="ferry-map-heading">
+<div class="geography-head">
+  <div><p class="kicker">03 / THE CROSSING · REAL GEOGRAPHY</p>
+    <h2 id="ferry-map-heading">Where the ferries actually take you.</h2>
+    <p>Grand Portage is on Minnesota's north shore. Windigo sits on Isle Royale's western tip. Rock Harbor is much farther along the island's northeastern end. These are different journeys—not alternative names for the same stop.</p>
+  </div>
+  <a class="geo-official" target="_blank" rel="noopener noreferrer" href="https://www.nps.gov/isro/planyourvisit/directions.htm">NPS ferry directions ↗</a>
+</div>
+<div class="geo-key" aria-label="Ferry service route key">
+ <div class="geo-key-option is-day" id="day-route-key"><span class="geo-stroke"></span><div><strong>Sea Hunter III → Windigo</strong><small>Same-day visit · published 2026 pattern: ~1½ hours each way</small></div></div>
+ <div class="geo-key-option is-long" id="long-route-key"><span class="geo-stroke"></span><div><strong>Voyageur II → Rock Harbor</strong><small>Via Windigo · longer journey, overnight needed for return</small></div></div>
+</div>
+<div class="ferry-map-container" id="ferry-map-container" data-active-route="windigo-day">
+ <div id="ferry-map-live" aria-label="Interactive map of Grand Portage, Windigo and Rock Harbor with geographic endpoint connections" role="application"></div>
+ <div class="ferry-map-fallback" id="ferry-map-fallback" role="img" aria-label="Geographically oriented diagram: Grand Portage in Minnesota is west of Windigo on Isle Royale; Rock Harbor lies far to the northeast. Sea Hunter III links Grand Portage and Windigo; Voyageur II continues northeast to Rock Harbor.">
+  <svg viewBox="0 0 960 440" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+   <defs><linearGradient id="ferry-water" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#d2e9ee"/><stop offset="1" stop-color="#b5d9e4"/></linearGradient></defs>
+   <rect width="960" height="440" fill="url(#ferry-water)"/>
+   <g fill="none" stroke="#ffffff" stroke-opacity=".35"><path d="M0 80H960M0 200H960M0 320H960"/><path d="M180 0V440M420 0V440M660 0V440M900 0V440"/></g>
+   <text x="482" y="115" fill="#497e90" font-size="27" font-family="Georgia,serif" font-style="italic" letter-spacing="7">LAKE SUPERIOR</text>
+   <path class="geo-svg-long" d="M100 270 Q238 218 412 309 Q440 215 548 176 Q710 88 836 124" stroke="#ae793f" stroke-width="7" stroke-dasharray="14 10" stroke-linecap="round" fill="none"/>
+   <path class="geo-svg-day" d="M100 270L412 309" stroke="#08738c" stroke-width="9" stroke-linecap="round" fill="none"/>
+   <g font-family="system-ui, sans-serif" font-weight="700" fill="#173a46"><circle cx="100" cy="270" r="10" fill="#153e4d" stroke="white" stroke-width="4"/><circle cx="412" cy="309" r="12" fill="#08738c" stroke="white" stroke-width="4"/><circle cx="836" cy="124" r="10" fill="#ae793f" stroke="white" stroke-width="4"/><text x="30" y="245" font-size="24">Grand Portage</text><text x="358" y="356" font-size="26">Windigo</text><text x="766" y="98" font-size="24">Rock Harbor</text></g>
+   <text x="29" y="406" fill="#345f6a" font-size="15" font-family="system-ui">DIAGRAM FALLBACK · OPEN STREET MAP IF AVAILABLE</text>
+  </svg>
+  <p>Map tiles unavailable? Open the <a href="https://www.openstreetmap.org/#map=9/48.015/-89.07" target="_blank" rel="noopener noreferrer">geographic area on OpenStreetMap ↗</a>.</p>
+ </div>
+ <div class="geo-map-tools">
+  <button type="button" id="geo-focus-route" class="geo-map-tool" aria-label="Zoom map to the current ferry itinerary">My ferry route</button>
+  <button type="button" id="geo-show-all" class="geo-map-tool" aria-label="Zoom map to show Grand Portage, Windigo, and Rock Harbor">All three docks</button>
+ </div>
+</div>
+<div class="geo-bottom"><p id="geo-route-explanation" aria-live="polite"><strong>Windigo is the day-trip destination.</strong> Sea Hunter III connects Grand Portage to Windigo and back on operating days. Rock Harbor is not a same-day Grand Portage ferry visit.</p>
+<p class="geo-map-disclaimer">Dock locations are approximate. Colored lines show <strong>illustrative endpoint connections only</strong>—not actual sailing tracks, navigation instructions, live vessel positions, or verified future sailings. OpenStreetMap contributors provide the geographic basemap.</p></div>
+</section>
 <section class="comparison" aria-label="What each vessel actually does">
 <article><p class="kicker">The Windigo day boat</p><h3>Sea Hunter III</h3><p>In the published 2026 pattern, this boat left Grand Portage and returned on the same day, giving visitors a few hours around Windigo before the afternoon departure. It is the natural boat to investigate for a first-time, no-overnight Windigo visit.</p><small>2026 reference: 8:30 AM CT departure, 10 AM CT Windigo arrival, 2 PM CT island departure. These are historical examples—not future operating hours.</small></article>
 <article><p class="kicker">The island-circling boat</p><h3>Voyageur II</h3><p>Voyageur II follows the northern side of Isle Royale toward Rock Harbor on the outbound day and the southern shore on its return circuit. It can serve remote docks by advance arrangement. Reaching Rock Harbor from Grand Portage and returning requires an overnight itinerary—not a same-day shortcut.</p><small>Intermediate docks depend on actual bookings and operating arrangements; no guaranteed pickup is inferred from the schedule.</small></article>
