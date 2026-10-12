@@ -66,11 +66,14 @@ function evaluate(input){
  }
  if(!options.length)return {...base,state:"NO_TIMETABLE_MATCH",headline:"No matching 2026 published sailing pattern",detail:"The selected dates do not match a published outbound/return pair for this itinerary. This does not tell us whether any seats are available."};
  const countDays=daysInclusive(i.depart,i.returnDate);
- const fee= i.pass?0:Math.max(0,countDays)*7*adult;
- return {...base,state:"ARCHIVE_MATCH",headline:"Matches the published 2026 timetable — historical only",detail:"These sailings are in the past. Examples are for route planning; no boat, departure or seat availability is being offered.",options:options.map(o=>({...o,ferryTotal:+(o.adultFare*adult+o.childFare*child).toFixed(2),parkFee:fee,illustrativeTotal:+(o.adultFare*adult+o.childFare*child+fee).toFixed(2)})),notes:[
+ const passCoveredAdults=i.pass?Math.min(4,adult):0;
+ const chargedAdults=adult-passCoveredAdults;
+ const fee=Math.max(0,countDays)*7*chargedAdults;
+ return {...base,state:"ARCHIVE_MATCH",headline:"Matches the published 2026 timetable — historical only",detail:"These sailings are in the past. Examples are for route planning; no boat, departure or seat availability is being offered.",options:options.map(o=>({...o,ferryTotal:+(o.adultFare*adult+o.childFare*child).toFixed(2),parkFee:fee,coveredAdults:passCoveredAdults,chargedAdults,illustrativeTotal:+(o.adultFare*adult+o.childFare*child+fee).toFixed(2)})),notes:[
   "All sailing clock times are Central Time (Grand Portage); Isle Royale uses Eastern Time, one hour ahead.",
   "Small parties of 1–6 camping overnight receive NPS permits upon arrival; groups of 7+ require advance NPS arrangements.",
-  "Park entrance: $7 per person age 16+ per calendar day, including arrival and departure, unless covered by an eligible pass.",
+  "Park entrance: $7 per person age 16+ per calendar day, including arrival and departure. One eligible season/federal pass waives fees for its holder and up to 3 other adults (4 total).",
+  ...(i.pass?["The estimate assumes ONE eligible pass covering up to four adults; additional adults are charged $7 each per calendar day. Bring and present that physical pass on-island."]:[]),
   "The operator requires outbound and return reservations together, and optional intermediate docks require advance arrangements.",
   "Parking at the marina is separately charged. Cost is omitted because the verified price was not available."
  ]};

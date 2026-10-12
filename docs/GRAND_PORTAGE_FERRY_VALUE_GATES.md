@@ -32,3 +32,6 @@ V_F = 0.25 calendar pairing + 0.20 boat/route feasibility + 0.15 permit logic + 
 
 ## Release protocol
 Benchmark via `npm run benchmark:ferry`; source-owner test suite `npm test`; confirm GitHub PR CI and source-route composition; do not claim live canonical production before tested rewrite/deploy. Future-season operator schedule must be verified and versioned before the tool offers concrete future pairings.
+
+## Post-launch source audit: one-pass group size (October 12, 2026)
+NPS confirms a federal land pass or Isle Royale season pass covers the holder and up to three other adults (four total); a Boolean pass indicator must never waive unlimited travelers. The engine now caps coverage at four adults per one qualifying pass and estimates the $7 daily fee for all remaining adults. It displays the assumption beside the result and links to https://www.nps.gov/isro/planyourvisit/fees.htm. Pass must be physically presented; eligibility is still traveler-verified. Added 4-adult and 7-adult overnight test cases. This fixes a potential underpricing loss rather than expanding functionality.
