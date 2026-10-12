@@ -28,6 +28,76 @@
 <figure class="hero-photo"><img fetchpriority="high" loading="eager" width="1280" height="932" onerror="this.closest('.hero-photo').classList.add('is-missing');this.hidden=true" alt="Sea Hunter III passenger ferry at Grand Portage dock, photographed in July 2022. Not a live image." src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sea%20Hunter%20III%20-%20Isle%20Royale%20Ferry%20-%20Grand%20Portage%20%2852429753995%29.jpg?width=1280"><figcaption class="photo-credit">Sea Hunter III · Grand Portage, 2022 · <a href="https://commons.wikimedia.org/wiki/File:Sea_Hunter_III_-_Isle_Royale_Ferry_-_Grand_Portage_(52429753995).jpg" target="_blank" rel="noopener noreferrer">Tony Webster</a> · <a href="https://creativecommons.org/licenses/by/2.0/" target="_blank" rel="noopener noreferrer">CC BY 2.0</a> · not live</figcaption></figure>
 </div></section>
 <main class="shell" id="voyage-desk"><div class="season-notice" role="note"><strong>2027 sailings not yet confirmed.</strong> Route guidance uses the operator's published 2026 reference; that season has ended. The planner cannot verify future departures, fares or seat availability. <a href="https://www.isleroyaleboats.com/schedules.html" target="_blank" rel="noopener noreferrer">Check official sailings ↗</a></div>
+
+<style>
+.ferry-purchase{margin:13px 0 27px;padding:0;background:#fff;border:1px solid #c9dad7;border-radius:9px;overflow:hidden;box-shadow:0 6px 22px #123a3b0b}
+.ferry-purchase-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(225px,305px);gap:24px;align-items:center;padding:25px 27px;background:#edf5f2}
+.ferry-purchase-head h2{font:normal clamp(28px,3vw,37px)/1.15 Georgia,serif;color:#173b47;margin:0 0 10px}
+.ferry-purchase-head p:not(.kicker){font-size:13px;color:#3f5b61;line-height:1.65;margin:0}
+.purchase-buttons{display:flex;flex-direction:column;gap:8px}
+.purchase-buttons a:first-child{background:#153e4d;color:#fff;padding:15px;border-radius:5px;text-align:center;font-size:14px;font-weight:800;text-decoration:none}
+.purchase-buttons small{font-size:11px;line-height:1.55;color:#51676c}
+.ferry-sailing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.ferry-sailing{padding:23px 27px;min-width:0}
+.ferry-sailing+.ferry-sailing{border-left:1px solid #dbe6e4}
+.ferry-sailing h3{font:normal 27px Georgia,serif;color:#23505d;margin:3px 0 7px}
+.ferry-sailing>p{font-size:12px;line-height:1.6;color:#4e6870}
+.ferry-sailing .season{font-weight:750;color:#205969}
+.ferry-ticket{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f1f7f4;border:1px solid #d7e6e0;border-radius:5px;padding:11px 13px;margin:13px 0}
+.ferry-ticket span{font-size:12px;line-height:1.4;color:#4b646c}
+.ferry-ticket strong{font:normal 27px Georgia,serif;white-space:nowrap;color:#124859}
+.ferry-timing{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:13px 0}
+.ferry-timing div{background:#edf4f2;padding:10px;border-radius:5px}
+.ferry-timing small{display:block;font-size:10px;color:#577079}
+.ferry-timing strong{font-size:15px;color:#183f4d}
+.ferry-sailing table{border-collapse:collapse;font-size:12px;line-height:1.45;width:100%}
+.ferry-sailing table caption{text-align:left;font-weight:800;color:#315c65;padding:9px 0 5px}
+.ferry-sailing th,.ferry-sailing td{padding:7px 4px;border-bottom:1px solid #dfeae7;text-align:left;vertical-align:top}
+.ferry-sailing th{font-size:10px;text-transform:uppercase;color:#537177;letter-spacing:.02em}
+.ferry-purchase-bottom{border-top:1px solid #dce8e5;padding:17px 27px;background:#fbfdfb;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.ferry-purchase-bottom p{font-size:11px;line-height:1.65;color:#48656b;margin:0}
+.ferry-purchase-bottom a{font-size:12px;font-weight:750}
+.ferry-price-calc{background:#e8f1ed;border:1px solid #c6dbd2;border-left:4px solid #578f83;border-radius:5px;margin:14px 0;padding:14px 17px}
+.ferry-price-calc h3{font:normal 20px Georgia,serif;margin:3px 0 6px}
+.ferry-price-calc strong{display:block;color:#114457;font-size:17px}
+.ferry-price-calc p:not(.kicker){font-size:11px;line-height:1.55;color:#4e6b6f;margin:7px 0 0}
+@media(max-width:820px){.ferry-purchase-head,.ferry-purchase-bottom{grid-template-columns:1fr}.purchase-buttons{max-width:390px}.ferry-sailing-grid{grid-template-columns:1fr}.ferry-sailing+.ferry-sailing{border-left:0;border-top:1px solid #dce6e4}}
+@media(max-width:600px){.ferry-purchase-head{padding:19px 16px}.ferry-sailing{padding:19px 16px}.ferry-purchase-bottom{padding:15px 16px}.ferry-sailing h3{font-size:24px}.ferry-ticket strong{font-size:23px}.ferry-sailing table{font-size:11px}}
+</style>
+<section class="ferry-purchase" aria-labelledby="ferry-purchase-heading">
+ <div class="ferry-purchase-head">
+  <div><p class="kicker">2026 OFFICIAL SAILINGS · 2027 NOT YET ON SALE</p><h2 id="ferry-purchase-heading">Fares, sailing days and tickets.</h2><p>Here is what the Grand Portage operator actually published for 2026. The 2026 season is over; <strong>2027 departure dates, prices and seats are not yet confirmed.</strong> The operator expects to open 2027 reservations in late November or early December 2026.</p></div>
+  <div class="purchase-buttons"><a href="https://www.isleroyaleboats.com/book-now-.html" target="_blank" rel="noopener noreferrer">Book ferry passage with the operator ↗</a><small>Use the official reservation page when booking opens. Reserve your outbound and return journeys together. We do not sell tickets or check live seats.</small></div>
+ </div>
+ <div class="ferry-sailing-grid">
+ <article class="ferry-sailing">
+  <p class="kicker">DAY VISIT OR WINDIGO CAMPING</p><h3>Sea Hunter III</h3>
+  <p class="season">2026 season: June 10 – September 5</p>
+  <div class="ferry-ticket"><span>2026 adult <strong>day trip</strong> round-trip<br><small>Child 15 and under $110.50</small></span><strong>$120.50</strong></div>
+  <p><strong>Camper one-way:</strong> $110.50 adult / $100.50 child. The day-trip and camper fares are different.</p>
+  <div class="ferry-timing"><div><small>Departs Grand Portage</small><strong>8:30 AM CT</strong></div><div><small>Departs Windigo</small><strong>2:00 PM CT</strong></div></div>
+  <p>Windigo arrival 10:00 AM CT, return to Minnesota 3:30 PM CT. About four hours to explore Windigo between arrival and departure.</p>
+  <table><caption>2026 sailing days</caption><thead><tr><th scope="col">Date range</th><th scope="col">Operating weekdays</th></tr></thead><tbody>
+  <tr><td>June 10 – July 11</td><td>Wednesday–Saturday</td></tr>
+  <tr><td>July 15 – August 16</td><td>Wednesday–Sunday</td></tr>
+  <tr><td>August 19 – September 5</td><td>Wednesday–Saturday</td></tr></tbody></table>
+ </article>
+ <article class="ferry-sailing">
+  <p class="kicker">WINDIGO, ROCK HARBOR AND INTERMEDIATE DOCKS</p><h3>Voyageur II</h3>
+  <p class="season">2026 season: May 9 – September 24</p>
+  <div class="ferry-ticket"><span>2026 adult <strong>one way</strong> from Grand Portage<br><small>Child 15 and under $100.50</small></span><strong>$110.50</strong></div>
+  <p><strong>Typical round trip:</strong> $221 adult / $201 child for the two Grand Portage legs; other island-to-island segments have different fares.</p>
+  <div class="ferry-timing"><div><small>Grand Portage outbound</small><strong>7:30 AM CT</strong></div><div><small>Rock Harbor return</small><strong>8:00 AM CT</strong></div></div>
+  <p>Outbound: Windigo 9:30 AM, Rock Harbor 3:00 PM CT. Inbound: Windigo 12:30 PM, Grand Portage 3:00 PM CT. Overnight itinerary, not a same-day Rock Harbor trip.</p>
+  <table><caption>2026 sailing days</caption><thead><tr><th scope="col">Date range</th><th scope="col">Outbound</th><th scope="col">Return</th></tr></thead><tbody>
+  <tr><td>May 9 – May 24</td><td>Wed, Sat</td><td>Thu, Sun</td></tr>
+  <tr><td>May 25 – Sept 13</td><td>Mon, Wed, Sat</td><td>Tue, Thu, Sun</td></tr>
+  <tr><td>Sept 16 – Sept 24</td><td>Wed</td><td>Thu</td></tr></tbody></table>
+  <p>Special Voyageur II Windigo day trips also ran September 19–20 and September 26–27 in 2026.</p>
+ </article></div>
+ <div class="ferry-purchase-bottom"><p><strong>Additional costs:</strong> 2026 Isle Royale entrance fees were $7 per person age 16+ per calendar day unless covered by an eligible pass. Grand Portage marina parking costs extra; luggage, kayaks, and overnight accommodation may also add costs. Every timetable here is historical, not live availability. All boat times shown are <strong>Central Time</strong>; Isle Royale uses Eastern Time.</p>
+ <div><a href="https://www.isleroyaleboats.com/schedules.html" target="_blank" rel="noopener noreferrer">Official schedule ↗</a> · <a href="https://isleroyaleboats.com/rates.html" target="_blank" rel="noopener noreferrer">Official fares ↗</a></div></div>
+</section>
 <div class="grid">
 <section class="panel pad" id="planner"><p class="kicker">01 / THE BRIEF</p><h2>Choose your journey.</h2><p>Grand Portage has two boats with different jobs. Tell us where you need to land and whether you're staying overnight.</p>
 <div class="routes" role="group" aria-label="Journey type">
@@ -48,9 +118,9 @@
 <h2 id="decision-heading">Windigo is the one-day ferry destination.</h2><p id="decision-desc">Sea Hunter III is the seasonal one-day service to Windigo. Confirm the operator's future calendar before booking.</p>
 <p class="map-cta"><a href="#ferry-route-map">See the actual docks on the map <span aria-hidden="true">↓</span></a><span>Grand Portage, Windigo &amp; Rock Harbor</span></p>
 <div class="vessel"><p class="kicker">Service fit</p><strong id="recommended-boat">Sea Hunter III / Windigo</strong><p id="vessel-explain">Seasonal day-trip pattern; subject to published sailing days.</p></div>
-<h3>How this journey works</h3><ol class="schedule" id="journey"></ol>
+<div class="ferry-price-calc" aria-label="2026 reference fare for selected party"><p class="kicker">2026 fare reference · 2027 price unconfirmed</p><h3>What your party would have paid</h3><strong id="ferry-reference-price" aria-live="polite">$241.00 · two adults, Windigo day trip</strong><p>Ferry passage only, at the <strong>published 2026 rates</strong>. Separate park admission, parking, gear and overnight costs are not included. This is <strong>not a 2027 price or reservation.</strong></p><a href="https://www.isleroyaleboats.com/book-now-.html" target="_blank" rel="noopener noreferrer">Buy passage from the operator when booking opens ↗</a></div><h3>How this journey works</h3><ol class="schedule" id="journey"></ol>
 <div id="calendar-result" class="warning" aria-label="Calendar check"></div>
-<div class="source-links"><a href="https://www.isleroyaleboats.com/schedules.html" target="_blank" rel="noopener noreferrer">Verify operator schedule ↗</a><a href="https://www.isleroyaleboats.com/" target="_blank" rel="noopener noreferrer">Reserve through ferry operator ↗</a><a href="https://www.nps.gov/isro/planyourvisit/permits.htm" target="_blank" rel="noopener noreferrer">NPS permits ↗</a></div><button id="copy-plan" class="button" type="button">Copy trip checklist</button><p id="copy-note" class="fine" role="status"></p>
+<div class="source-links"><a href="https://www.isleroyaleboats.com/schedules.html" target="_blank" rel="noopener noreferrer">Verify operator schedule ↗</a><a href="https://www.isleroyaleboats.com/book-now-.html" target="_blank" rel="noopener noreferrer">Reserve through ferry operator ↗</a><a href="https://www.nps.gov/isro/planyourvisit/permits.htm" target="_blank" rel="noopener noreferrer">NPS permits ↗</a></div><button id="copy-plan" class="button" type="button">Copy trip checklist</button><p id="copy-note" class="fine" role="status"></p>
 </section>
 </div>
 <section class="geography" id="ferry-route-map" aria-labelledby="ferry-map-heading">
@@ -99,8 +169,28 @@
 </section>
 <section class="source-desk"><p class="kicker">Before you click Purchase</p><h2 style="font:30px Georgia,serif">Make the return booking part of the outbound decision.</h2>
 <p>The operator requires you to reserve your return leg along with outbound travel. For intermediate docks, ask about actual stops and reservation requirements. Parking at the Grand Portage marina is a separate cost, and this page does not invent its price. The next published season may change days, rates and availability.</p>
-<div class="source-links"><a href="https://www.isleroyaleboats.com/schedules.html">Operator route and dates ↗</a><a href="https://isleroyaleboats.com/rates.html">Published fares ↗</a><a href="https://www.nps.gov/isro/planyourvisit/fees.htm">NPS entrance fees ↗</a><a href="https://www.nps.gov/isro/planyourvisit/permits.htm">NPS camping permits ↗</a><a href="/isle-royale-map/">Isle Royale portages, docks and camps ↗</a></div>
+<div class="source-links"><a href="https://www.isleroyaleboats.com/book-now-.html">Official booking ↗</a><a href="https://www.isleroyaleboats.com/schedules.html">Operator route and dates ↗</a><a href="https://isleroyaleboats.com/rates.html">Published fares ↗</a><a href="https://www.nps.gov/isro/planyourvisit/fees.htm">NPS entrance fees ↗</a><a href="https://www.nps.gov/isro/planyourvisit/permits.htm">NPS camping permits ↗</a><a href="/isle-royale-map/">Isle Royale portages, docks and camps ↗</a></div>
 <p class="fine">Operator schedule and rates last reviewed October 12, 2026. No seat inventory API or automatic 2027 schedule feed. This is not affiliated with the operator or NPS.</p></section>
 </main><footer class="site-footer"><div class="inner"><span>Independent ferry planning aid · Operator calendar checked October 12, 2026</span><span><a href="https://chrisizworski.com/chris-izworski/">Built by Chris Izworski</a></span></div></footer>
 <script src="/assets/grand-portage-ferry.js" defer></script><script src="/assets/grand-portage-ferry-v2.js" defer></script>
-</body></html>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+ var price=document.getElementById('ferry-reference-price');
+ if(!price)return;
+ function update(){
+  var selected=document.querySelector('[data-voyage][aria-pressed="true"]');
+  var mode=selected?selected.getAttribute('data-voyage'):'windigo-day';
+  var a=Math.min(20,Math.max(0,Number(document.getElementById('adults').value)||0));
+  var c=Math.min(20,Math.max(0,Number(document.getElementById('children').value)||0));
+  if(mode==='rock-harbor-day'){price.textContent='No same-day Rock Harbor passage exists from Grand Portage';return;}
+  if(!a&&!c){price.textContent='Enter at least one traveler for a 2026 fare reference';return;}
+  var day=mode==='windigo-day';
+  var fare=a*(day?120.50:221)+c*(day?110.50:201);
+  price.textContent='+fare.toFixed(2)+' · '+(a+c)+' traveler'+(a+c===1?'':'s')+' · '+(day?'2026 Windigo day-trip fare':'2026 two one-way passage fares');
+ }
+ document.querySelectorAll('[data-voyage]').forEach(function(el){el.addEventListener('click',update)});
+ ['adults','children'].forEach(function(id){document.getElementById(id).addEventListener('input',update)});
+ update();
+});
+</script></body></html>
