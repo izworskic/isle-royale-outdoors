@@ -6,6 +6,11 @@ let pass=0;function gate(name,ok){assert.ok(ok,name);console.log('PASS '+name);p
 const title=(page.match(/<title>(.*?)<\/title>/)||[])[1]||'',desc=(page.match(/<meta name="description" content="([^"]+)/)||[])[1]||'';
 gate('query-first title, creator and <=60',title.length<=60&&title.includes('Chris Izworski'));
 gate('meta description <=158',desc.length<=158&&desc.length>65);
+gate('query-first ferry cost and schedule title',/Isle Royale Ferry Cost & Schedule/.test(title));
+gate('visible decision FAQ with eight distinct supported answers',page.includes('id="ferry-faq"')&&page.includes("How much is the ferry from Grand Portage to Isle Royale?")&&page.includes("Which days does the Grand Portage Isle Royale ferry run?")&&page.includes("Can I take a one-day trip to Isle Royale from Minnesota?")&&page.includes("Where do I book Sea Hunter III and Voyageur II tickets?")&&page.includes("Where do I board, and what about marina parking?")&&page.includes("Why does the Isle Royale ferry timetable use Central Time?")&&page.includes("Can I take my car to Isle Royale National Park?")&&page.includes("What happens if Lake Superior weather delays the ferry?"));
+const richGraph=JSON.parse((page.match(/<script type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/)||[])[1]||'{}')['@graph']||[];
+gate('one shared creator and complete page breadcrumbs',richGraph.filter(n=>n['@type']==='Person').length===1&&richGraph.some(n=>n['@type']==='BreadcrumbList')&&richGraph.some(n=>n['@type']==='WebPage'));
+gate('FAQ markup matches visible answers exactly',richGraph.find(n=>n['@type']==='FAQPage')?.mainEntity?.length===8&&richGraph.find(n=>n['@type']==='FAQPage').mainEntity.every(n=>page.includes(n.name)&&page.includes(n.acceptedAnswer.text)));
 gate('canonical is dedicated ferry intent',page.includes('rel="canonical" href="https://chrisizworski.com/isle-royale-ferry/"'));
 gate('defined Person identity',page.includes('"@type":"Person"')&&page.includes('https://chrisizworski.com/#person'));
 gate('visible author identity',page.includes('Built by Chris Izworski'));
