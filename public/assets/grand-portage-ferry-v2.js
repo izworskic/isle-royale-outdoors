@@ -108,13 +108,9 @@ function update(track){
  last={model,evald,data};
  const price=$("ferry-reference-price");
  if(price){
-  const a=Math.min(20,Math.max(0,Number(data.adults)||0)),c=Math.min(20,Math.max(0,Number(data.children)||0));
   if(model.veto)price.textContent="No same-day Rock Harbor passage exists from Grand Portage";
-  else if(!a&&!c)price.textContent="Enter at least one traveler for a 2026 fare reference";
-  else{
-   const day=model.trip==="day",total=a*(day?120.50:221)+c*(day?110.50:201),count=a+c;
-   price.textContent="$"+total.toFixed(2)+" · "+count+" traveler"+(count===1?"":"s")+" · "+(day?"2026 Windigo day-trip fare":"2026 two one-way passage fares");
-  }
+  else if(evald.options.length)price.textContent="$"+evald.options[0].ferryTotal.toFixed(2)+" · "+data.year+(data.year==="2026"?" historical base fare":" published base ferry fare");
+  else price.textContent="No verified fare for the selected date pair";
  }
  geographicMap.setMode(selected);
  $("trip").value=model.trip;$("destination").value=model.destination;
@@ -122,13 +118,13 @@ function update(track){
  $("decision-heading").textContent=model.heading;
  $("decision-desc").textContent=model.note;
  $("recommended-boat").textContent=model.boat;
- $("vessel-explain").textContent=model.veto?"There is no direct same-day ferry itinerary from Grand Portage to Rock Harbor.":model.trip==="day"?"Check the published 2027 calendar; live seats and fares are unverified.":"Both the outbound and return days need to match the operator's actual future calendar.";
+ $("vessel-explain").textContent=model.veto?"There is no direct same-day ferry itinerary from Grand Portage to Rock Harbor.":model.trip==="day"?"Check the published 2027 calendar; published base fares are available; live seats are unverified.":"Both the outbound and return days need to match the operator's actual future calendar.";
  const ul=$("journey");ul.replaceChildren();model.sequence.forEach(a=>{const li=d.createElement("li"),time=d.createElement("time"),p=d.createElement("span");time.textContent=a[0];p.textContent=a[1];li.append(time,p);ul.append(li)});
  const check=$("calendar-result");
  if(model.veto){check.textContent="Itinerary veto: a Grand Portage → Rock Harbor → Grand Portage day trip cannot be constructed from the published ferry routes. Choose overnight or Windigo."}
  else if(evald.state==="ARCHIVE_MATCH"){
   check.textContent="2026 archival example only — "+evald.options.map(x=>x.boat+": "+x.out+" out, "+x.leave+" back; 2026 reference fare and entrance estimate $"+x.illustrativeTotal.toFixed(2)).join(" / ")+". These past trips are not bookable. Confirm current fares and dates with the operator.";
- }else if(evald.state==="PUBLISHED_MATCH"){check.textContent="Published 2027 schedule match: "+evald.options.map(x=>x.boat+": "+x.out+" out, "+x.leave+" back").join(" / ")+". Scheduled service only. 2027 fares and seats are not verified."}
+ }else if(evald.state==="PUBLISHED_MATCH"){check.textContent="Published 2027 schedule match: "+evald.options.map(x=>x.boat+": "+x.out+" out, "+x.leave+" back; base ferry fare $"+x.ferryTotal.toFixed(2)).join(" / ")+". Excludes booking fee and other charges; seats are not verified."}
  else if(evald.state==="UNPUBLISHED"){check.textContent=evald.headline+". "+evald.detail}
  else {check.textContent=evald.headline+". "+evald.detail}
  if(track&&typeof root.gtag==="function")root.gtag("event","ferry_itinerary_evaluated",{event_category:"decision_tool",decision_state:model.veto?"ITINERARY_VETO":evald.state,route:model.destination,season:data.year});
@@ -136,7 +132,7 @@ function update(track){
 d.querySelectorAll("[data-voyage]").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.voyage;d.querySelectorAll("[data-voyage]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));const x=$("depart"),y=$("returnDate");if(recommendJourney(selected).trip==="overnight"&&x.value===y.value){const date=new Date(x.value+"T12:00:00Z");if(Number.isFinite(+date)){date.setUTCDate(date.getUTCDate()+2);y.value=date.toISOString().slice(0,10)}}if(recommendJourney(selected).trip==="day")y.value=x.value;update(true)}));
 form.addEventListener("submit",e=>{e.preventDefault();update(true);$("answer").scrollIntoView({behavior:root.matchMedia&&root.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"})});
 ["adults","children","pass","season","depart","returnDate"].forEach(id=>$(id).addEventListener("change",()=>update(false)));
-$("copy-plan").addEventListener("click",async()=>{if(!last)return;const x=$("copy-note"),m=last.model,r=last.evald,v=last.data;const text=["Grand Portage → Isle Royale ferry trip plan",m.heading,m.boat,m.note,"Date pair: "+v.depart+" → "+v.returnDate,"Verification: "+r.state,...m.sequence.map(x=>x[0]+". "+x[1]),"Book with operator: https://www.isleroyaleboats.com/schedules.html","NPS park fees: https://www.nps.gov/isro/planyourvisit/fees.htm","2027 published timetable or 2026 historical reference; 2027 fares and live seats unverified."].join("\n");try{await root.navigator.clipboard.writeText(text);x.textContent="Trip checklist copied."}catch(e){x.textContent="Copy unavailable; use the linked operator and NPS sources."}});
+$("copy-plan").addEventListener("click",async()=>{if(!last)return;const x=$("copy-note"),m=last.model,r=last.evald,v=last.data;const text=["Grand Portage → Isle Royale ferry trip plan",m.heading,m.boat,m.note,"Date pair: "+v.depart+" → "+v.returnDate,"Verification: "+r.state,...m.sequence.map(x=>x[0]+". "+x[1]),"Book with operator: https://www.isleroyaleboats.com/schedules.html","NPS park fees: https://www.nps.gov/isro/planyourvisit/fees.htm","2027 published timetable or 2026 historical reference; 2027 published base fares; live seats unverified."].join("\n");try{await root.navigator.clipboard.writeText(text);x.textContent="Trip checklist copied."}catch(e){x.textContent="Copy unavailable; use the linked operator and NPS sources."}});
 update(false);
 }
 return {MODELS,recommendJourney,DOCKS,DISPLAY_CORRIDORS,mapRouteType,mount};
