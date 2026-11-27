@@ -75,9 +75,12 @@ function evaluate(input){
   if(schedule("Voyageur II fall day trip",i.depart,"outbound"))options.push({boat:"Voyageur II fall day trip",out:"8:00 AM CT",arrive:"Verify with operator",leave:"1:00 PM CT",back:"Verify with operator",adultFare:120.50,childFare:110.50,kind:"Special 2026 sailing — confirm exact timing"});
  } else {
   const candidates=i.destination==="Rock Harbor"?["Voyageur II"]:["Voyageur II","Sea Hunter III"];
-  for(const boat of candidates){
-   if(schedule(boat,i.depart,"outbound")&&schedule(boat,i.returnDate,"inbound"))
-    options.push({boat,out:boat==="Voyageur II"?"7:30 AM CT":"8:30 AM CT",arrive:i.destination==="Rock Harbor"?"3:00 PM CT (Rock Harbor)":(boat==="Voyageur II"?"9:30 AM CT":"10:00 AM CT"),leave:i.destination==="Rock Harbor"?"8:00 AM CT (Rock Harbor)":boat==="Voyageur II"?"1:00 PM CT":"2:00 PM CT",back:boat==="Voyageur II"?"3:00 PM CT":"3:30 PM CT",adultFare:221,childFare:201,kind:"Two scheduled one-way legs; separate bookings required"});
+  for(const outboundBoat of candidates){
+   for(const inboundBoat of candidates){
+    if(year===2026&&outboundBoat!==inboundBoat)continue;
+    if(schedule(outboundBoat,i.depart,"outbound")&&schedule(inboundBoat,i.returnDate,"inbound"))
+     options.push({boat:outboundBoat===inboundBoat?outboundBoat:outboundBoat+" out / "+inboundBoat+" return",out:outboundBoat==="Voyageur II"?"7:30 AM CT":"8:30 AM CT",arrive:i.destination==="Rock Harbor"?"3:00 PM CT (Rock Harbor)":(outboundBoat==="Voyageur II"?"9:30 AM CT":"10:00 AM CT"),leave:i.destination==="Rock Harbor"?"8:00 AM CT (Rock Harbor)":inboundBoat==="Voyageur II"?"1:00 PM CT":"2:00 PM CT",back:inboundBoat==="Voyageur II"?"3:00 PM CT":"3:30 PM CT",adultFare:221,childFare:201,kind:"Two scheduled one-way legs; confirm both together"});
+   }
   }
  }
  if(!options.length)return {...base,state:"NO_TIMETABLE_MATCH",headline:"No matching "+year+" published sailing pattern",detail:"The selected dates do not match a published outbound/return pair for this itinerary. This does not tell us whether any seats are available."};
