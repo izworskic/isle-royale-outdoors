@@ -1,4 +1,4 @@
-/* Grand Portage ferry planner. Published 2027 timetable; 2026 archival fares and timetable; NO live inventory. */
+/* Grand Portage ferry planner. Published 2027 timetable; 2027 published fares; 2026 archival fares and timetable; NO live inventory. */
 (function(root,factory){ const api=factory(); if(typeof module!=="undefined"&&module.exports)module.exports=api; if(root)root.GrandPortageFerry=api; })(typeof window!=="undefined"?window:null,function(){
 "use strict";
 const SOURCES=Object.freeze({
@@ -71,20 +71,20 @@ function evaluate(input){
  if(i.trip==="overnight"&&i.depart===i.returnDate)return {...base,state:"OVERNIGHT_DATE_MISMATCH",headline:"Choose a later return date",detail:"An overnight trip requires at least one night on the island."};
  let options=[];
  if(i.trip==="day"&&i.destination==="Windigo"){
-  if(schedule("Sea Hunter III",i.depart,"outbound"))options.push({boat:"Sea Hunter III",out:"8:30 AM CT",arrive:"10:00 AM CT",leave:"2:00 PM CT",back:"3:30 PM CT",adultFare:120.50,childFare:110.50,kind:"Historical timetable match — not seat availability"});
-  if(schedule("Voyageur II fall day trip",i.depart,"outbound"))options.push({boat:"Voyageur II fall day trip",out:"8:00 AM CT",arrive:"Verify with operator",leave:"1:00 PM CT",back:"Verify with operator",adultFare:120.50,childFare:110.50,kind:"Special 2026 sailing — confirm exact timing"});
+  if(schedule("Sea Hunter III",i.depart,"outbound"))options.push({boat:"Sea Hunter III",out:"8:30 AM CT",arrive:"10:00 AM CT",leave:"2:00 PM CT",back:"3:30 PM CT",adultFare:year===2027?128.50:120.50,childFare:year===2027?118.50:110.50,kind:"Historical timetable match — not seat availability"});
+  if(schedule("Voyageur II fall day trip",i.depart,"outbound"))options.push({boat:"Voyageur II fall day trip",out:"8:00 AM CT",arrive:"Verify with operator",leave:"1:00 PM CT",back:"Verify with operator",adultFare:year===2027?128.50:120.50,childFare:year===2027?118.50:110.50,kind:"Special 2026 sailing — confirm exact timing"});
  } else {
   const candidates=i.destination==="Rock Harbor"?["Voyageur II"]:["Voyageur II","Sea Hunter III"];
   for(const outboundBoat of candidates){
    for(const inboundBoat of candidates){
     if(year===2026&&outboundBoat!==inboundBoat)continue;
     if(schedule(outboundBoat,i.depart,"outbound")&&schedule(inboundBoat,i.returnDate,"inbound"))
-     options.push({boat:outboundBoat===inboundBoat?outboundBoat:outboundBoat+" out / "+inboundBoat+" return",out:outboundBoat==="Voyageur II"?"7:30 AM CT":"8:30 AM CT",arrive:i.destination==="Rock Harbor"?"3:00 PM CT (Rock Harbor)":(outboundBoat==="Voyageur II"?"9:30 AM CT":"10:00 AM CT"),leave:i.destination==="Rock Harbor"?"8:00 AM CT (Rock Harbor)":inboundBoat==="Voyageur II"?"1:00 PM CT":"2:00 PM CT",back:inboundBoat==="Voyageur II"?"3:00 PM CT":"3:30 PM CT",adultFare:221,childFare:201,kind:"Two scheduled one-way legs; confirm both together"});
+     options.push({boat:outboundBoat===inboundBoat?outboundBoat:outboundBoat+" out / "+inboundBoat+" return",out:outboundBoat==="Voyageur II"?"7:30 AM CT":"8:30 AM CT",arrive:i.destination==="Rock Harbor"?"3:00 PM CT (Rock Harbor)":(outboundBoat==="Voyageur II"?"9:30 AM CT":"10:00 AM CT"),leave:i.destination==="Rock Harbor"?"8:00 AM CT (Rock Harbor)":inboundBoat==="Voyageur II"?"1:00 PM CT":"2:00 PM CT",back:inboundBoat==="Voyageur II"?"3:00 PM CT":"3:30 PM CT",adultFare:year===2027?237:221,childFare:year===2027?217:201,kind:"Two scheduled one-way legs; confirm both together"});
    }
   }
  }
  if(!options.length)return {...base,state:"NO_TIMETABLE_MATCH",headline:"No matching "+year+" published sailing pattern",detail:"The selected dates do not match a published outbound/return pair for this itinerary. This does not tell us whether any seats are available."};
- if(year===2027)return {...base,state:"PUBLISHED_MATCH",headline:"Matches the published 2027 timetable",detail:"Scheduled service only; fares, reservations and seat availability are not verified.",options:options.map(({adultFare,childFare,kind,...o})=>({...o,kind:"Published timetable match; no live inventory"})),notes:["All boat times are Central Time; Isle Royale is one hour ahead.","Confirm both legs with the operator together. Optional docks require advance arrangements.","2027 fares and park costs are not quoted."]};
+ if(year===2027)return {...base,state:"PUBLISHED_MATCH",headline:"Matches the published 2027 timetable",detail:"Published timetable and base fares; reservations and seat availability are not verified.",options:options.map(o=>({...o,ferryTotal:+(o.adultFare*adult+o.childFare*child).toFixed(2),kind:"Published base fare; no live inventory"})),notes:["All boat times are Central Time; Isle Royale is one hour ahead.","Confirm both legs with the operator together. Optional docks require advance arrangements.","2027 base ferry fares exclude booking fees, park costs, parking, gear and other charges. Verify the final operator price."]};
  const countDays=daysInclusive(i.depart,i.returnDate);
  const passCoveredAdults=i.pass?Math.min(4,adult):0;
  const chargedAdults=adult-passCoveredAdults;
